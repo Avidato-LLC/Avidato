@@ -1,31 +1,8 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 220 15% 15%;      /* darker text */
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
-    --primary: 218 88% 36%;         /* richer brand blue */
-    --secondary: 210 40% 96%;
-    --border: 216 30% 90%;          /* distinct border */
-  }
-  .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-    --primary: 211 72% 55%;
-    --secondary: 224 71% 10%;
-    --border: 0 0% 20%;
-  }
-
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-}
+/* Test with minimal CSS to see if basic Tailwind dark mode works */
 
 @layer utilities {
   .animation-delay-2000 { animation-delay: 2s; }

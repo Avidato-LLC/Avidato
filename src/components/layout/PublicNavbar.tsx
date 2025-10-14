@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image"; // Import the Next.js Image component for optimization
+import { useSession } from "next-auth/react";
 
 const PublicNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
@@ -55,18 +57,29 @@ const PublicNavbar: React.FC = () => {
           {/* === Right: Auth Buttons & Hamburger === */}
           <div className="flex items-center space-x-4">
             {/* Desktop Auth Buttons */}
-            <Link
-              href="/login"
-              className="hidden sm:inline-block text-sm font-semibold hover:text-gray-600 transition-colors"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors"
-            >
-              Sign Up
-            </Link>
+            {session ? (
+              <Link
+                href="/dashboard"
+                className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="hidden sm:inline-block text-sm font-semibold hover:text-gray-600 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
 
             {/* Mobile Hamburger Button */}
             <button
@@ -110,20 +123,32 @@ const PublicNavbar: React.FC = () => {
               </Link>
             ))}
             <hr className="my-2 border-gray-200" />
-            <Link
-              href="/login"
-              onClick={() => setIsMenuOpen(false)}
-              className="block px-3 py-2 rounded-md font-medium hover:bg-gray-100 transition-colors"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              onClick={() => setIsMenuOpen(false)}
-              className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors text-center"
-            >
-              Sign Up
-            </Link>
+            {session ? (
+              <Link
+                href="/dashboard"
+                onClick={() => setIsMenuOpen(false)}
+                className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors text-center"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block px-3 py-2 rounded-md font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors text-center"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}

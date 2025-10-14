@@ -1,0 +1,101 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// --- AUTH MODELS (for Next-Auth) ---
+// These are required for Next-Auth's Prisma Adapter to manage logins and sessions.
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// --- APPLICATION MODELS ---
+
+model User {
+  id            String    @id @default(cuid()) // This is your 'uid'
+  username      String?   // Not unique anymore - can be duplicate
+  name          String?   // This is the display name from the form
+  email         String    @unique // Only email is unique
+  emailVerified DateTime?
+  image         String?   // This can store the profile photo URL
+  password      String?   // For credentials authentication
+
+  // Usage and Subscription details
+  dailyGenerationCount Int      @default(0)
+  lastGenerationDate   DateTime?
+  dailyLimit           Int      @default(10)
+
+  // Next-Auth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Application relations
+  students Student[]
+}
+
+model Student {
+  id             String @id @default(cuid())
+  name           String
+  targetLanguage String
+  nativeLanguage String
+  ageGroup       String
+  level          String
+  endGoals       String   @db.Text
+  occupation     String?
+  weaknesses     String?  @db.Text // Combining the weaknesses map into a single flexible text field
+  interests      String?  @db.Text
+  archived       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relation: Each student belongs to one User (the Tutor)
+  tutorId String
+  tutor   User   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+
+  // Relation: A student can have many Lessons
+  lessons Lesson[]
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  title     String
+  overview  String?  // <-- ADD THIS LINE to store the plan overview
+  isRefined Boolean  @default(false)
+  content   Json // IMPORTANT: Storing the flexible 'exercises' array as a JSON object
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation: Each lesson belongs to one Student
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}

@@ -3,14 +3,14 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export default function ClientThemeProvider({
+export default function DashboardThemeProvider({
   children,
 }: { children: React.ReactNode }) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system" // Allow system preference by default
-      enableSystem={true} // Enable auto switching based on system preference  
+      defaultTheme="system"
+      enableSystem={true}
       disableTransitionOnChange
     >
       {children}

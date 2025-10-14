@@ -110,6 +110,7 @@ Folder structure
 PROGRESS.md
 README.md
 eslint.config.mjs
+folder_structure.txt
 issues.txt
 next.config.ts
 package-lock.json
@@ -118,8 +119,12 @@ postcss.config.mjs
 public/file.svg
 public/globe.svg
     public/images/tutor-hero.png
+public/logo.svg
+public/name.svg
 public/next.svg
 public/vercel.svg
+public/white-logo.svg
+public/white-name.svg
 public/window.svg
     src/app/favicon.ico
     src/app/globals.css
@@ -130,6 +135,7 @@ public/window.svg
         src/components/icons/AddIcon.tsx
         src/components/icons/ArrowForwardIcon.tsx
         src/components/icons/AutoAwesomeIcon.tsx
+        src/components/icons/AvidatoLogo.tsx
         src/components/icons/CheckCircleIcon.tsx
         src/components/icons/FactCheckIcon.tsx
         src/components/icons/ManageAccountsIcon.tsx
