@@ -34,12 +34,14 @@ const PublicNavbar: React.FC = () => {
   ];
 
   return (
-    <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-border text-foreground">
+    // Set base text color to black for the entire header
+    <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-border text-black">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* === Left: Logo === */}
           <Link href="/" className="flex items-center gap-2">
-            <AppIcon className="w-8 h-8 text-primary" />
+            {/* Changed icon color to black */}
+            <AppIcon className="w-8 h-8 text-black" />
             <span className="text-xl font-bold">Avidato</span>
           </Link>
 
@@ -49,7 +51,8 @@ const PublicNavbar: React.FC = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="hover:text-primary transition-colors"
+                // Changed hover to a subtle gray for contrast
+                className="hover:text-gray-600 transition-colors"
               >
                 {link.label}
               </Link>
@@ -61,37 +64,39 @@ const PublicNavbar: React.FC = () => {
             {/* Desktop Auth Buttons */}
             <Link
               href="/login"
-              className="hidden sm:inline text-sm font-semibold hover:text-primary transition-colors"
+              className="hidden sm:inline-block text-sm font-semibold hover:text-gray-600 transition-colors"
             >
               Log In
             </Link>
             <Link
               href="/signup"
-              className="hidden sm:inline px-4 py-2 text-sm font-semibold rounded-full text-white bg-primary hover:opacity-90 transition-colors"
+              // Updated to an outline button style
+              className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors"
             >
               Sign Up
             </Link>
 
-            {/* Mobile Hamburger */}
+            {/* Mobile Hamburger Button */}
             <button
               type="button"
               onClick={toggleMenu}
-              className="md:hidden flex flex-col justify-center items-center space-y-1 focus:outline-none"
+              className="md:hidden flex h-8 w-8 flex-col justify-center items-center gap-1.5 focus:outline-none"
               aria-label="Toggle menu"
             >
+              {/* Changed hamburger bars to black */}
               <span
-                className={`block w-5 h-0.5 bg-foreground transition-transform ${
-                  isMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                className={`block w-5 h-0.5 bg-black transition-transform duration-300 ease-in-out ${
+                  isMenuOpen ? "rotate-45 translate-y-2" : ""
                 }`}
               />
               <span
-                className={`block w-5 h-0.5 bg-foreground transition-opacity ${
+                className={`block w-5 h-0.5 bg-black transition-opacity duration-300 ease-in-out ${
                   isMenuOpen ? "opacity-0" : "opacity-100"
                 }`}
               />
               <span
-                className={`block w-5 h-0.5 bg-foreground transition-transform ${
-                  isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                className={`block w-5 h-0.5 bg-black transition-transform duration-300 ease-in-out ${
+                  isMenuOpen ? "-rotate-45 -translate-y-2" : ""
                 }`}
               />
             </button>
@@ -102,7 +107,7 @@ const PublicNavbar: React.FC = () => {
       {/* === Mobile Dropdown Menu === */}
       {isMenuOpen && (
         <div className="md:hidden bg-background border-t border-border shadow-xl">
-          <nav className="flex flex-col px-4 py-3 space-y-2 text-sm">
+          <nav className="flex flex-col px-4 py-4 space-y-2 text-sm">
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -124,7 +129,8 @@ const PublicNavbar: React.FC = () => {
             <Link
               href="/signup"
               onClick={() => setIsMenuOpen(false)}
-              className="block px-3 py-2 rounded-md font-semibold text-white bg-primary text-center hover:opacity-90 transition-colors"
+              // Matched mobile Sign Up button to new outline style
+              className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors text-center"
             >
               Sign Up
             </Link>

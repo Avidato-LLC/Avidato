@@ -9,8 +9,9 @@ export default function ClientThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="light" // ⬅️ Force light theme by default
+      forcedTheme="light" // ⬅️ Hardcode theme to light (ignores system preference)
+      enableSystem={false} // ⬅️ Disable auto switching
       disableTransitionOnChange
     >
       {children}

@@ -1,0 +1,35 @@
+.gitignore
+PROGRESS.md
+README.md
+eslint.config.mjs
+issues.txt
+next.config.ts
+package-lock.json
+package.json
+postcss.config.mjs
+public/file.svg
+public/globe.svg
+    public/images/tutor-hero.png
+public/next.svg
+public/vercel.svg
+public/window.svg
+    src/app/favicon.ico
+    src/app/globals.css
+    src/app/layout.tsx
+    src/app/page.tsx
+    src/components/ClientThemeProvider.tsx
+    src/components/ThemeProvider.tsx
+        src/components/icons/AddIcon.tsx
+        src/components/icons/ArrowForwardIcon.tsx
+        src/components/icons/AutoAwesomeIcon.tsx
+        src/components/icons/CheckCircleIcon.tsx
+        src/components/icons/FactCheckIcon.tsx
+        src/components/icons/ManageAccountsIcon.tsx
+        src/components/icons/RuleIcon.tsx
+        src/components/icons/SchemaIcon.tsx
+        src/components/icons/ShareIcon.tsx
+        src/components/icons/TaskAltIcon.tsx
+        src/components/layout/PublicFooter.tsx
+        src/components/layout/PublicNavbar.tsx
+tailwind.config.ts
+tsconfig.json
