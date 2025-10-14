@@ -31,7 +31,7 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -212,7 +212,7 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-brand-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isLoading ? 'Creating account...' : 'Create account'}
               </button>
@@ -244,7 +244,7 @@ export default function SignupPage() {
             <div className="text-center">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Already have an account?{' '}
-                <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                <Link href="/login" className="font-medium text-brand-primary hover:text-brand-accent dark:text-brand-secondary dark:hover:text-brand-primary">
                   Sign in here
                 </Link>
               </p>

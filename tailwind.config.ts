@@ -9,6 +9,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        brand: {
+          primary: '#3d74b5',    // Medium Blue
+          secondary: '#5ebbc8',  // Light Teal/Cyan  
+          dark: '#252e48',       // Dark Navy/Charcoal
+          accent: '#467bab',     // Lighter Blue
+        },
+      },
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
       },

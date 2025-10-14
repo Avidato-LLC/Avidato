@@ -26,10 +26,10 @@ import AddIcon from '@/components/icons/AddIcon';
 // --- Page-Specific Data ---
 // It's good practice to keep data separate from the component logic.
 const features = [
-  { icon: <AutoAwesomeIcon className="h-8 w-8 text-blue-500" />, title: "AI Course Outlines", description: "Instantly generate a 10-lesson course outline based on your student's proficiency level and learning goals." },
-  { icon: <FactCheckIcon className="h-8 w-8 text-green-500" />, title: "Detailed Lesson Plans", description: "Go from outline to a complete, structured lesson plan with warm-ups, activities, and vocabulary in a single click." },
-  { icon: <ManageAccountsIcon className="h-8 w-8 text-purple-500" />, title: "Simple Student Hub", description: "Keep all your student notes, progress, and generated lesson plans organized in one central dashboard." },
-  { icon: <ShareIcon className="h-8 w-8 text-orange-500" />, title: "Shareable Links", description: "Send a read-only link of the lesson plan to your student. No login required for them to view the materials." },
+  { icon: <AutoAwesomeIcon className="h-8 w-8 text-brand-primary" />, title: "AI Course Outlines", description: "Instantly generate a 10-lesson course outline based on your student's proficiency level and learning goals." },
+  { icon: <FactCheckIcon className="h-8 w-8 text-brand-secondary" />, title: "Detailed Lesson Plans", description: "Go from outline to a complete, structured lesson plan with warm-ups, activities, and vocabulary in a single click." },
+  { icon: <ManageAccountsIcon className="h-8 w-8 text-brand-accent" />, title: "Simple Student Hub", description: "Keep all your student notes, progress, and generated lesson plans organized in one central dashboard." },
+  { icon: <ShareIcon className="h-8 w-8 text-brand-dark" />, title: "Shareable Links", description: "Send a read-only link of the lesson plan to your student. No login required for them to view the materials." },
 ];
 
 const methodologies = [
@@ -82,13 +82,13 @@ const LandingPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-12 items-center">
               <div className="text-center lg:text-left">
                 <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-4 min-h-[120px] md:min-h-[150px]">
-                  <span className="text-blue-600">{text}</span>
-                  <Cursor cursorColor="#2563eb" />
+                  <span className="text-brand-primary">{text}</span>
+                  <Cursor cursorColor="#3d74b5" />
                 </h1>
                 <p className="text-lg text-gray-600 max-w-lg mx-auto lg:mx-0 mb-8">
                   Your AI assistant for creating tailored language lesson plans in minutes, not hours. Reclaim your time and focus on what you do best.
                 </p>
-                <Link href="/signup" className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors">
+                <Link href="/signup" className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-brand-primary rounded-full hover:bg-brand-accent transition-colors">
                     Get Started for Free
                     <ArrowForwardIcon className="w-5 h-5 ml-2" />
                 </Link>
@@ -104,14 +104,14 @@ const LandingPage: React.FC = () => {
         <section id="features" className="py-20 md:py-28 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <p className="text-sm font-semibold text-blue-600 uppercase tracking-wider">Why You'll Love It</p>
+              <p className="text-sm font-semibold text-brand-primary uppercase tracking-wider">Why You'll Love It</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mt-2">
                   A Smarter Way to Prepare Lessons
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {features.map((feature, index) => (
-                <div key={index} className="text-center p-6 border border-gray-200 rounded-xl hover:shadow-lg hover:border-blue-300 transition-all duration-300">
+                <div key={index} className="text-center p-6 border border-gray-200 rounded-xl hover:shadow-lg hover:border-brand-primary transition-all duration-300">
                   <div className="flex justify-center mb-4">{feature.icon}</div>
                   <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                   <p className="text-sm text-gray-500">{feature.description}</p>
@@ -126,13 +126,13 @@ const LandingPage: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="text-center lg:text-left">
-                <p className="text-sm font-semibold text-blue-600 uppercase tracking-wider">SEE IT IN ACTION</p>
+                <p className="text-sm font-semibold text-brand-primary uppercase tracking-wider">SEE IT IN ACTION</p>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mt-2 mb-6">From Idea to Lesson in 3 Clicks</h2>
                 <p className="text-base text-gray-600 mb-8">Our intuitive workflow takes the guesswork out of planning. Simply define your student's needs, and let our AI handle the heavy lifting.</p>
                 <ul className="space-y-4">
-                  <li className="flex items-start"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold mr-4">1</span><span><strong className="font-semibold">Add Student:</strong> Enter your student's goals and proficiency level.</span></li>
-                  <li className="flex items-start"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold mr-4">2</span><span><strong className="font-semibold">Generate Outline:</strong> Get a 10-lesson course structure in seconds.</span></li>
-                  <li className="flex items-start"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white font-bold mr-4">3</span><span><strong className="font-semibold">Create Lesson:</strong> Generate a detailed, activity-packed plan.</span></li>
+                  <li className="flex items-start"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-primary text-white font-bold mr-4">1</span><span><strong className="font-semibold">Add Student:</strong> Enter your student's goals and proficiency level.</span></li>
+                  <li className="flex items-start"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-primary text-white font-bold mr-4">2</span><span><strong className="font-semibold">Generate Outline:</strong> Get a 10-lesson course structure in seconds.</span></li>
+                  <li className="flex items-start"><span className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-primary text-white font-bold mr-4">3</span><span><strong className="font-semibold">Create Lesson:</strong> Generate a detailed, activity-packed plan.</span></li>
                 </ul>
               </div>
               <div className="relative h-96 flex items-center justify-center">
@@ -147,7 +147,7 @@ const LandingPage: React.FC = () => {
                     </div>
                 </div>
                 <div className="absolute top-10 left-0 w-24 h-12 flex items-center justify-center rounded-lg -rotate-12 bg-white shadow-lg"><p className="text-xs">Student: Alex</p></div>
-                <div className="absolute bottom-10 right-0 w-16 h-16 flex items-center justify-center rounded-full bg-blue-500 text-white rotate-12 shadow-lg"><AutoAwesomeIcon className="w-8 h-8"/></div>
+                <div className="absolute bottom-10 right-0 w-16 h-16 flex items-center justify-center rounded-full bg-brand-primary text-white rotate-12 shadow-lg"><AutoAwesomeIcon className="w-8 h-8"/></div>
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ const LandingPage: React.FC = () => {
         <section id="pedagogy" className="py-20 md:py-28 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <p className="text-sm font-semibold text-blue-600 uppercase tracking-wider">Built on Proven Pedagogy</p>
+              <p className="text-sm font-semibold text-brand-primary uppercase tracking-wider">Built on Proven Pedagogy</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mt-2">Grounded in Teaching Science</h2>
               <p className="mt-4 max-w-3xl mx-auto text-gray-600 text-lg">
                 Our AI doesn't just write content; it structures lessons using methodologies you know and trust, ensuring effective and engaging learning experiences.
@@ -166,7 +166,7 @@ const LandingPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
               <div className="flex flex-col space-y-2 lg:col-span-1">
                 {methodologies.map((method) => (
-                  <button key={method.id} onClick={() => setActiveMethod(method.id)} className={`p-4 justify-start text-left transition-all duration-200 rounded-xl ${activeMethod === method.id ? 'bg-blue-600 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
+                  <button key={method.id} onClick={() => setActiveMethod(method.id)} className={`p-4 justify-start text-left transition-all duration-200 rounded-xl ${activeMethod === method.id ? 'bg-brand-primary text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}>
                     <span className="font-bold">{method.title}</span>
                   </button>
                 ))}
@@ -174,7 +174,7 @@ const LandingPage: React.FC = () => {
               <div className="lg:col-span-2">
                 <div key={activeMethod} className="p-8 rounded-xl border border-gray-200 animate-fade-in bg-white">
                   <div className="flex flex-row space-x-3 items-center">
-                    <div className="flex-shrink-0 w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary">
                       {currentMethod?.icon}
                     </div>
                     <div><h3 className="text-xl font-bold text-gray-900">{currentMethod?.title}</h3></div>
@@ -203,16 +203,16 @@ const LandingPage: React.FC = () => {
               {pricingPlans.map((plan, index) => {
                 const isHighlighted = hoveredCardIndex === index;
                 return (
-                  <div key={plan.title} onMouseEnter={() => setHoveredCardIndex(index)} onMouseLeave={() => setHoveredCardIndex(1)} className={`p-8 rounded-xl flex flex-col h-full relative transition-all duration-300 ${isHighlighted ? 'bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-2xl transform scale-105' : 'bg-white text-gray-900 border border-gray-200'}`}>
-                    {plan.isPopular && isHighlighted && (<div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-semibold shadow-md">Most Popular</div>)}
+                  <div key={plan.title} onMouseEnter={() => setHoveredCardIndex(index)} onMouseLeave={() => setHoveredCardIndex(1)} className={`p-8 rounded-xl flex flex-col h-full relative transition-all duration-300 ${isHighlighted ? 'bg-gradient-to-br from-brand-primary to-brand-accent text-white shadow-2xl transform scale-105' : 'bg-white text-gray-900 border border-gray-200'}`}>
+                    {plan.isPopular && isHighlighted && (<div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-white text-brand-primary px-3 py-1 rounded-full text-sm font-semibold shadow-md">Most Popular</div>)}
                     <h3 className="text-xl font-bold">{plan.title}</h3>
                     <p className={`mt-2 min-h-[48px] ${isHighlighted ? 'opacity-90' : 'text-gray-500'}`}>{plan.description}</p>
                     <div className="mt-6 text-4xl font-extrabold">${pricingTier === 'monthly' ? plan.price.monthly : plan.price.annual}{plan.price.monthly > 0 && <span className={`text-lg font-normal ${isHighlighted ? 'opacity-70' : 'text-gray-500'}`}> / month</span>}</div>
                     <div className="flex-grow" />
-                    <Link href="/signup" className={`block w-full text-center mt-8 py-2.5 rounded-md font-semibold transition-colors ${isHighlighted ? 'bg-white text-blue-600 hover:bg-gray-100' : 'border border-blue-500 text-blue-500 hover:bg-blue-50'}`}>{plan.buttonText}</Link>
+                    <Link href="/signup" className={`block w-full text-center mt-8 py-2.5 rounded-md font-semibold transition-colors ${isHighlighted ? 'bg-white text-brand-primary hover:bg-gray-100' : 'border border-brand-primary text-brand-primary hover:bg-brand-primary/5'}`}>{plan.buttonText}</Link>
                     <ul className="mt-8 space-y-4 text-left text-sm">
                       {plan.features.map((feature, fIndex) => (<li key={fIndex} className="flex items-start">
-                        <CheckCircleIcon className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${isHighlighted ? 'text-white' : 'text-green-500'}`} />
+                        <CheckCircleIcon className={`w-5 h-5 mr-3 mt-0.5 flex-shrink-0 ${isHighlighted ? 'text-white' : 'text-brand-secondary'}`} />
                         <span dangerouslySetInnerHTML={{ __html: feature }} />
                       </li>))}
                     </ul>
@@ -226,7 +226,7 @@ const LandingPage: React.FC = () => {
         <section id="faq" className="py-20 md:py-28 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <p className="text-sm font-semibold text-blue-600 uppercase tracking-wider">ANSWERS TO YOUR QUESTIONS</p>
+              <p className="text-sm font-semibold text-brand-primary uppercase tracking-wider">ANSWERS TO YOUR QUESTIONS</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mt-2">Frequently Asked Questions</h2>
             </div>
             <div className="max-w-3xl mx-auto">
@@ -234,8 +234,8 @@ const LandingPage: React.FC = () => {
                 {faqData.map((faq) => (
                   <div key={faq.id} className={`border border-gray-200 rounded-xl transition-all ${expandedFaq === faq.id ? 'bg-white shadow-lg' : 'bg-transparent'}`}>
                     <button onClick={() => setExpandedFaq(expandedFaq === faq.id ? false : faq.id)} className="w-full flex justify-between items-center text-left p-4">
-                      <h3 className={`font-semibold text-lg ${expandedFaq === faq.id ? 'text-blue-600' : 'text-gray-800'}`}>{faq.question}</h3>
-                      <AddIcon className={`w-6 h-6 text-blue-500 transition-transform ${expandedFaq === faq.id ? 'rotate-45' : ''}`} />
+                      <h3 className={`font-semibold text-lg ${expandedFaq === faq.id ? 'text-brand-primary' : 'text-gray-800'}`}>{faq.question}</h3>
+                      <AddIcon className={`w-6 h-6 text-brand-primary transition-transform ${expandedFaq === faq.id ? 'rotate-45' : ''}`} />
                     </button>
                     {expandedFaq === faq.id && (
                       <div className="p-4 pt-0 animate-fade-in">
@@ -254,7 +254,7 @@ const LandingPage: React.FC = () => {
           <div className="container mx-auto px-4 max-w-md">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-6">Ready to Cut Your Prep Time in Half?</h2>
             <p className="text-lg text-gray-600 max-w-xl mx-auto mb-8">Join today and experience the future of lesson planning. The first 5 lesson plans are on us.</p>
-            <Link href="/signup" className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors">
+            <Link href="/signup" className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-brand-primary rounded-full hover:bg-brand-accent transition-colors">
                 Start Generating Lessons
                 <ArrowForwardIcon className="w-5 h-5 ml-2" />
             </Link>
