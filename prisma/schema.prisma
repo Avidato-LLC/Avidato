@@ -49,6 +49,7 @@ model User {
   emailVerified DateTime?
   image         String?   // This can store the profile photo URL
   password      String?   // For credentials authentication
+  bio           String?   @db.Text // Tutor bio/description
 
   // Usage and Subscription details
   dailyGenerationCount Int      @default(0)
