@@ -147,7 +147,7 @@ function ProfileTab() {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: session?.user?.name || '',
-    email: session?.user?.email || '',
+    email: session?.user?.email || '', // Read-only, for display only
     username: '', // Will be loaded from database
     bio: ''
   })
@@ -158,7 +158,13 @@ function ProfileTab() {
     
     try {
       // TODO: Implement profile update server action
-      console.log('Profile update:', formData)
+      // Only send updatable fields (exclude email for security)
+      const updateData = {
+        name: formData.name,
+        username: formData.username,
+        bio: formData.bio
+      }
+      console.log('Profile update:', updateData)
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -192,7 +198,7 @@ function ProfileTab() {
           />
         </div>
 
-        {/* Email */}
+        {/* Email (Read-only) */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Email Address
@@ -201,10 +207,13 @@ function ProfileTab() {
             type="email"
             id="email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            readOnly
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             placeholder="Enter your email address"
           />
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Email cannot be changed for security reasons. Contact support if needed.
+          </p>
         </div>
 
         {/* Username */}
