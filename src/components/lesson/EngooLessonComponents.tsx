@@ -34,33 +34,40 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
     <div className="space-y-6">
       {vocabulary.map((item, index) => (
         <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
-          <div className="flex gap-6 max-w-4xl">
-            {/* Left side - Word and Part of Speech */}
-            <div className="flex-shrink-0 w-48 min-w-[180px] max-w-[200px]">
-              <div className="text-lg font-semibold text-blue-600 dark:text-blue-400 break-words leading-tight mb-2">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 max-w-4xl">
+            {/* Word section - full width on mobile, left side on desktop */}
+            <div className="lg:flex-shrink-0 lg:w-48 lg:min-w-[180px] lg:max-w-[200px]">
+              <div className="text-xl lg:text-lg font-semibold text-blue-600 dark:text-blue-400 break-words leading-tight mb-2">
                 {item.word}
               </div>
-              <div className="mb-2">
+              <div className="flex items-center gap-3 mb-3 lg:mb-2">
                 <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded font-medium">
                   {item.partOfSpeech}
                 </span>
+                {/* Audio icon */}
+                <div className="text-gray-400 dark:text-gray-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6h4a1 1 0 001-1v-4a1 1 0 00-1-1H9z" />
+                  </svg>
+                </div>
               </div>
-              {/* Audio icon placeholder */}
-              <div className="text-gray-400 dark:text-gray-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6h4a1 1 0 001-1v-4a1 1 0 00-1-1H9z" />
-                </svg>
+              {/* Phonetics - show on mobile too */}
+              <div className="lg:hidden mb-3">
+                <span className="text-orange-600 dark:text-orange-400 font-mono text-sm break-all">
+                  {item.phonetics}
+                </span>
               </div>
             </div>
             
-            {/* Right side - Phonetics, Definition, Example */}
+            {/* Definition and example section */}
             <div className="flex-1 min-w-0">
-              {/* Phonetics and Definition on same line */}
+              {/* Phonetics and Definition */}
               <div className="mb-3">
-                <span className="text-orange-600 dark:text-orange-400 font-mono text-sm mr-3 break-all">
+                {/* Phonetics only show on desktop */}
+                <span className="hidden lg:inline text-orange-600 dark:text-orange-400 font-mono text-sm mr-3 break-all">
                   {item.phonetics}
                 </span>
-                <span className="text-gray-700 dark:text-gray-300 text-sm break-words">
+                <span className="text-gray-700 dark:text-gray-300 text-sm lg:text-sm break-words">
                   <span dangerouslySetInnerHTML={{ 
                     __html: item.definition.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
                   }} />
@@ -269,7 +276,16 @@ export function ComprehensionExercise({
   const isCorrect = (questionIndex: number, selectedAnswer: string) => {
     const question = questions[questionIndex]
     if (question.type === 'multiple-choice' && question.answer) {
-      return selectedAnswer === question.answer
+      // Handle both cases: answer as letter ("A") and answer as full option ("A) Option text")
+      const correctAnswer = question.answer
+      
+      // If the answer is just a letter (A, B, C, etc.), match it with the option that starts with that letter
+      if (correctAnswer.length === 1 && /^[A-Z]$/.test(correctAnswer)) {
+        return selectedAnswer.startsWith(correctAnswer + ')')
+      }
+      
+      // Otherwise, do exact match
+      return selectedAnswer === correctAnswer
     }
     return false
   }
