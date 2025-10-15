@@ -48,70 +48,67 @@ export async function getDashboardStats(): Promise<DashboardResponse> {
     const userId = session.user.id
 
     try {
-      // Get student count for this user with timeout protection
-      const studentCount = await Promise.race([
-        prisma.student.count({
-          where: {
-            tutorId: userId,
-            archived: false // Only count active students
+      // Use a single transaction for all queries to improve performance
+      const result = await Promise.race([
+        prisma.$transaction(async (tx) => {
+          // Run all queries in parallel within the transaction
+          const [studentCount, lessonCount, recentStudents] = await Promise.all([
+            tx.student.count({
+              where: {
+                tutorId: userId,
+                archived: false
+              }
+            }),
+            tx.lesson.count({
+              where: {
+                student: {
+                  tutorId: userId,
+                  archived: false
+                }
+              }
+            }),
+            tx.student.findMany({
+              where: {
+                tutorId: userId,
+                archived: false
+              },
+              select: {
+                id: true,
+                name: true,
+                targetLanguage: true,
+                level: true,
+                createdAt: true
+              },
+              orderBy: {
+                createdAt: 'desc'
+              },
+              take: 5
+            })
+          ])
+
+          return {
+            studentCount,
+            lessonCount,
+            recentStudents
           }
         }),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 5000)
+          setTimeout(() => reject(new Error('Database timeout')), 3000)
         )
-      ]) as number
-
-      // Get lesson count for this user (across all their students)
-      const lessonCount = await Promise.race([
-        prisma.lesson.count({
-          where: {
-            student: {
-              tutorId: userId,
-              archived: false
-            }
-          }
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 5000)
-        )
-      ]) as number
-
-      // Get recent students (last 5 created) with timeout protection
-      const recentStudents = await Promise.race([
-        prisma.student.findMany({
-          where: {
-            tutorId: userId,
-            archived: false
-          },
-          select: {
-            id: true,
-            name: true,
-            targetLanguage: true,
-            level: true,
-            createdAt: true
-          },
-          orderBy: {
-            createdAt: 'desc'
-          },
-          take: 5
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 5000)
-        )
-      ]) as Array<{
-        id: string
-        name: string
-        targetLanguage: string
-        level: string
-        createdAt: Date
-      }>
+      ])
 
       return {
         success: true,
-        data: {
-          studentCount,
-          lessonCount,
-          recentStudents
+        data: result as {
+          studentCount: number
+          lessonCount: number
+          recentStudents: Array<{
+            id: string
+            name: string
+            targetLanguage: string
+            level: string
+            createdAt: Date
+          }>
         }
       }
 

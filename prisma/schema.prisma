@@ -1,17 +1,12 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
-// --- AUTH MODELS (for Next-Auth) ---
-// These are required for Next-Auth's Prisma Adapter to manage logins and sessions.
 
 model Account {
   id                String  @id @default(cuid())
@@ -19,12 +14,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -39,79 +34,62 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// --- APPLICATION MODELS ---
-
 model User {
-  id            String    @id @default(cuid()) // This is your 'uid'
-  username      String?   // Not unique anymore - can be duplicate
-  name          String?   // This is the display name from the form
-  email         String    @unique // Only email is unique
-  emailVerified DateTime?
-  image         String?   // This can store the profile photo URL
-  password      String?   // For credentials authentication
-  bio           String?   @db.Text // Tutor bio/description
-
-  // Usage and Subscription details
-  dailyGenerationCount Int      @default(0)
+  id                   String    @id @default(cuid())
+  username             String?
+  name                 String?
+  email                String    @unique
+  emailVerified        DateTime?
+  image                String?
+  password             String?
+  dailyGenerationCount Int       @default(0)
   lastGenerationDate   DateTime?
-  dailyLimit           Int      @default(10)
-
-  // Next-Auth relations
-  accounts Account[]
-  sessions Session[]
-
-  // Application relations
-  students Student[]
+  dailyLimit           Int       @default(10)
+  bio                  String?
+  accounts             Account[]
+  sessions             Session[]
+  students             Student[]
 }
 
 model Student {
-  id             String @id @default(cuid())
+  id             String         @id @default(cuid())
   name           String
   targetLanguage String
   nativeLanguage String
-  ageGroup       String // child, teen, adult
-  level          String // beginner, intermediate, advanced
-  endGoals       String   @db.Text // specific goals like "business presentations", "customer service", "travel English"
-  occupation     String? // helps determine lesson context (business, academic, casual)
-  weaknesses     String?  @db.Text // grammar, pronunciation, vocabulary, speaking confidence, etc.
-  interests      String?  @db.Text // helps personalize content
-  
-  archived       Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  // Relation: Each student belongs to one User (the Tutor)
-  tutorId String
-  tutor   User   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-
-  // Relation: A student can have many Lessons and Learning Plans
-  lessons Lesson[]
-  learningPlans LearningPlan[]
+  ageGroup       String
+  level          String
+  endGoals       String
+  occupation     String?
+  weaknesses     String?
+  interests      String?
+  archived       Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  tutorId        String
+  learningPlans  LearningPlan[]
+  lessons        Lesson[]
+  tutor          User           @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 }
 
 model LearningPlan {
-  id                     String   @id @default(cuid())
-  selectedMethodology    String   // CLT, TBLT, PPP, TTT
-  methodologyReasoning   String   @db.Text
-  topics                 Json     // Array of learning topics
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-
-  // Relation: Each learning plan belongs to one Student
-  studentId String
-  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(cuid())
+  selectedMethodology  String
+  methodologyReasoning String
+  topics               Json
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  studentId            String
+  student              Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
   id        String   @id @default(cuid())
   title     String
-  overview  String?  @db.Text // Brief lesson description
+  overview  String?
   isRefined Boolean  @default(false)
-  content   Json     // Flexible JSON structure for different lesson formats
+  content   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Relation: Each lesson belongs to one Student  
   studentId String
-  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

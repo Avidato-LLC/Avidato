@@ -330,32 +330,34 @@ export default function LessonPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Loading State */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">Loading lesson...</p>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading lesson...</p>
+            </div>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 sm:p-6">
+            <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
 
         {/* Lesson Content */}
         {!loading && !error && lesson && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Header with Back Button */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
               <Link
                 href={`/dashboard/students/${lesson.student.id}`}
-                className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 text-sm sm:text-base"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to {lesson.student.name}
@@ -364,7 +366,7 @@ export default function LessonPage() {
               <Link
                 href={`/lessons/${lessonId}/share`}
                 target="_blank"
-                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
@@ -374,15 +376,15 @@ export default function LessonPage() {
             </div>
 
             {/* Lesson Header */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
+              <div className="mb-4 sm:mb-6">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                   {lesson.content.title}
                 </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
                   {lesson.content.objective}
                 </p>
-                <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div className="flex items-center space-x-2">
                     <span className="font-medium text-gray-500 dark:text-gray-400">Student:</span>
                     <span className="text-gray-900 dark:text-white">{lesson.student.name}</span>
@@ -405,12 +407,12 @@ export default function LessonPage() {
               </div>
 
               {/* Lesson Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Skills Practiced</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Skills Practiced</h3>
                   <div className="flex flex-wrap gap-2">
                     {lesson.content.skills.map((skill) => (
-                      <span key={skill} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-sm">
+                      <span key={skill} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-xs sm:text-sm">
                         {skill}
                       </span>
                     ))}
@@ -418,7 +420,7 @@ export default function LessonPage() {
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Key Vocabulary</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Key Vocabulary</h3>
                   <div className="flex flex-wrap gap-2">
                     {lesson.content.vocabulary.slice(0, 6).map((word, index) => {
                       // Handle both string vocabulary and object vocabulary
@@ -426,13 +428,13 @@ export default function LessonPage() {
                       const key = typeof word === 'string' ? word : `vocab-${index}`;
                       
                       return (
-                        <span key={key} className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 rounded text-sm">
+                        <span key={key} className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 rounded text-xs sm:text-sm">
                           {displayWord}
                         </span>
                       );
                     })}
                     {lesson.content.vocabulary.length > 6 && (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-sm">
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs sm:text-sm">
                         +{lesson.content.vocabulary.length - 6} more
                       </span>
                     )}
@@ -440,43 +442,43 @@ export default function LessonPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Context</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Context</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     {lesson.content.context}
                   </p>
                   <div className="mt-2">
-                    <span className="font-medium text-gray-500 dark:text-gray-400 text-sm">Difficulty: </span>
-                    <span className="text-sm text-gray-900 dark:text-white">{lesson.content.difficulty}/10</span>
+                    <span className="font-medium text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Difficulty: </span>
+                    <span className="text-xs sm:text-sm text-gray-900 dark:text-white">{lesson.content.difficulty}/10</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Lesson Exercises */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {lesson.content.exercises.map((exercise, index) => (
-                <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-brand-primary text-white rounded-full flex items-center justify-center">
+                <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+                  <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
                         {getExerciseIcon(exercise.type)}
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
                           {exercise.title}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                           {getExerciseTitle(exercise.type)} • {exercise.timeMinutes} minutes
                         </p>
                       </div>
                     </div>
                   </div>
                   
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 sm:mb-4">
                     {exercise.description}
                   </p>
                   
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 overflow-x-auto">
                     {renderExerciseContent(exercise)}
                   </div>
                 </div>
@@ -487,22 +489,22 @@ export default function LessonPage() {
 
         {/* No Lesson Found */}
         {!loading && !lesson && !error && (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-8 sm:py-12 px-4">
+            <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253z" />
             </svg>
-            <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
+            <h3 className="mt-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
               Lesson not found
             </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
               The lesson you&apos;re looking for doesn&apos;t exist or you don&apos;t have permission to view it.
             </p>
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <Link
                 href="/dashboard/students"
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-brand-accent"
+                className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-brand-accent"
               >
-                <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="-ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Students

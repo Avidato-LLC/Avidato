@@ -82,57 +82,75 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <ManageAccountsIcon className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Settings
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Manage your account settings and preferences
-              </p>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="space-y-4 sm:space-y-6">
+          {/* Header */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <ManageAccountsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                  Settings
+                </h1>
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
+                  Manage your account settings and preferences
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Tabs Navigation */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          {/* Tab Headers */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <div className="flex overflow-x-auto">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'border-primary text-primary bg-primary/5'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-                  }`}
+          {/* Tabs Navigation */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            {/* Tab Headers */}
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              {/* Mobile Tab Dropdown */}
+              <div className="block sm:hidden px-4 py-4">
+                <select 
+                  value={activeTab}
+                  onChange={(e) => setActiveTab(e.target.value as SettingsTab)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 >
-                  {tab.icon}
-                  <span>{tab.label}</span>
-                </button>
-              ))}
+                  {tabs.map((tab) => (
+                    <option key={tab.id} value={tab.id}>
+                      {tab.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Desktop Tab Navigation */}
+              <div className="hidden sm:flex overflow-x-auto scrollbar-hide">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'border-primary text-primary bg-primary/5'
+                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Tab Content */}
-          <div className="p-6">
-            {/* Tab Description */}
-            <div className="mb-6">
-              <p className="text-gray-600 dark:text-gray-400">
-                {tabs.find(tab => tab.id === activeTab)?.description}
-              </p>
+            {/* Tab Content */}
+            <div className="p-4 sm:p-6">
+              {/* Tab Description */}
+              <div className="mb-4 sm:mb-6">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                  {tabs.find(tab => tab.id === activeTab)?.description}
+                </p>
+              </div>
+
+              {/* Active Tab Content */}
+              {renderTabContent()}
             </div>
-
-            {/* Active Tab Content */}
-            {renderTabContent()}
           </div>
         </div>
       </div>
@@ -233,10 +251,10 @@ function ProfileTab() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       {/* Success/Error Messages */}
       {message && (
-        <div className={`p-4 rounded-lg ${
+        <div className={`p-3 sm:p-4 rounded-lg text-sm sm:text-base ${
           message.type === 'success' 
             ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800' 
             : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
@@ -245,10 +263,10 @@ function ProfileTab() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Display Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Display Name
           </label>
           <input
@@ -256,18 +274,18 @@ function ProfileTab() {
             id="name"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             placeholder="Enter your display name"
             required
           />
           {errors.name && (
-            <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.name[0]}</p>
+            <p className="text-red-600 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.name[0]}</p>
           )}
         </div>
 
         {/* Email (Read-only) */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Email Address
           </label>
           <input
@@ -275,17 +293,17 @@ function ProfileTab() {
             id="email"
             value={formData.email}
             readOnly
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+            className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
             placeholder="Enter your email address"
           />
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             Email cannot be changed for security reasons. Contact support if needed.
           </p>
         </div>
 
         {/* Username */}
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="username" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Username
           </label>
           <input
@@ -293,41 +311,41 @@ function ProfileTab() {
             id="username"
             value={formData.username}
             onChange={handleUsernameChange}
-            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+            className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
               errors.username ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
             }`}
             placeholder="Choose a unique username"
           />
           {errors.username && (
-            <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.username[0]}</p>
+            <p className="text-red-600 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.username[0]}</p>
           )}
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             Used for your profile URL and identification
           </p>
         </div>
 
         {/* Profile Picture */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <div className="lg:col-span-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Profile Picture
           </label>
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
               {session?.user?.image ? (
                 <Image 
                   src={session.user.image} 
                   alt="Profile" 
                   width={48}
                   height={48}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                 />
               ) : (
-                <ManageAccountsIcon className="w-6 h-6 text-gray-400" />
+                <ManageAccountsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
               )}
             </div>
             <button
               type="button"
-              className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="px-3 py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               Change Picture
             </button>
@@ -337,7 +355,7 @@ function ProfileTab() {
 
       {/* Bio */}
       <div>
-        <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="bio" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Bio
         </label>
         <textarea
@@ -345,15 +363,15 @@ function ProfileTab() {
           rows={4}
           value={formData.bio}
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none ${
+          className={`w-full px-3 py-2 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none ${
             errors.bio ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
           }`}
           placeholder="Tell us about yourself and your teaching experience..."
         />
         {errors.bio && (
-          <p className="text-red-600 dark:text-red-400 text-sm mt-1">{errors.bio[0]}</p>
+          <p className="text-red-600 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.bio[0]}</p>
         )}
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
           Brief description for your tutor profile (optional, max 500 characters)
         </p>
       </div>
@@ -363,14 +381,14 @@ function ProfileTab() {
         <button
           type="submit"
           disabled={isLoading}
-          className={`px-6 py-2 bg-primary text-white rounded-lg font-medium transition-colors ${
+          className={`px-4 sm:px-6 py-2 bg-primary text-white rounded-lg font-medium transition-colors text-sm sm:text-base w-full sm:w-auto ${
             isLoading 
               ? 'opacity-50 cursor-not-allowed' 
               : 'hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2'
           }`}
         >
           {isLoading ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center space-x-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               <span>Saving...</span>
             </div>
@@ -697,20 +715,245 @@ function SecurityTab() {
 
 /**
  * Account Linking Tab Component
- * Handles provider linking/unlinking
+ * Handles provider linking/unlinking and OAuth management
  */
 function AccountLinkingTab() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
+  const [securityInfo, setSecurityInfo] = useState<{
+    hasPassword: boolean
+    linkedAccounts: Array<{provider: string, type: string}>
+    emailVerified: boolean
+    email: string
+  } | null>(null)
+
+  // Load security info to get linked accounts
+  useEffect(() => {
+    async function loadAccountInfo() {
+      try {
+        const result = await getSecurityInfo()
+        if (result.success && result.data) {
+          setSecurityInfo(result.data)
+        }
+      } catch (error) {
+        console.error('Failed to load account info:', error)
+      }
+    }
+    loadAccountInfo()
+  }, [])
+
+  // Available OAuth providers
+  const availableProviders = [
+    {
+      id: 'google',
+      name: 'Google',
+      description: 'Link your Google account for easy sign-in',
+      icon: '🔍',
+      color: 'bg-red-500',
+      textColor: 'text-red-700',
+      bgLight: 'bg-red-50 dark:bg-red-900/20',
+      borderColor: 'border-red-200 dark:border-red-800'
+    },
+    {
+      id: 'github',
+      name: 'GitHub',
+      description: 'Connect your GitHub account',
+      icon: '⚡',
+      color: 'bg-gray-800',
+      textColor: 'text-gray-700',
+      bgLight: 'bg-gray-50 dark:bg-gray-900/20',
+      borderColor: 'border-gray-200 dark:border-gray-800'
+    },
+    {
+      id: 'microsoft',
+      name: 'Microsoft',
+      description: 'Link your Microsoft/Outlook account',
+      icon: '🔷',
+      color: 'bg-blue-500',
+      textColor: 'text-blue-700',
+      bgLight: 'bg-blue-50 dark:bg-blue-900/20',
+      borderColor: 'border-blue-200 dark:border-blue-800'
+    }
+  ]
+
+  const isProviderLinked = (providerId: string) => {
+    return securityInfo?.linkedAccounts.some(account => account.provider === providerId) || false
+  }
+
+  const handleLinkAccount = async (providerId: string) => {
+    setIsLoading(true)
+    setMessage(null)
+
+    try {
+      // Redirect to NextAuth provider sign-in
+      const baseUrl = window.location.origin
+      const callbackUrl = `${baseUrl}/dashboard/settings?tab=account-linking&linked=${providerId}`
+      window.location.href = `/api/auth/signin/${providerId}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to initiate account linking' })
+      setIsLoading(false)
+    }
+  }
+
+  const handleUnlinkAccount = async (providerId: string) => {
+    setIsLoading(true)
+    setMessage(null)
+
+    try {
+      // TODO: Implement account unlinking
+      // This would require a server action to remove the account record
+      console.log('Unlinking provider:', providerId)
+      setMessage({ 
+        type: 'error', 
+        text: 'Account unlinking feature coming soon. Please contact support for assistance.' 
+      })
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to unlink account' })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-          </svg>
+    <div className="space-y-8">
+      {/* Success/Error Messages */}
+      {message && (
+        <div className={`p-4 rounded-lg ${
+          message.type === 'success' 
+            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
+            : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
+        }`}>
+          <div className="flex">
+            <div className="flex-shrink-0">
+              {message.type === 'success' ? (
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium">{message.text}</p>
+            </div>
+          </div>
         </div>
-        <h3 className="text-lg font-medium mb-2">Account Linking</h3>
-        <p>Connect and manage your authentication providers...</p>
+      )}
+
+      {/* Account Linking Overview */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Account Linking</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Connect social accounts for easier sign-in and enhanced security
+            </p>
+          </div>
+        </div>
+
+        {/* Current Status */}
+        {securityInfo && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Current Status</h4>
+            <p className="text-sm text-blue-800 dark:text-blue-300">
+              You have <strong>{securityInfo.linkedAccounts.length}</strong> account(s) connected.
+              {securityInfo.linkedAccounts.length === 0 && " Consider linking a social account for backup access."}
+              {securityInfo.linkedAccounts.length > 0 && " You can sign in using any of your connected accounts."}
+            </p>
+          </div>
+        )}
+
+        {/* Available Providers */}
+        <div className="space-y-4">
+          {availableProviders.map(provider => {
+            const isLinked = isProviderLinked(provider.id)
+            
+            return (
+              <div key={provider.id} className={`border rounded-lg p-4 transition-colors ${
+                isLinked 
+                  ? `${provider.bgLight} ${provider.borderColor}` 
+                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white ${provider.color}`}>
+                      <span className="text-lg">{provider.icon}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">{provider.name}</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{provider.description}</p>
+                      {isLinked && (
+                        <div className="flex items-center space-x-1 mt-1">
+                          <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-sm font-medium text-green-600 dark:text-green-400">Connected</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    {isLinked ? (
+                      <button
+                        onClick={() => handleUnlinkAccount(provider.id)}
+                        disabled={isLoading}
+                        className={`px-4 py-2 text-sm font-medium border rounded-lg transition-colors ${
+                          isLoading
+                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed border-gray-300 dark:border-gray-600'
+                            : 'text-red-700 dark:text-red-300 border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                        }`}
+                      >
+                        {isLoading ? 'Processing...' : 'Disconnect'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleLinkAccount(provider.id)}
+                        disabled={isLoading}
+                        className={`px-4 py-2 text-sm font-medium border rounded-lg transition-colors ${
+                          isLoading
+                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed border-gray-300 dark:border-gray-600'
+                            : `${provider.textColor} dark:text-gray-300 ${provider.borderColor} hover:${provider.bgLight}`
+                        }`}
+                      >
+                        {isLoading ? 'Connecting...' : 'Connect'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Security Information */}
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-3">Security Information</h3>
+        <ul className="space-y-2 text-sm text-yellow-800 dark:text-yellow-300">
+          <li className="flex items-start space-x-2">
+            <span className="font-bold">•</span>
+            <span>Linking multiple accounts provides backup access options</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <span className="font-bold">•</span>
+            <span>You can sign in with any connected account using the same email</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <span className="font-bold">•</span>
+            <span>Disconnecting accounts will not affect your existing data</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <span className="font-bold">•</span>
+            <span>Keep at least one authentication method (password or linked account)</span>
+          </li>
+        </ul>
       </div>
     </div>
   )

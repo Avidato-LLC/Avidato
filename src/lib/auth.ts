@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth"
+import type { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
@@ -10,7 +10,7 @@ const prisma = new PrismaClient()
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "database",
+    strategy: "jwt", // Changed from database to jwt for better reliability
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   debug: false, // Clean production configuration
@@ -84,13 +84,26 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async session({ session, user }: { session: any; user: any }) {
-      if (user && session.user) {
-        session.user.id = user.id
-        session.user.username = user.username
-        session.user.dailyGenerationCount = user.dailyGenerationCount
-        session.user.dailyLimit = user.dailyLimit
-        session.user.lastGenerationDate = user.lastGenerationDate
+    async jwt({ token, user }: { token: any; user: any }) {
+      // When user signs in, add user data to token
+      if (user) {
+        token.id = user.id
+        token.username = user.username
+        token.dailyGenerationCount = user.dailyGenerationCount
+        token.dailyLimit = user.dailyLimit
+        token.lastGenerationDate = user.lastGenerationDate
+      }
+      return token
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, token }: { session: any; token: any }) {
+      // Send user data from token to session
+      if (token && session.user) {
+        session.user.id = token.id
+        session.user.username = token.username
+        session.user.dailyGenerationCount = token.dailyGenerationCount
+        session.user.dailyLimit = token.dailyLimit
+        session.user.lastGenerationDate = token.lastGenerationDate
       }
       return session
     },
@@ -104,7 +117,6 @@ export const authOptions: NextAuthOptions = {
       }
       return true
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
       if (url.includes('/login?callbackUrl=')) {
         const callbackUrl = new URL(url).searchParams.get('callbackUrl')

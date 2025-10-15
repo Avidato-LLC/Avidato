@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { signIn, getSession, useSession, signOut } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -65,14 +65,29 @@ export default function LoginPage() {
         redirect: false,
       })
 
+      console.log('Login result:', result)
+
       if (result?.error) {
         setError('Invalid email or password')
+        console.log('Login error:', result.error)
+      } else if (result?.ok) {
+        // Wait a moment for session to be established
+        setTimeout(async () => {
+          const session = await getSession()
+          console.log('Session after login:', session)
+          
+          if (session) {
+            const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+            router.push(callbackUrl)
+          } else {
+            setError('Session not established. Please try again.')
+          }
+        }, 500)
       } else {
-        // Refresh the session and redirect
-        await getSession()
-        router.push('/dashboard')
+        setError('Login failed. Please try again.')
       }
-    } catch {
+    } catch (error) {
+      console.error('Login catch error:', error)
       setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
@@ -206,5 +221,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   )
 }

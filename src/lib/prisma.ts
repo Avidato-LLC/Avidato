@@ -21,10 +21,10 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
       url: process.env.DATABASE_URL,
     },
   },
-  // Add connection timeout settings
+  // Optimized connection settings for Supabase
   transactionOptions: {
-    maxWait: 5000, // 5 seconds
-    timeout: 10000, // 10 seconds
+    maxWait: 3000, // 3 seconds - shorter wait time
+    timeout: 8000, // 8 seconds - shorter timeout
   },
 })
 

@@ -134,10 +134,10 @@ export default function AddStudentPage() {
       <div className="min-h-full bg-gray-50 dark:bg-gray-900">
         {/* Page Header */}
         <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                   Add New Student
                 </h1>
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -148,7 +148,7 @@ export default function AddStudentPage() {
               {/* Back Button */}
               <button
                 onClick={() => router.back()}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                className="inline-flex items-center justify-center px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors w-full sm:w-auto"
               >
                 <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -160,20 +160,20 @@ export default function AddStudentPage() {
         </div>
 
         {/* Form Content */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* General Error Display */}
               {errors.general && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <p className="text-red-600 dark:text-red-400">{errors.general}</p>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4">
+                  <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{errors.general}</p>
                 </div>
               )}
 
               {/* Basic Information Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Student Name */}
-                <div>
+                <div className="lg:col-span-1">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Student Name *
                   </label>
@@ -183,16 +183,16 @@ export default function AddStudentPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
                       errors.name ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     placeholder="Enter student's full name"
                   />
-                  {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+                  {errors.name && <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
                 </div>
 
                 {/* Target Language */}
-                <div>
+                <div className="lg:col-span-1">
                   <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Target Language *
                   </label>
@@ -201,7 +201,7 @@ export default function AddStudentPage() {
                     name="targetLanguage"
                     value={formData.targetLanguage}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
                       errors.targetLanguage ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
@@ -212,11 +212,11 @@ export default function AddStudentPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.targetLanguage && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.targetLanguage}</p>}
+                  {errors.targetLanguage && <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">{errors.targetLanguage}</p>}
                 </div>
 
                 {/* Native Language */}
-                <div>
+                <div className="lg:col-span-1">
                   <label htmlFor="nativeLanguage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Native Language *
                   </label>
@@ -225,7 +225,7 @@ export default function AddStudentPage() {
                     name="nativeLanguage"
                     value={formData.nativeLanguage}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
                       errors.nativeLanguage ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
@@ -236,11 +236,11 @@ export default function AddStudentPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.nativeLanguage && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nativeLanguage}</p>}
+                  {errors.nativeLanguage && <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">{errors.nativeLanguage}</p>}
                 </div>
 
                 {/* Age Group */}
-                <div>
+                <div className="lg:col-span-1">
                   <label htmlFor="ageGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Age Group *
                   </label>
@@ -249,7 +249,7 @@ export default function AddStudentPage() {
                     name="ageGroup"
                     value={formData.ageGroup}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
                       errors.ageGroup ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
@@ -260,11 +260,11 @@ export default function AddStudentPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.ageGroup && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.ageGroup}</p>}
+                  {errors.ageGroup && <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">{errors.ageGroup}</p>}
                 </div>
 
                 {/* Language Level */}
-                <div>
+                <div className="lg:col-span-1">
                   <label htmlFor="level" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Current Level *
                   </label>
@@ -273,7 +273,7 @@ export default function AddStudentPage() {
                     name="level"
                     value={formData.level}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
                       errors.level ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
@@ -284,11 +284,11 @@ export default function AddStudentPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.level && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.level}</p>}
+                  {errors.level && <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">{errors.level}</p>}
                 </div>
 
                 {/* Occupation */}
-                <div>
+                <div className="lg:col-span-1">
                   <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Occupation <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
                   </label>
@@ -298,7 +298,7 @@ export default function AddStudentPage() {
                     name="occupation"
                     value={formData.occupation}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white transition-colors"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white transition-colors"
                     placeholder="e.g., Student, Engineer, Teacher"
                   />
                 </div>
@@ -315,12 +315,12 @@ export default function AddStudentPage() {
                   value={formData.endGoals}
                   onChange={handleChange}
                   rows={4}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors ${
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors resize-y ${
                     errors.endGoals ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="What does the student want to achieve? (e.g., business communication, travel, academic studies, certification exam)"
                 />
-                {errors.endGoals && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.endGoals}</p>}
+                {errors.endGoals && <p className="mt-1 text-xs sm:text-sm text-red-600 dark:text-red-400">{errors.endGoals}</p>}
               </div>
 
               {/* Areas for Improvement */}
@@ -334,7 +334,7 @@ export default function AddStudentPage() {
                   value={formData.weaknesses}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white transition-colors resize-y"
                   placeholder="What areas need the most work? (e.g., pronunciation, grammar, vocabulary, speaking confidence)"
                 />
               </div>
@@ -350,24 +350,24 @@ export default function AddStudentPage() {
                   value={formData.interests}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white transition-colors resize-y"
                   placeholder="What topics and activities interest the student? This helps personalize lesson content."
                 />
               </div>
 
               {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-brand-primary text-white rounded-lg hover:bg-brand-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center order-1 sm:order-2"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center space-x-2">

@@ -234,23 +234,23 @@ export default function StudentsPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               Students
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Manage your student profiles and track their progress
             </p>
           </div>
           
           <Link
             href="/dashboard/students/add"
-            className="mt-4 sm:mt-0 inline-flex items-center gap-2 bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors"
+            className="mt-4 sm:mt-0 inline-flex items-center justify-center gap-2 bg-brand-primary text-white px-4 py-2 sm:py-2 rounded-lg hover:bg-brand-accent transition-colors text-sm sm:text-base w-full sm:w-auto"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Add Student
@@ -258,12 +258,12 @@ export default function StudentsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-8">
+            <nav className="-mb-px flex space-x-4 sm:space-x-8 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('active')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === 'active'
                     ? 'border-brand-primary text-brand-primary'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
@@ -273,7 +273,7 @@ export default function StudentsPage() {
               </button>
               <button
                 onClick={() => setActiveTab('archived')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === 'archived'
                     ? 'border-brand-primary text-brand-primary'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
@@ -286,10 +286,10 @@ export default function StudentsPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Search */}
-            <div className="lg:col-span-1">
+            <div className="sm:col-span-2 lg:col-span-1">
               <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Search Students
               </label>
@@ -299,7 +299,7 @@ export default function StudentsPage() {
                 placeholder="Search by name, goals, occupation..."
                 value={filters.search || ''}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
               />
             </div>
 
@@ -312,7 +312,7 @@ export default function StudentsPage() {
                 id="targetLanguage"
                 value={filters.targetLanguage || ''}
                 onChange={(e) => handleFilterChange('targetLanguage', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Languages</option>
                 {languages.map((lang) => (
@@ -332,7 +332,7 @@ export default function StudentsPage() {
                 id="level"
                 value={filters.level || ''}
                 onChange={(e) => handleFilterChange('level', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Levels</option>
                 {levels.map((level) => (
@@ -352,7 +352,7 @@ export default function StudentsPage() {
                 id="ageGroup"
                 value={filters.ageGroup || ''}
                 onChange={(e) => handleFilterChange('ageGroup', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary dark:bg-gray-700 dark:text-white"
               >
                 <option value="">All Ages</option>
                 {ageGroups.map((group) => (
@@ -366,7 +366,7 @@ export default function StudentsPage() {
 
           {/* Clear Filters */}
           {(filters.search || filters.targetLanguage || filters.level || filters.ageGroup) && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={clearFilters}
                 className="text-sm text-brand-primary hover:text-brand-accent"
@@ -379,46 +379,46 @@ export default function StudentsPage() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
 
         {/* Students Count */}
         {!loading && !error && (
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               {students.length} {activeTab} student{students.length !== 1 ? 's' : ''} found
             </p>
           </div>
         )}
 
-        {/* Students Table */}
+        {/* Students Content */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           {loading ? (
-            <div className="p-6">
-              <div className="animate-pulse space-y-4">
+            <div className="p-4 sm:p-6">
+              <div className="animate-pulse space-y-3 sm:space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/6"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/6"></div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/12"></div>
+                  <div key={i} className="flex items-center space-x-3 sm:space-x-4">
+                    <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/6"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/6"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/12"></div>
                   </div>
                 ))}
               </div>
             </div>
           ) : students.length === 0 ? (
             /* Empty State */
-            <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="text-center py-8 sm:py-12 px-4">
+              <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               </svg>
-              <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
+              <h3 className="mt-2 text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
                 No {activeTab} students found
               </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
                 {filters.search || filters.targetLanguage || filters.level || filters.ageGroup
                   ? 'Try adjusting your filters to see more results.'
                   : activeTab === 'active' 
@@ -426,12 +426,12 @@ export default function StudentsPage() {
                     : 'No archived students yet.'}
               </p>
               {activeTab === 'active' && (
-                <div className="mt-6">
+                <div className="mt-4 sm:mt-6">
                   <Link
                     href="/dashboard/students/add"
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-brand-accent"
+                    className="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-primary hover:bg-brand-accent"
                   >
-                    <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="-ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Add Student
@@ -440,9 +440,86 @@ export default function StudentsPage() {
               )}
             </div>
           ) : (
-            /* Students Table */
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <>
+              {/* Mobile Card View */}
+              <div className="block lg:hidden">
+                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {students.map((student) => (
+                    <div key={student.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <Link 
+                            href={`/dashboard/students/${student.id}`}
+                            className="block hover:text-brand-primary transition-colors"
+                          >
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                              {student.name}
+                            </h3>
+                          </Link>
+                          <div className="mt-1 space-y-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-medium">{student.targetLanguage}</span> • {student.level}
+                            </p>
+                            {student.occupation && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                {student.occupation}
+                              </p>
+                            )}
+                            <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 space-x-4">
+                              <span>{student.lessonCount || 0} lessons</span>
+                              <span>Added {new Date(student.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Mobile Menu */}
+                        <div className="ml-3 relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setOpenMenuId(openMenuId === student.id ? null : student.id)
+                            }}
+                            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                            </svg>
+                          </button>
+                          
+                          {openMenuId === student.id && (
+                            <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
+                              <div className="py-1">
+                                <button
+                                  onClick={() => handleMenuAction('view', student.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                >
+                                  View Details
+                                </button>
+                                <button
+                                  onClick={() => handleMenuAction('archive', student.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                >
+                                  {activeTab === 'active' ? 'Archive' : 'Unarchive'}
+                                </button>
+                                <button
+                                  onClick={() => handleMenuAction('delete', student.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
                     <th 
@@ -597,8 +674,9 @@ export default function StudentsPage() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>

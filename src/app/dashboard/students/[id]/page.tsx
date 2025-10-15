@@ -333,14 +333,14 @@ export default function StudentProfilePage() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 lg:p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header with Back Button */}
-        <div className="flex items-center mb-8">
+        <div className="flex items-center mb-4 sm:mb-6 lg:mb-8">
           <Link
             href="/dashboard/students"
-            className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 mr-4"
+            className="inline-flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 mr-4 text-sm sm:text-base"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back to Students
@@ -349,56 +349,60 @@ export default function StudentProfilePage() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-red-600 dark:text-red-400">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+            <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {loading && (
-          <div className="text-center py-12">
+          <div className="text-center py-8 sm:py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">Loading student profile...</p>
+            <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading student profile...</p>
           </div>
         )}
 
         {/* Student Profile Content */}
         {!loading && !error && student && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Student Header */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-brand-primary to-brand-accent rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-xl">
-                    {student.name.charAt(0).toUpperCase()}
-                  </span>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <div className="flex items-center space-x-4 min-w-0 flex-1">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-brand-primary to-brand-accent rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-semibold text-lg sm:text-xl">
+                      {student.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">
+                      {student.name}
+                    </h1>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                      Learning {getLanguageLabel(student.targetLanguage)} • {getLevelLabel(student.level)}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {getAgeGroupLabel(student.ageGroup)} • Added {new Date(student.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {student.name}
-                  </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Learning {getLanguageLabel(student.targetLanguage)} • {getLevelLabel(student.level)}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {getAgeGroupLabel(student.ageGroup)} • Added {new Date(student.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex space-x-3">
-                  <div className="text-right">
+                
+                {/* Actions - Stack on mobile, inline on desktop */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                  <div className="text-center sm:text-right order-3 sm:order-1">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Generations: {generationStats.used}/{generationStats.limit}
                     </p>
                   </div>
                   <button 
                     onClick={() => setActiveTab('generate-lesson')}
-                    className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors"
+                    className="bg-brand-primary text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors text-sm sm:text-base order-1 sm:order-2"
                   >
                     Generate Lesson
                   </button>
                   <Link
                     href={`/dashboard/students/${studentId}/edit`}
-                    className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors inline-flex items-center"
+                    className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors inline-flex items-center justify-center text-sm sm:text-base order-2 sm:order-3"
                   >
                     Edit Profile
                   </Link>
@@ -409,120 +413,141 @@ export default function StudentProfilePage() {
             {/* Tab Navigation */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="border-b border-gray-200 dark:border-gray-700">
-                <nav className="-mb-px flex space-x-8 px-6">
+                {/* Mobile Tab Navigation - Dropdown Style */}
+                <div className="block sm:hidden px-4 sm:px-6 py-4">
+                  <select 
+                    value={activeTab}
+                    onChange={(e) => setActiveTab(e.target.value as TabType)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  >
+                    <option value="details">Student Details</option>
+                    <option value="learning-plan">Learning Plan</option>
+                    <option value="generate-lesson">Generate Lesson</option>
+                    <option value="generated-lessons">Generated Lessons</option>
+                    <option value="instant-lesson">Instant Lesson</option>
+                  </select>
+                </div>
+                
+                {/* Desktop Tab Navigation */}
+                <nav className="hidden sm:flex -mb-px space-x-4 lg:space-x-8 px-4 sm:px-6 overflow-x-auto scrollbar-hide">
                   <button
                     onClick={() => setActiveTab('details')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                       activeTab === 'details'
                         ? 'border-brand-primary text-brand-primary'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      <span>Student Details</span>
+                      <span className="hidden lg:inline">Student Details</span>
+                      <span className="lg:hidden">Details</span>
                     </div>
                   </button>
                   <button
                     onClick={() => setActiveTab('learning-plan')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                       activeTab === 'learning-plan'
                         ? 'border-brand-primary text-brand-primary'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                       </svg>
-                      <span>Learning Plan</span>
+                      <span className="hidden lg:inline">Learning Plan</span>
+                      <span className="lg:hidden">Plan</span>
                     </div>
                   </button>
                   <button
                     onClick={() => setActiveTab('generate-lesson')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                       activeTab === 'generate-lesson'
                         ? 'border-brand-primary text-brand-primary'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
                       </svg>
-                      <span>Generate Lesson</span>
+                      <span className="hidden lg:inline">Generate Lesson</span>
+                      <span className="lg:hidden">Generate</span>
                     </div>
                   </button>
                   <button
                     onClick={() => setActiveTab('generated-lessons')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                       activeTab === 'generated-lessons'
                         ? 'border-brand-primary text-brand-primary'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
                       </svg>
-                      <span>Generated Lessons</span>
+                      <span className="hidden lg:inline">Generated Lessons</span>
+                      <span className="lg:hidden">Lessons</span>
                     </div>
                   </button>
                   <button
                     onClick={() => setActiveTab('instant-lesson')}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                       activeTab === 'instant-lesson'
                         ? 'border-brand-primary text-brand-primary'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                     }`}
                   >
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      <span>Instant Lesson</span>
+                      <span className="hidden lg:inline">Instant Lesson</span>
+                      <span className="lg:hidden">Instant</span>
                     </div>
                   </button>
                 </nav>
               </div>
 
               {/* Tab Content */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {/* Student Details Tab */}
                 {activeTab === 'details' && (
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {/* Personal Information Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                       {/* Basic Info */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           Personal Information
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Target Language</label>
-                            <p className="text-gray-900 dark:text-white">{getLanguageLabel(student.targetLanguage)}</p>
+                            <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Target Language</label>
+                            <p className="text-sm sm:text-base text-gray-900 dark:text-white">{getLanguageLabel(student.targetLanguage)}</p>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Native Language</label>
-                            <p className="text-gray-900 dark:text-white">{getLanguageLabel(student.nativeLanguage)}</p>
+                            <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Native Language</label>
+                            <p className="text-sm sm:text-base text-gray-900 dark:text-white">{getLanguageLabel(student.nativeLanguage)}</p>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Current Level</label>
+                            <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Current Level</label>
                             <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-brand-primary/10 text-brand-primary">
                               {getLevelLabel(student.level)}
                             </span>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Age Group</label>
-                            <p className="text-gray-900 dark:text-white">{getAgeGroupLabel(student.ageGroup)}</p>
+                            <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Age Group</label>
+                            <p className="text-sm sm:text-base text-gray-900 dark:text-white">{getAgeGroupLabel(student.ageGroup)}</p>
                           </div>
                           {student.occupation && (
                             <div>
-                              <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Occupation</label>
-                              <p className="text-gray-900 dark:text-white">{student.occupation}</p>
+                              <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Occupation</label>
+                              <p className="text-sm sm:text-base text-gray-900 dark:text-white">{student.occupation}</p>
                             </div>
                           )}
                         </div>
@@ -530,28 +555,28 @@ export default function StudentProfilePage() {
 
                       {/* Learning Stats */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           Learning Progress
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-3 sm:space-y-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Lessons Generated</span>
-                            <span className="text-2xl font-bold text-brand-primary">{student.lessonCount || 0}</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Lessons Generated</span>
+                            <span className="text-xl sm:text-2xl font-bold text-brand-primary">{student.lessonCount || 0}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Profile Created</span>
-                            <span className="text-sm text-gray-900 dark:text-white">
+                            <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Profile Created</span>
+                            <span className="text-xs sm:text-sm text-gray-900 dark:text-white">
                               {new Date(student.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Last Updated</span>
-                            <span className="text-sm text-gray-900 dark:text-white">
+                            <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Last Updated</span>
+                            <span className="text-xs sm:text-sm text-gray-900 dark:text-white">
                               {new Date(student.updatedAt).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                               student.archived 
                                 ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -566,23 +591,23 @@ export default function StudentProfilePage() {
 
                     {/* Learning Goals */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                         Learning Goals
                       </h3>
-                      <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                      <p className="text-sm sm:text-base text-gray-900 dark:text-white whitespace-pre-wrap">
                         {student.endGoals}
                       </p>
                     </div>
 
                     {/* Additional Information */}
                     {(student.weaknesses || student.interests) && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                         {student.weaknesses && (
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                               Areas to Improve
                             </h3>
-                            <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                            <p className="text-sm sm:text-base text-gray-900 dark:text-white whitespace-pre-wrap">
                               {student.weaknesses}
                             </p>
                           </div>
@@ -590,10 +615,10 @@ export default function StudentProfilePage() {
                         
                         {student.interests && (
                           <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                               Interests & Hobbies
                             </h3>
-                            <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                            <p className="text-sm sm:text-base text-gray-900 dark:text-white whitespace-pre-wrap">
                               {student.interests}
                             </p>
                           </div>
@@ -605,13 +630,13 @@ export default function StudentProfilePage() {
 
                 {/* Learning Plan Tab */}
                 {activeTab === 'learning-plan' && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           Personalized Learning Plan
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                           {currentLearningPlan 
                             ? `AI-generated using ${currentLearningPlan.selectedMethodology} methodology`
                             : `10 topics tailored to ${student.name}'s goals and level`

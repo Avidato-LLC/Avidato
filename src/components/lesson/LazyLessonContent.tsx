@@ -1,6 +1,9 @@
 // src/components/lesson/LazyLessonContent.tsx
 import { Suspense, lazy } from 'react'
 
+// Import types
+import type { VocabularyItem, DialogueLine } from '@/types/lesson-template'
+
 // Lazy load heavy exercise components
 const VocabularyExercise = lazy(() => 
   import('./EngooLessonComponents').then(module => ({ 
@@ -44,13 +47,13 @@ export function LazyExerciseRenderer({
   return (
     <Suspense fallback={<ExerciseLoadingSkeleton />}>
       {exercise.type === 'vocabulary' && (
-        <VocabularyExercise vocabulary={content.vocabulary as any[]} />
+        <VocabularyExercise vocabulary={content.vocabulary as VocabularyItem[]} />
       )}
       {exercise.type === 'dialogue' && (
         <DialogueExercise 
           context=""
           characters={[]}
-          dialogue={content.dialogue as any[]}
+          dialogue={content.dialogue as DialogueLine[]}
         />
       )}
       {exercise.type === 'finalprep' && (
