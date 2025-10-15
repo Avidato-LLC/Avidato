@@ -282,6 +282,24 @@ export async function generateLesson(
       return { success: false, error: 'Student not found' };
     }
 
+    // Check if a lesson with similar title already exists
+    const existingLesson = await prisma.lesson.findFirst({
+      where: {
+        studentId: studentId,
+        OR: [
+          { title: { contains: lessonData.title, mode: 'insensitive' } },
+          { title: { contains: lessonData.title.split(':')[0], mode: 'insensitive' } }
+        ]
+      }
+    });
+
+    if (existingLesson) {
+      return { 
+        success: false, 
+        error: `A lesson about "${lessonData.title}" has already been generated for this student.` 
+      };
+    }
+
     // Convert to StudentProfile
     const studentProfile: StudentProfile = {
       name: student.name,
@@ -327,6 +345,91 @@ export async function generateLesson(
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to generate lesson' 
+    };
+  }
+}
+
+// Generate instant lesson based on user prompt
+export async function generateInstantLesson(
+  studentId: string,
+  prompt: string,
+  focus: 'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed' = 'mixed',
+  duration: 25 | 50 = 50
+): Promise<{
+  success: boolean;
+  data?: { lesson: GeneratedLesson; lessonId: string };
+  error?: string;
+}> {
+  try {
+    const session = await getServerSession(authOptions) as Session | null;
+    if (!session?.user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Check generation limit
+    const canGenerate = await checkAndUpdateGenerationLimit(session.user.id);
+    if (!canGenerate) {
+      return { success: false, error: 'Daily generation limit reached. Try again tomorrow.' };
+    }
+
+    // Get student data
+    const student = await prisma.student.findUnique({
+      where: { 
+        id: studentId,
+        tutorId: session.user.id,
+      },
+    });
+
+    if (!student) {
+      return { success: false, error: 'Student not found' };
+    }
+
+    // Convert to StudentProfile
+    const studentProfile: StudentProfile = {
+      name: student.name,
+      targetLanguage: student.targetLanguage,
+      nativeLanguage: student.nativeLanguage,
+      ageGroup: student.ageGroup,
+      level: student.level,
+      endGoals: student.endGoals,
+      occupation: student.occupation || undefined,
+      weaknesses: student.weaknesses || undefined,
+      interests: student.interests || undefined,
+    };
+
+    // Generate instant lesson
+    const generatedLesson = await geminiService.generateInstantLesson(
+      studentProfile,
+      prompt,
+      focus,
+      duration
+    );
+
+    // Store lesson in database
+    const savedLesson = await prisma.lesson.create({
+      data: {
+        title: generatedLesson.title,
+        overview: `${generatedLesson.objective} | Skills: ${generatedLesson.skills.join(', ')} | Type: ${generatedLesson.lessonType}`,
+        content: JSON.parse(JSON.stringify(generatedLesson)),
+        studentId: studentId,
+        isRefined: true,
+      },
+    });
+
+    revalidatePath(`/dashboard/students/${studentId}`);
+    return { 
+      success: true, 
+      data: { 
+        lesson: generatedLesson, 
+        lessonId: savedLesson.id 
+      } 
+    };
+
+  } catch (error) {
+    console.error('Error generating instant lesson:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to generate instant lesson' 
     };
   }
 }

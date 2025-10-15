@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getStudent } from '../../../actions/students'
-import { generateLearningPlan, generateLesson, getGenerationStats, getStudentLearningPlan } from '../../../actions/ai-generation'
+import { generateLearningPlan, generateLesson, generateInstantLesson, getGenerationStats, getStudentLearningPlan } from '../../../actions/ai-generation'
 import { languages, levels, ageGroups } from '@/lib/form-data-mappings'
 import { LearningPlan } from '@/lib/gemini'
 
@@ -52,7 +52,7 @@ interface StudentLesson {
   createdAt: Date
 }
 
-type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons'
+type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
 
 export default function StudentProfilePage() {
   const { data: session, status } = useSession()
@@ -72,6 +72,18 @@ export default function StudentProfilePage() {
   const [currentLearningPlan, setCurrentLearningPlan] = useState<LearningPlan | null>(null)
   const [lessons, setLessons] = useState<StudentLesson[]>([])
   const [loadingLessons, setLoadingLessons] = useState(false)
+  const [instantPrompt, setInstantPrompt] = useState('')
+  const [instantFocus, setInstantFocus] = useState<'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed'>('mixed')
+  const [instantDuration, setInstantDuration] = useState<25 | 50>(50)
+  const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
+
+  // Helper function to check if a lesson already exists for a topic
+  const isLessonGenerated = (topicTitle: string) => {
+    return lessons.some(lesson => 
+      lesson.title.toLowerCase().includes(topicTitle.toLowerCase()) ||
+      topicTitle.toLowerCase().includes(lesson.title.toLowerCase())
+    )
+  }
 
   // Fetch lessons for the student
   const fetchLessons = useCallback(async () => {
@@ -233,6 +245,37 @@ export default function StudentProfilePage() {
   const generateLearningTopics = (studentData: StudentData) => {
     // Remove demo data - topics will come from AI generation only
     setLearningTopics([])
+  }
+
+  // Handle instant lesson generation
+  const handleInstantLessonGenerate = async () => {
+    if (!instantPrompt.trim() || isGeneratingInstantLesson) return
+
+    setIsGeneratingInstantLesson(true)
+    try {
+      const result = await generateInstantLesson(
+        studentId,
+        instantPrompt.trim(),
+        instantFocus,
+        instantDuration
+      )
+      
+      if (result.success && result.data) {
+        // Refresh lessons list
+        await fetchLessons()
+        // Clear the form
+        setInstantPrompt('')
+        // Show success message or redirect to lesson
+        window.location.href = `/lessons/${result.data.lessonId}`
+      } else {
+        alert(result.error || 'Failed to generate instant lesson')
+      }
+    } catch (error) {
+      console.error('Error generating instant lesson:', error)
+      alert('Failed to generate instant lesson. Please try again.')
+    } finally {
+      setIsGeneratingInstantLesson(false)
+    }
   }
 
   // Redirect if not authenticated
@@ -425,6 +468,21 @@ export default function StudentProfilePage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
                       </svg>
                       <span>Generated Lessons</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('instant-lesson')}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'instant-lesson'
+                        ? 'border-brand-primary text-brand-primary'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span>Instant Lesson</span>
                     </div>
                   </button>
                 </nav>
@@ -657,7 +715,7 @@ export default function StudentProfilePage() {
                         Generate AI Lesson
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Select a topic from the learning plan to generate a detailed lesson
+                        Click on a topic below to see the &ldquo;Generate Lesson&rdquo; button appear directly underneath it
                       </p>
                       <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                         Generations remaining: {generationStats.remaining}/{generationStats.limit}
@@ -688,82 +746,103 @@ export default function StudentProfilePage() {
 
                     {learningTopics.length > 0 && (
                     <div className="grid grid-cols-1 gap-3">
-                      {learningTopics.map((topic, index) => (
-                        <div 
-                          key={topic.id} 
-                          className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                            selectedTopic === topic.id
-                              ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
-                          }`}
-                          onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                selectedTopic === topic.id
-                                  ? 'bg-brand-primary text-white'
-                                  : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
-                              }`}>
-                                {index + 1}
-                              </span>
-                              <div>
-                                <h4 className="font-medium text-gray-900 dark:text-white">
-                                  {topic.title}
-                                </h4>
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
-                                  {topic.description}
-                                </p>
+                      {learningTopics.map((topic, index) => {
+                        const isGenerated = isLessonGenerated(topic.title)
+                        const isSelected = selectedTopic === topic.id
+                        
+                        return (
+                        <div key={topic.id} className="space-y-3">
+                          <div 
+                            className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10'
+                                : isGenerated
+                                  ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10'
+                                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                            }`}
+                            onClick={() => {
+                              if (!isGenerated) {
+                                setSelectedTopic(selectedTopic === topic.id ? null : topic.id)
+                              }
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                                  isGenerated
+                                    ? 'bg-green-500 text-white'
+                                    : isSelected
+                                      ? 'bg-brand-primary text-white'
+                                      : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                                }`}>
+                                  {isGenerated ? '✓' : index + 1}
+                                </span>
+                                <div>
+                                  <h4 className={`font-medium ${isGenerated ? 'text-green-700 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
+                                    {topic.title}
+                                  </h4>
+                                  <p className={`text-sm ${isGenerated ? 'text-green-600 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'}`}>
+                                    {topic.description}
+                                  </p>
+                                  {isGenerated && (
+                                    <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-medium">
+                                      ✅ Lesson already generated
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(topic.difficulty)}`}>
+                                  {topic.difficulty}
+                                </span>
+                                {isSelected && !isGenerated && (
+                                  <svg className="w-5 h-5 text-brand-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                )}
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(topic.difficulty)}`}>
-                                {topic.difficulty}
-                              </span>
-                              {selectedTopic === topic.id && (
-                                <svg className="w-5 h-5 text-brand-primary" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
+                          </div>
+
+                          {/* Generate Lesson Button - appears directly below clicked topic */}
+                          {isSelected && !isGenerated && (
+                            <div className="ml-11 bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/20 rounded-lg p-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h5 className="text-sm font-medium text-gray-900 dark:text-white">
+                                    Ready to Generate Lesson
+                                  </h5>
+                                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                    {currentLearningPlan && `Using ${currentLearningPlan.selectedMethodology} methodology`}
+                                  </p>
+                                </div>
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleGenerateLesson();
+                                  }}
+                                  disabled={isGeneratingLesson || generationStats.remaining <= 0}
+                                  className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                >
+                                  {isGeneratingLesson && (
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                  )}
+                                  <span>{isGeneratingLesson ? 'Generating...' : 'Generate Lesson'}</span>
+                                </button>
+                              </div>
+                              {generationStats.remaining <= 0 && (
+                                <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                                  Daily generation limit reached. Please try again tomorrow.
+                                </p>
                               )}
                             </div>
-                          </div>
+                          )}
                         </div>
-                      ))}
+                        )
+                      })}
                     </div>
                     )}
 
-                    {selectedTopic && (
-                      <div className="bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/20 rounded-lg p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            Ready to Generate Lesson
-                          </h4>
-                          <button 
-                            onClick={handleGenerateLesson}
-                            disabled={isGeneratingLesson || generationStats.remaining <= 0}
-                            className="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                          >
-                            {isGeneratingLesson && (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            )}
-                            <span>{isGeneratingLesson ? 'Generating...' : 'Generate AI Lesson'}</span>
-                          </button>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Selected topic: <span className="font-medium">{learningTopics.find(t => t.id === selectedTopic)?.title}</span>
-                        </p>
-                        {currentLearningPlan && (
-                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                            Will use {currentLearningPlan.selectedMethodology} methodology for this lesson
-                          </p>
-                        )}
-                        {generationStats.remaining <= 0 && (
-                          <p className="text-xs text-red-600 dark:text-red-400 mt-2">
-                            Daily generation limit reached. Please try again tomorrow.
-                          </p>
-                        )}
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -861,6 +940,113 @@ export default function StudentProfilePage() {
                         ))}
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Instant Lesson Tab */}
+                {activeTab === 'instant-lesson' && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                          Instant Lesson Generator
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 mt-1">
+                          Generate a lesson instantly based on specific needs or situations
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="flex">
+                        <svg className="flex-shrink-0 w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="ml-3">
+                          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-400">
+                            Examples of instant lesson prompts:
+                          </h4>
+                          <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                            <ul className="list-disc list-inside space-y-1">
+                              <li>&quot;I have a job interview tomorrow&quot;</li>
+                              <li>&quot;I need to give a presentation next week&quot;</li>
+                              <li>&quot;I&apos;m going to a business dinner&quot;</li>
+                              <li>&quot;I need to negotiate a contract&quot;</li>
+                              <li>&quot;I&apos;m traveling to London next month&quot;</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="instant-prompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Describe your immediate learning need
+                        </label>
+                        <textarea
+                          id="instant-prompt"
+                          rows={4}
+                          value={instantPrompt}
+                          onChange={(e) => setInstantPrompt(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
+                          placeholder="Example: I have a job interview tomorrow for a marketing position and need to practice talking about my experience and asking good questions..."
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-4">
+                        <div>
+                          <label htmlFor="lesson-duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Lesson Duration
+                          </label>
+                          <select
+                            id="lesson-duration"
+                            value={instantDuration}
+                            onChange={(e) => setInstantDuration(Number(e.target.value) as 25 | 50)}
+                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
+                          >
+                            <option value={25}>25 minutes</option>
+                            <option value={50}>50 minutes</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label htmlFor="lesson-focus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Primary Focus
+                          </label>
+                          <select
+                            id="lesson-focus"
+                            value={instantFocus}
+                            onChange={(e) => setInstantFocus(e.target.value as 'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed')}
+                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
+                          >
+                            <option value="speaking">Speaking Practice</option>
+                            <option value="vocabulary">Vocabulary Building</option>
+                            <option value="grammar">Grammar Focus</option>
+                            <option value="listening">Listening Skills</option>
+                            <option value="mixed">Mixed Skills</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleInstantLessonGenerate}
+                        disabled={isGeneratingInstantLesson || !instantPrompt.trim()}
+                        className="w-full bg-brand-primary text-white py-3 px-4 rounded-lg hover:bg-brand-accent transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isGeneratingInstantLesson ? 'Generating Instant Lesson...' : 'Generate Instant Lesson'}
+                      </button>
+                    </div>
+
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">How it works:</h4>
+                      <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                        <li>Describe your specific situation or learning need</li>
+                        <li>AI analyzes your student profile and the context</li>
+                        <li>Generates a customized lesson with relevant vocabulary and exercises</li>
+                        <li>Practice immediately or save for later</li>
+                      </ol>
+                    </div>
                   </div>
                 )}
               </div>

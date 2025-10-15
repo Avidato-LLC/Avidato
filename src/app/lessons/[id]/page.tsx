@@ -5,6 +5,16 @@ import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
+import { 
+  VocabularyExercise, 
+  WarmupExercise, 
+  DialogueExercise, 
+  ComprehensionExercise, 
+  RolePlayExercise, 
+  DiscussionExercise,
+  PreparationExercise,
+  FinalPrepExercise
+} from '@/components/lesson/EngooLessonComponents'
 
 /**
  * Individual Lesson View Page
@@ -150,6 +160,20 @@ export default function LessonPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
         )
+      case 'preparation':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        )
+      case 'final-prep':
+      case 'finalPrep':
+      case 'finalprep':
+        return (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+        )
       default:
         return (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,6 +181,111 @@ export default function LessonPage() {
           </svg>
         )
     }
+  }
+
+  const renderExerciseContent = (exercise: { type: string; content: unknown; timeMinutes: number }) => {
+    // Type assertion for content - we know the structure from our AI generation
+    const content = exercise.content as Record<string, unknown>
+
+    switch (exercise.type) {
+      case 'vocabulary':
+        if (content?.vocabulary && Array.isArray(content.vocabulary)) {
+          return <VocabularyExercise vocabulary={content.vocabulary} />
+        }
+        break
+      
+      case 'warmup':
+        if (content?.questions && Array.isArray(content.questions)) {
+          return <WarmupExercise questions={content.questions} instructions={content.instructions as string} />
+        }
+        break
+      
+      case 'dialogue':
+        if (content?.dialogue && Array.isArray(content.dialogue)) {
+          // Extract unique speakers from dialogue to create characters array
+          const speakers = [...new Set(
+            content.dialogue.map((line: Record<string, unknown>) => 
+              (line.speaker || line.character || 'Unknown') as string
+            )
+          )];
+          const characters = speakers.map(speaker => ({ name: speaker }));
+          
+          // Transform dialogue format to match component expectations
+          const transformedDialogue = content.dialogue.map((line: Record<string, unknown>) => ({
+            character: (line.speaker || line.character || 'Unknown') as string,
+            text: (line.line || line.text || '') as string
+          }));
+          
+          const setting = content.setting as string || content.context as string || '';
+          
+          return (
+            <DialogueExercise
+              context={setting}
+              characters={characters}
+              dialogue={transformedDialogue}
+              instructions={content.instructions as string || ''}
+            />
+          )
+        }
+        break
+      
+      case 'comprehension':
+        if (content?.questions && Array.isArray(content.questions)) {
+          return <ComprehensionExercise questions={content.questions} />
+        }
+        break
+      
+      case 'roleplay':
+        if (content?.scenario && content?.roles && Array.isArray(content.roles)) {
+          return (
+            <RolePlayExercise
+              scenario={content.scenario as string}
+              roles={content.roles}
+              instructions={content.instructions as string || ''}
+              timeMinutes={exercise.timeMinutes}
+            />
+          )
+        }
+        break
+      
+      case 'discussion':
+        if (content?.questions && Array.isArray(content.questions)) {
+          return <DiscussionExercise questions={content.questions} instructions={content.instructions as string} />
+        }
+        break
+
+      case 'preparation':
+        if (content?.questions && Array.isArray(content.questions)) {
+          return <PreparationExercise questions={content.questions} tips={content.tips as string[]} />
+        }
+        break
+
+      case 'final-prep':
+      case 'finalPrep':
+      case 'finalprep':
+        return (
+          <FinalPrepExercise 
+            phrases={content.phrases as string[] || []}
+            checklist={content.checklist as string[] || []}
+            confidence={content.confidence as string[] || []}
+          />
+        )
+      
+      default:
+        // Fallback for other exercise types or malformed content
+        return (
+          <div className="whitespace-pre-wrap text-gray-900 dark:text-white">
+            {typeof exercise.content === 'string' ? exercise.content : JSON.stringify(exercise.content, null, 2)}
+          </div>
+        )
+    }
+
+    // Fallback if content doesn't match expected structure
+    return (
+      <div className="whitespace-pre-wrap text-gray-900 dark:text-white">
+        {typeof exercise.content === 'string' ? exercise.content : JSON.stringify(exercise.content, null, 2)}
+      </div>
+    )
   }
 
   const getExerciseTitle = (type: string) => {
@@ -348,9 +477,7 @@ export default function LessonPage() {
                   </p>
                   
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <div className="whitespace-pre-wrap text-gray-900 dark:text-white">
-                      {typeof exercise.content === 'string' ? exercise.content : JSON.stringify(exercise.content, null, 2)}
-                    </div>
+                    {renderExerciseContent(exercise)}
                   </div>
                 </div>
               ))}

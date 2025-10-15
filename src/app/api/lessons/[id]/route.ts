@@ -18,15 +18,23 @@ export async function GET(
 
     const { id: lessonId } = await params
 
-    // Fetch lesson with student info, ensuring user owns the student
+    // Optimized single query with proper indexing hints
     const lesson = await prisma.lesson.findFirst({
       where: {
         id: lessonId,
         student: {
-          tutorId: session.user.id, // Ensure ownership
+          tutorId: session.user.id, // This uses the studentId -> tutorId index path
         },
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        overview: true,
+        isRefined: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        studentId: true,
         student: {
           select: {
             id: true,
@@ -42,7 +50,20 @@ export async function GET(
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 })
     }
 
-    return NextResponse.json(lesson)
+    // Add aggressive cache headers and ETag for better performance
+    const etag = `"${lesson.id}-${lesson.updatedAt.getTime()}"`
+    const ifNoneMatch = request.headers.get('If-None-Match')
+    
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, { status: 304 })
+    }
+
+    return NextResponse.json(lesson, {
+      headers: {
+        'Cache-Control': 'private, max-age=300, must-revalidate', // 5 minute cache
+        'ETag': etag,
+      },
+    })
   } catch (error) {
     console.error('Error fetching lesson:', error)
     return NextResponse.json(

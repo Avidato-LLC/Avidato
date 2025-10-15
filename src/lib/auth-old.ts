@@ -13,7 +13,8 @@ export const authOptions: NextAuthOptions = {
     strategy: "database",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  debug: false, // Clean production configuration
+  // Clean production-ready configuration
+  debug: false, // Disable NextAuth debug logs
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -85,43 +86,84 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async session({ session, user }: { session: any; user: any }) {
+      // Enterprise session management - user data comes from database
       if (user && session.user) {
         session.user.id = user.id
         session.user.username = user.username
         session.user.dailyGenerationCount = user.dailyGenerationCount
         session.user.dailyLimit = user.dailyLimit
         session.user.lastGenerationDate = user.lastGenerationDate
+        
+        console.log('🏢 Enterprise Session Created:', {
+          userId: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          provider: 'database'
+        })
       }
       return session
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async signIn({ user, account, profile }: any): Promise<boolean> {
+      console.log('🏢 Enterprise SignIn - Start:', {
+        provider: account?.provider,
+        userEmail: user?.email,
+        profileEmail: profile?.email
+      })
+      
+      // ENTERPRISE APPROACH: Let NextAuth handle everything automatically
+      // No manual user lookup or modification - trust the adapter
+      
       if (account?.provider === "google" && profile) {
-        // Prevent account switching by using profile data
+        console.log('🏢 Google OAuth - Enterprise Flow:', {
+          profileEmail: profile.email,
+          profileName: profile.name,
+          profileId: profile.sub
+        })
+        
+        // Ensure user data matches profile (prevent account switching)
         user.email = profile.email
         user.name = profile.name
         user.image = profile.picture || user.image
+        
+        console.log('✅ Profile data normalized for enterprise authentication')
       }
+      
+      console.log('🏢 Enterprise SignIn - Success')
       return true
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      console.log('� Enterprise Redirect:', { url, baseUrl })
+      
+      // CRITICAL: Fix redirect loop issue
+      // If redirecting to login with callbackUrl, go to dashboard instead
       if (url.includes('/login?callbackUrl=')) {
         const callbackUrl = new URL(url).searchParams.get('callbackUrl')
         if (callbackUrl) {
-          return `${baseUrl}${callbackUrl}`
+          const finalUrl = `${baseUrl}${callbackUrl}`
+          console.log('🎯 Redirecting to callback:', finalUrl)
+          return finalUrl
         }
       }
       
+      // For relative URLs, use baseUrl
       if (url.startsWith('/')) {
-        return `${baseUrl}${url}`
+        const finalUrl = `${baseUrl}${url}`
+        console.log('🎯 Redirecting to relative URL:', finalUrl)
+        return finalUrl
       }
       
+      // For same origin URLs, allow
       if (url.startsWith(baseUrl)) {
+        console.log('🎯 Same origin redirect:', url)
         return url
       }
       
-      return `${baseUrl}/dashboard`
+      // Default to dashboard
+      const defaultUrl = `${baseUrl}/dashboard`
+      console.log('🎯 Default redirect to dashboard:', defaultUrl)
+      return defaultUrl
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

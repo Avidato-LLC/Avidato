@@ -118,13 +118,6 @@ export async function addStudent(formData: FormData): Promise<ActionResponse> {
       },
     })
 
-    console.log('✅ Student created successfully:', {
-      id: student.id,
-      name: student.name,
-      targetLanguage: student.targetLanguage,
-      level: student.level
-    })
-
     return {
       success: true,
       data: {

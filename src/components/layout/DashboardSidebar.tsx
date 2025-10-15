@@ -144,10 +144,26 @@ export default function DashboardSidebar({
   }
 
   /**
-   * Handles user sign out with proper error handling
+   * Handles user sign out with proper error handling and session clearing
    */
-  const handleSignOut = () => {
-    signOut({ callbackUrl: '/login' })
+  const handleSignOut = async () => {
+    try {
+      // Clear any local storage/session storage if needed
+      if (typeof window !== 'undefined') {
+        window.localStorage.clear()
+        window.sessionStorage.clear()
+      }
+      
+      // Sign out with NextAuth
+      await signOut({ 
+        callbackUrl: '/login?logout=true',
+        redirect: true 
+      })
+    } catch (error) {
+      console.error('Error during sign out:', error)
+      // Fallback: redirect to login page
+      window.location.href = '/login'
+    }
   }
 
   return (

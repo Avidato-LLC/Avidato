@@ -9,12 +9,20 @@ export async function GET(
   try {
     const { id: lessonId } = await params
 
-    // Fetch lesson with student info (no auth required for sharing)
+    // Optimized query with select to avoid fetching unnecessary data
     const lesson = await prisma.lesson.findUnique({
       where: {
         id: lessonId,
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        overview: true,
+        isRefined: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        studentId: true,
         student: {
           select: {
             id: true,
@@ -30,7 +38,12 @@ export async function GET(
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 })
     }
 
-    return NextResponse.json(lesson)
+    // Add cache headers for better performance on shared lessons
+    return NextResponse.json(lesson, {
+      headers: {
+        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes since shared lessons don't change often
+      },
+    })
   } catch (error) {
     console.error('Error fetching shared lesson:', error)
     return NextResponse.json(

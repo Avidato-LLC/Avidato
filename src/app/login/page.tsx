@@ -2,8 +2,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { signIn, getSession, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { signIn, getSession, useSession, signOut } from 'next-auth/react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginPage() {
@@ -13,14 +13,28 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { data: session, status } = useSession()
+  const searchParams = useSearchParams()
 
-  // Redirect to dashboard if already logged in
+  // Check if user was redirected here after logout
+  const fromLogout = searchParams.get('logout') === 'true'
+
+  // Clear session if coming from logout or force logout parameter
+  useEffect(() => {
+    if (fromLogout && session) {
+      signOut({ redirect: false })
+      return
+    }
+  }, [fromLogout, session])
+
+  // Redirect to dashboard if already logged in (and not coming from logout)
   useEffect(() => {
     if (status === 'loading') return // Still loading
-    if (session) {
-      router.push('/dashboard')
+    
+    if (session && !fromLogout) {
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+      router.push(callbackUrl)
     }
-  }, [session, status, router])
+  }, [session, status, router, fromLogout, searchParams])
 
   // Show loading while checking session
   if (status === 'loading') {
@@ -58,16 +72,37 @@ export default function LoginPage() {
         await getSession()
         router.push('/dashboard')
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.')
-      console.error('Login error:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/dashboard' })
+  const handleGoogleSignIn = async () => {
+    try {
+      // Clear any existing auth state before signing in
+      if (typeof window !== 'undefined') {
+        // Clear Google-specific cookies/storage that might cache the account
+        const cookies = document.cookie.split(";")
+        cookies.forEach(cookie => {
+          const eqPos = cookie.indexOf("=")
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim()
+          if (name.startsWith('__Secure-') || name.includes('google') || name.includes('oauth')) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+          }
+        })
+      }
+      
+      // Force Google to show account picker
+      await signIn('google', { 
+        callbackUrl: '/dashboard',
+        prompt: 'select_account'
+      })
+    } catch {
+      setError('Failed to sign in with Google. Please try again.')
+    }
   }
 
   return (
