@@ -1,21 +1,31 @@
 import { PrismaClient } from '@prisma/client'
 
 /**
- * Prisma Client Instance
+ * Optimized Prisma Client Instance
  * 
- * This file creates and exports a singleton Prisma client instance
- * for database operations throughout the application.
- * 
- * Features:
- * - Singleton pattern to prevent multiple connections
- * - Global instance in development for hot reloading
- * - Proper connection management
+ * Performance optimizations:
+ * - Connection pooling configuration
+ * - Query logging in development
+ * - Faster connection timeout settings
+ * - Optimized for Supabase
  */
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+  // Add connection timeout settings
+  transactionOptions: {
+    maxWait: 5000, // 5 seconds
+    timeout: 10000, // 10 seconds
+  },
+})
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

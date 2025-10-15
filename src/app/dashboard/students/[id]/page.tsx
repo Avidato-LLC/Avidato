@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getStudent } from '../../../actions/students'
+import { generateLearningPlan, generateLesson, getGenerationStats, getStudentLearningPlan } from '../../../actions/ai-generation'
 import { languages, levels, ageGroups } from '@/lib/form-data-mappings'
+import { LearningPlan } from '@/lib/gemini'
 
 /**
  * StudentProfilePage Component
@@ -43,7 +45,14 @@ interface LearningTopic {
   skills: string[]
 }
 
-type TabType = 'details' | 'learning-plan' | 'generate-lesson'
+interface StudentLesson {
+  id: string
+  title: string
+  overview: string | null
+  createdAt: Date
+}
+
+type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons'
 
 export default function StudentProfilePage() {
   const { data: session, status } = useSession()
@@ -57,6 +66,57 @@ export default function StudentProfilePage() {
   const [activeTab, setActiveTab] = useState<TabType>('details')
   const [learningTopics, setLearningTopics] = useState<LearningTopic[]>([])
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
+  const [generationStats, setGenerationStats] = useState({ used: 0, limit: 10, remaining: 10 })
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false)
+  const [isGeneratingLesson, setIsGeneratingLesson] = useState(false)
+  const [currentLearningPlan, setCurrentLearningPlan] = useState<LearningPlan | null>(null)
+  const [lessons, setLessons] = useState<StudentLesson[]>([])
+  const [loadingLessons, setLoadingLessons] = useState(false)
+
+  // Fetch lessons for the student
+  const fetchLessons = useCallback(async () => {
+    if (!studentId) return
+
+    setLoadingLessons(true)
+    try {
+      const response = await fetch(`/api/students/${studentId}/lessons`)
+      if (response.ok) {
+        const data = await response.json()
+        setLessons(data)
+      } else {
+        console.error('Failed to fetch lessons')
+      }
+    } catch (err) {
+      console.error('Error fetching lessons:', err)
+    } finally {
+      setLoadingLessons(false)
+    }
+  }, [studentId])
+
+  // Fetch existing learning plan
+  const fetchExistingLearningPlan = useCallback(async () => {
+    if (!studentId) return
+
+    try {
+      const result = await getStudentLearningPlan(studentId)
+      if (result.success && result.data) {
+        setCurrentLearningPlan(result.data)
+        // Convert AI topics to display format
+        const aiTopics: LearningTopic[] = result.data.topics.map((topic) => ({
+          id: topic.lessonNumber.toString(),
+          title: topic.title,
+          description: topic.objective,
+          difficulty: topic.lessonNumber <= 3 ? 'Beginner' : 
+                     topic.lessonNumber <= 7 ? 'Intermediate' : 'Advanced',
+          estimatedLessons: 1,
+          skills: topic.skills
+        }))
+        setLearningTopics(aiTopics)
+      }
+    } catch (err) {
+      console.error('Error fetching existing learning plan:', err)
+    }
+  }, [studentId])
 
   // Fetch student data
   useEffect(() => {
@@ -71,6 +131,10 @@ export default function StudentProfilePage() {
             setStudent(response.data)
             // Generate learning topics based on student data
             generateLearningTopics(response.data)
+            // Fetch lessons for this student
+            fetchLessons()
+            // Fetch existing learning plan
+            fetchExistingLearningPlan()
           } else {
             setError(response.error || 'Failed to load student profile')
           }
@@ -84,96 +148,91 @@ export default function StudentProfilePage() {
     }
 
     fetchStudent()
-  }, [session, studentId])
+  }, [session, studentId, fetchLessons, fetchExistingLearningPlan])
+
+  // Fetch generation stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (session) {
+        try {
+          const stats = await getGenerationStats()
+          setGenerationStats(stats)
+        } catch (err) {
+          console.error('Error fetching generation stats:', err)
+        }
+      }
+    }
+
+    fetchStats()
+  }, [session])
+
+  // Handle AI learning plan generation
+  const handleGenerateLearningPlan = async () => {
+    if (!student || isGeneratingPlan) return
+
+    setIsGeneratingPlan(true)
+    try {
+      const result = await generateLearningPlan(student.id)
+      if (result.success && result.data) {
+        setCurrentLearningPlan(result.data)
+        // Convert AI topics to display format
+        const aiTopics: LearningTopic[] = result.data.topics.map((topic) => ({
+          id: topic.lessonNumber.toString(),
+          title: topic.title,
+          description: topic.objective,
+          difficulty: topic.lessonNumber <= 3 ? 'Beginner' : 
+                     topic.lessonNumber <= 7 ? 'Intermediate' : 'Advanced',
+          estimatedLessons: 1,
+          skills: topic.skills
+        }))
+        setLearningTopics(aiTopics)
+        
+        // Update generation stats
+        const stats = await getGenerationStats()
+        setGenerationStats(stats)
+      } else {
+        setError(result.error || 'Failed to generate learning plan')
+      }
+    } catch (err) {
+      console.error('Error generating learning plan:', err)
+      setError('Failed to generate learning plan. Please try again.')
+    } finally {
+      setIsGeneratingPlan(false)
+    }
+  }
+
+  // Handle AI lesson generation
+  const handleGenerateLesson = async () => {
+    if (!student || !selectedTopic || !currentLearningPlan || isGeneratingLesson) return
+
+    const selectedAITopic = currentLearningPlan.topics.find(t => t.lessonNumber.toString() === selectedTopic)
+    if (!selectedAITopic) return
+
+    setIsGeneratingLesson(true)
+    try {
+      const result = await generateLesson(student.id, selectedAITopic, 50)
+      if (result.success && result.data) {
+        // Refresh lessons list and generation stats
+        await fetchLessons()
+        const stats = await getGenerationStats()
+        setGenerationStats(stats)
+        setSelectedTopic(null) // Clear selection
+      } else {
+        setError(result.error || 'Failed to generate lesson')
+      }
+    } catch (err) {
+      console.error('Error generating lesson:', err)
+      setError('Failed to generate lesson. Please try again.')
+    } finally {
+      setIsGeneratingLesson(false)
+    }
+  }
 
   // Generate learning topics based on student's profile
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const generateLearningTopics = (studentData: StudentData) => {
-    // TODO: This will be replaced with AI generation based on studentData later
-    const mockTopics: LearningTopic[] = [
-      {
-        id: '1',
-        title: 'Basic Greetings & Introductions',
-        description: 'Learn essential phrases for meeting new people and introducing yourself',
-        difficulty: 'Beginner',
-        estimatedLessons: 2,
-        skills: ['Speaking', 'Listening', 'Vocabulary']
-      },
-      {
-        id: '2',
-        title: 'Workplace Communication',
-        description: 'Professional language for emails, meetings, and workplace interactions',
-        difficulty: 'Intermediate',
-        estimatedLessons: 4,
-        skills: ['Writing', 'Speaking', 'Professional Vocabulary']
-      },
-      {
-        id: '3',
-        title: 'Travel & Transportation',
-        description: 'Navigate airports, hotels, and public transportation with confidence',
-        difficulty: 'Beginner',
-        estimatedLessons: 3,
-        skills: ['Speaking', 'Listening', 'Practical Vocabulary']
-      },
-      {
-        id: '4',
-        title: 'Food & Dining',
-        description: 'Order food, understand menus, and discuss dietary preferences',
-        difficulty: 'Beginner',
-        estimatedLessons: 2,
-        skills: ['Speaking', 'Vocabulary', 'Cultural Understanding']
-      },
-      {
-        id: '5',
-        title: 'Past Tense Storytelling',
-        description: 'Master past tense forms to tell stories and describe experiences',
-        difficulty: 'Intermediate',
-        estimatedLessons: 3,
-        skills: ['Grammar', 'Speaking', 'Writing']
-      },
-      {
-        id: '6',
-        title: 'Future Plans & Goals',
-        description: 'Express intentions, make plans, and discuss future aspirations',
-        difficulty: 'Intermediate',
-        estimatedLessons: 2,
-        skills: ['Grammar', 'Speaking', 'Vocabulary']
-      },
-      {
-        id: '7',
-        title: 'Shopping & Money',
-        description: 'Handle transactions, compare prices, and make purchases',
-        difficulty: 'Beginner',
-        estimatedLessons: 2,
-        skills: ['Speaking', 'Numbers', 'Practical Vocabulary']
-      },
-      {
-        id: '8',
-        title: 'Health & Medical',
-        description: 'Describe symptoms, understand medical advice, and health vocabulary',
-        difficulty: 'Intermediate',
-        estimatedLessons: 3,
-        skills: ['Speaking', 'Listening', 'Emergency Vocabulary']
-      },
-      {
-        id: '9',
-        title: 'Entertainment & Hobbies',
-        description: 'Discuss movies, music, sports, and personal interests',
-        difficulty: 'Beginner',
-        estimatedLessons: 2,
-        skills: ['Speaking', 'Vocabulary', 'Cultural Understanding']
-      },
-      {
-        id: '10',
-        title: 'Advanced Conversations',
-        description: 'Engage in complex discussions about current events and opinions',
-        difficulty: 'Advanced',
-        estimatedLessons: 5,
-        skills: ['Speaking', 'Listening', 'Critical Thinking']
-      }
-    ]
-    
-    setLearningTopics(mockTopics)
+    // Remove demo data - topics will come from AI generation only
+    setLearningTopics([])
   }
 
   // Redirect if not authenticated
@@ -283,6 +342,11 @@ export default function StudentProfilePage() {
                   </p>
                 </div>
                 <div className="flex space-x-3">
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Generations: {generationStats.used}/{generationStats.limit}
+                    </p>
+                  </div>
                   <button 
                     onClick={() => setActiveTab('generate-lesson')}
                     className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors"
@@ -346,6 +410,21 @@ export default function StudentProfilePage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
                       </svg>
                       <span>Generate Lesson</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('generated-lessons')}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'generated-lessons'
+                        ? 'border-brand-primary text-brand-primary'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                      </svg>
+                      <span>Generated Lessons</span>
                     </div>
                   </button>
                 </nav>
@@ -475,14 +554,61 @@ export default function StudentProfilePage() {
                           Personalized Learning Plan
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          10 topics tailored to {student.name}&apos;s goals and level
+                          {currentLearningPlan 
+                            ? `AI-generated using ${currentLearningPlan.selectedMethodology} methodology`
+                            : `10 topics tailored to ${student.name}'s goals and level`
+                          }
                         </p>
+                        {currentLearningPlan && (
+                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                            {currentLearningPlan.methodologyReasoning}
+                          </p>
+                        )}
                       </div>
-                      <button className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors">
-                        Regenerate Plan
+                      <button 
+                        onClick={handleGenerateLearningPlan}
+                        disabled={isGeneratingPlan || generationStats.remaining <= 0}
+                        className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      >
+                        {isGeneratingPlan && (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        )}
+                        <span>{currentLearningPlan ? 'Regenerate Plan' : 'Generate AI Plan'}</span>
                       </button>
                     </div>
 
+                    {learningTopics.length === 0 && !isGeneratingPlan && (
+                      <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
+                          No learning plan yet
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          Generate an AI-powered learning plan based on {student.name}&apos;s profile
+                        </p>
+                        <div className="mt-6">
+                          <button 
+                            onClick={handleGenerateLearningPlan}
+                            disabled={generationStats.remaining <= 0}
+                            className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Generate AI Learning Plan
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {isGeneratingPlan && (
+                      <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">Generating personalized learning plan...</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Using AI to analyze student profile and select optimal methodology</p>
+                      </div>
+                    )}
+
+                    {learningTopics.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {learningTopics.map((topic, index) => (
                         <div key={topic.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
@@ -519,6 +645,7 @@ export default function StudentProfilePage() {
                         </div>
                       ))}
                     </div>
+                    )}
                   </div>
                 )}
 
@@ -532,8 +659,34 @@ export default function StudentProfilePage() {
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         Select a topic from the learning plan to generate a detailed lesson
                       </p>
+                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Generations remaining: {generationStats.remaining}/{generationStats.limit}
+                      </div>
                     </div>
 
+                    {learningTopics.length === 0 && (
+                      <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
+                          No learning plan available
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          Generate a learning plan first to create individual lessons
+                        </p>
+                        <div className="mt-6">
+                          <button 
+                            onClick={() => setActiveTab('learning-plan')}
+                            className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors"
+                          >
+                            Go to Learning Plan
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {learningTopics.length > 0 && (
                     <div className="grid grid-cols-1 gap-3">
                       {learningTopics.map((topic, index) => (
                         <div 
@@ -577,6 +730,7 @@ export default function StudentProfilePage() {
                         </div>
                       ))}
                     </div>
+                    )}
 
                     {selectedTopic && (
                       <div className="bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/20 rounded-lg p-6">
@@ -584,13 +738,127 @@ export default function StudentProfilePage() {
                           <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                             Ready to Generate Lesson
                           </h4>
-                          <button className="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition-colors font-medium">
-                            Generate AI Lesson
+                          <button 
+                            onClick={handleGenerateLesson}
+                            disabled={isGeneratingLesson || generationStats.remaining <= 0}
+                            className="bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                          >
+                            {isGeneratingLesson && (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            )}
+                            <span>{isGeneratingLesson ? 'Generating...' : 'Generate AI Lesson'}</span>
                           </button>
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-300">
                           Selected topic: <span className="font-medium">{learningTopics.find(t => t.id === selectedTopic)?.title}</span>
                         </p>
+                        {currentLearningPlan && (
+                          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                            Will use {currentLearningPlan.selectedMethodology} methodology for this lesson
+                          </p>
+                        )}
+                        {generationStats.remaining <= 0 && (
+                          <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                            Daily generation limit reached. Please try again tomorrow.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Generated Lessons Tab */}
+                {activeTab === 'generated-lessons' && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          Generated Lessons
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          View and manage all lessons generated for {student.name}
+                        </p>
+                      </div>
+                      {lessons.length > 0 && (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {lessons.length} lesson{lessons.length !== 1 ? 's' : ''} created
+                        </span>
+                      )}
+                    </div>
+
+                    {loadingLessons && (
+                      <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">Loading lessons...</p>
+                      </div>
+                    )}
+
+                    {!loadingLessons && lessons.length === 0 && (
+                      <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
+                          No lessons generated yet
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          Generate your first lesson from the learning plan topics in the &quot;Generate Lesson&quot; tab
+                        </p>
+                        <div className="mt-6">
+                          <button 
+                            onClick={() => setActiveTab('generate-lesson')}
+                            className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors"
+                          >
+                            Go to Generate Lesson
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {!loadingLessons && lessons.length > 0 && (
+                      <div className="grid grid-cols-1 gap-4">
+                        {lessons.map((lesson, index) => (
+                          <div key={lesson.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-4">
+                                  <span className="w-10 h-10 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                    {index + 1}
+                                  </span>
+                                  <div>
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                      {lesson.title}
+                                    </h4>
+                                    {lesson.overview && (
+                                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                        {lesson.overview}
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                      Created {new Date(lesson.createdAt).toLocaleDateString()} at {new Date(lesson.createdAt).toLocaleTimeString()}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-3">
+                                <Link
+                                  href={`/lessons/${lesson.id}`}
+                                  className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors text-sm font-medium"
+                                >
+                                  View Lesson
+                                </Link>
+                                <Link
+                                  href={`/lessons/${lesson.id}/share`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm font-medium"
+                                >
+                                  Share
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>

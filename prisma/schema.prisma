@@ -68,12 +68,13 @@ model Student {
   name           String
   targetLanguage String
   nativeLanguage String
-  ageGroup       String
-  level          String
-  endGoals       String   @db.Text
-  occupation     String?
-  weaknesses     String?  @db.Text // Combining the weaknesses map into a single flexible text field
-  interests      String?  @db.Text
+  ageGroup       String // child, teen, adult
+  level          String // beginner, intermediate, advanced
+  endGoals       String   @db.Text // specific goals like "business presentations", "customer service", "travel English"
+  occupation     String? // helps determine lesson context (business, academic, casual)
+  weaknesses     String?  @db.Text // grammar, pronunciation, vocabulary, speaking confidence, etc.
+  interests      String?  @db.Text // helps personalize content
+  
   archived       Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -82,20 +83,34 @@ model Student {
   tutorId String
   tutor   User   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 
-  // Relation: A student can have many Lessons
+  // Relation: A student can have many Lessons and Learning Plans
   lessons Lesson[]
+  learningPlans LearningPlan[]
+}
+
+model LearningPlan {
+  id                     String   @id @default(cuid())
+  selectedMethodology    String   // CLT, TBLT, PPP, TTT
+  methodologyReasoning   String   @db.Text
+  topics                 Json     // Array of learning topics
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // Relation: Each learning plan belongs to one Student
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model Lesson {
   id        String   @id @default(cuid())
   title     String
-  overview  String?  // <-- ADD THIS LINE to store the plan overview
+  overview  String?  @db.Text // Brief lesson description
   isRefined Boolean  @default(false)
-  content   Json // IMPORTANT: Storing the flexible 'exercises' array as a JSON object
+  content   Json     // Flexible JSON structure for different lesson formats
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relation: Each lesson belongs to one Student
+  // Relation: Each lesson belongs to one Student  
   studentId String
   student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

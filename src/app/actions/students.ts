@@ -402,11 +402,24 @@ export async function getStudents(filters: StudentFilters = {}): Promise<Student
       orderBy = { [sortBy]: sortOrder }
     }
 
-    // Fetch students with lesson counts
+    // Fetch students with optimized query
     const students = await prisma.student.findMany({
       where: whereClause,
       orderBy,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        targetLanguage: true,
+        nativeLanguage: true,
+        ageGroup: true,
+        level: true,
+        endGoals: true,
+        occupation: true,
+        weaknesses: true,
+        interests: true,
+        archived: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
             lessons: true

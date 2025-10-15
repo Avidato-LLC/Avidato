@@ -33,9 +33,9 @@ const features = [
 ];
 
 const methodologies = [
-  { id: 'PPP', title: 'Presentation, Practice, Production (PPP)', description: 'A classic, structured approach. Our AI introduces new concepts clearly (Presentation), provides guided exercises (Practice), and creates opportunities for free-form student expression (Production).', icon: <SchemaIcon className="h-8 w-8" /> },
-  { id: 'TBL', title: 'Task-Based Learning (TBL)', description: 'Focus on real-world outcomes. Lessons are built around completing a meaningful task—like ordering food or booking a hotel—making language acquisition practical and motivating.', icon: <TaskAltIcon className="h-8 w-8" /> },
-  { id: 'TTT', title: 'Test-Teach-Test (TTT)', description: 'Identify and address specific knowledge gaps. The AI structures activities to first assess student understanding (Test), provide targeted instruction (Teach), and then re-evaluate for progress (Test).', icon: <RuleIcon className="h-8 w-8" /> },
+  { id: 'CLT', title: 'Communicative Language Teaching (CLT)', description: 'Focuses on real-life communication. Emphasizes fluency, interaction, and meaning over grammar drills. Core tools: role-plays, discussions, task-based activities. Perfect for students who prefer speaking-based material.', icon: <SchemaIcon className="h-8 w-8" /> },
+  { id: 'TBLT', title: 'Task-Based Language Teaching (TBLT)', description: 'Students complete meaningful tasks (e.g., planning a trip, solving a problem). Grammar and vocabulary emerge naturally from task needs. Strong for advanced learners who want practical application.', icon: <TaskAltIcon className="h-8 w-8" /> },
+  { id: 'LEXICAL', title: 'The Lexical Approach', description: 'Prioritizes vocabulary chunks and collocations instead of grammar rules. Focus on noticing and using common word combinations to sound more natural. Builds fluency through pattern recognition.', icon: <RuleIcon className="h-8 w-8" /> },
 ];
 
 const faqData = [
@@ -59,7 +59,7 @@ const LandingPage: React.FC = () => {
   const [expandedFaq, setExpandedFaq] = useState<string | false>('faq1');
   const [pricingTier, setPricingTier] = useState<'monthly' | 'annual'>('monthly');
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number>(1); // Default to highlighting the 'Pro' plan
-  const [activeMethod, setActiveMethod] = useState('PPP');
+  const [activeMethod, setActiveMethod] = useState('CLT');
 
   // --- Typewriter Effect Hook ---
   const [text] = useTypewriter({

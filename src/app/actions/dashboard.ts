@@ -47,58 +47,94 @@ export async function getDashboardStats(): Promise<DashboardResponse> {
 
     const userId = session.user.id
 
-    // Get student count for this user
-    const studentCount = await prisma.student.count({
-      where: {
-        tutorId: userId,
-        archived: false // Only count active students
-      }
-    })
+    try {
+      // Get student count for this user with timeout protection
+      const studentCount = await Promise.race([
+        prisma.student.count({
+          where: {
+            tutorId: userId,
+            archived: false // Only count active students
+          }
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database timeout')), 5000)
+        )
+      ]) as number
 
-    // Get lesson count for this user (across all their students)
-    const lessonCount = await prisma.lesson.count({
-      where: {
-        student: {
-          tutorId: userId,
-          archived: false
+      // Get lesson count for this user (across all their students)
+      const lessonCount = await Promise.race([
+        prisma.lesson.count({
+          where: {
+            student: {
+              tutorId: userId,
+              archived: false
+            }
+          }
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database timeout')), 5000)
+        )
+      ]) as number
+
+      // Get recent students (last 5 created) with timeout protection
+      const recentStudents = await Promise.race([
+        prisma.student.findMany({
+          where: {
+            tutorId: userId,
+            archived: false
+          },
+          select: {
+            id: true,
+            name: true,
+            targetLanguage: true,
+            level: true,
+            createdAt: true
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: 5
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database timeout')), 5000)
+        )
+      ]) as Array<{
+        id: string
+        name: string
+        targetLanguage: string
+        level: string
+        createdAt: Date
+      }>
+
+      return {
+        success: true,
+        data: {
+          studentCount,
+          lessonCount,
+          recentStudents
         }
       }
-    })
 
-    // Get recent students (last 5 created)
-    const recentStudents = await prisma.student.findMany({
-      where: {
-        tutorId: userId,
-        archived: false
-      },
-      select: {
-        id: true,
-        name: true,
-        targetLanguage: true,
-        level: true,
-        createdAt: true
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: 5
-    })
-
-    return {
-      success: true,
-      data: {
-        studentCount,
-        lessonCount,
-        recentStudents
+    } catch (error) {
+      console.error('❌ Error fetching dashboard stats:', error)
+      
+      // Return fallback data instead of complete failure
+      return {
+        success: true,
+        data: {
+          studentCount: 0,
+          lessonCount: 0,
+          recentStudents: []
+        }
       }
     }
 
   } catch (error) {
-    console.error('❌ Error fetching dashboard stats:', error)
+    console.error('❌ Auth error:', error)
     
     return {
       success: false,
-      error: 'Failed to load dashboard statistics. Please try again.'
+      error: 'Authentication failed. Please try logging in again.'
     }
   }
 }

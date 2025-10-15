@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getDashboardStats } from '../actions/dashboard'
+import { getGenerationStats } from '../actions/ai-generation'
 
 // Extended session type for our custom fields
 interface ExtendedUser {
@@ -38,6 +39,7 @@ export default function DashboardPage() {
   const [currentDateTime, setCurrentDateTime] = useState('')
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null)
   const [statsLoading, setStatsLoading] = useState(true)
+  const [generationStats, setGenerationStats] = useState({ used: 0, limit: 10, remaining: 10 })
 
   // Fetch dashboard statistics
   useEffect(() => {
@@ -45,10 +47,16 @@ export default function DashboardPage() {
       if (session) {
         try {
           setStatsLoading(true)
-          const response = await getDashboardStats()
-          if (response.success && response.data) {
-            setDashboardStats(response.data)
+          const [dashboardResponse, generationResponse] = await Promise.all([
+            getDashboardStats(),
+            getGenerationStats()
+          ])
+          
+          if (dashboardResponse.success && dashboardResponse.data) {
+            setDashboardStats(dashboardResponse.data)
           }
+          
+          setGenerationStats(generationResponse)
         } catch (error) {
           console.error('Error fetching dashboard stats:', error)
         } finally {
@@ -188,7 +196,13 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{extendedSession.user?.dailyGenerationCount || 0}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {statsLoading ? (
+                    <span className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-8 h-8 block"></span>
+                  ) : (
+                    generationStats.used
+                  )}
+                </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Generated Today</p>
               </div>
             </div>
@@ -202,8 +216,14 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{extendedSession.user?.dailyLimit || 10}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Daily Limit</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {statsLoading ? (
+                    <span className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-8 h-8 block"></span>
+                  ) : (
+                    `${generationStats.remaining}/${generationStats.limit}`
+                  )}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Remaining</p>
               </div>
             </div>
           </div>

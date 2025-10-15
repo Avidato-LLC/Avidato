@@ -66,7 +66,8 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   callbacks: {
-    async jwt({ token, user, account }: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user, account }: { token: any; user?: any; account?: any }) {
       if (user) {
         token.id = user.id
         token.username = user.username
@@ -102,6 +103,7 @@ export const authOptions: NextAuthOptions = {
       
       return token
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async session({ session, token }: any) {
       if (token && session.user) {
         session.user.id = token.id as string
@@ -109,29 +111,39 @@ export const authOptions: NextAuthOptions = {
         session.user.dailyGenerationCount = token.dailyGenerationCount as number
         session.user.dailyLimit = token.dailyLimit as number
         
-        // Fetch fresh user data for important operations
-        try {
-          const freshUser = await prisma.user.findUnique({
-            where: { id: token.id as string },
-            select: {
-              dailyGenerationCount: true,
-              lastGenerationDate: true,
-              dailyLimit: true,
+        // Only fetch fresh user data for generation-related requests or periodically
+        // This prevents unnecessary DB calls on every page load
+        const now = new Date()
+        const lastFetch = token.lastDataFetch as number || 0
+        const fiveMinutesAgo = now.getTime() - (5 * 60 * 1000)
+        
+        if (lastFetch < fiveMinutesAgo) {
+          try {
+            const freshUser = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: {
+                dailyGenerationCount: true,
+                lastGenerationDate: true,
+                dailyLimit: true,
+              }
+            })
+            
+            if (freshUser) {
+              session.user.dailyGenerationCount = freshUser.dailyGenerationCount
+              session.user.dailyLimit = freshUser.dailyLimit
+              session.user.lastGenerationDate = freshUser.lastGenerationDate
+              // Cache the fetch time
+              token.lastDataFetch = now.getTime()
             }
-          })
-          
-          if (freshUser) {
-            session.user.dailyGenerationCount = freshUser.dailyGenerationCount
-            session.user.dailyLimit = freshUser.dailyLimit
-            session.user.lastGenerationDate = freshUser.lastGenerationDate
+          } catch (error) {
+            console.error("Error fetching fresh user data:", error)
           }
-        } catch (error) {
-          console.error("Error fetching fresh user data:", error)
         }
       }
       return session
     },
-    async signIn({ user, account, profile }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async signIn({ user, account, profile }: any): Promise<boolean> {
       // For Google OAuth, ensure user profile is enriched
       if (account?.provider === "google" && profile) {
         try {
@@ -141,6 +153,7 @@ export const authOptions: NextAuthOptions = {
           
           if (existingUser) {
             // Update existing user with Google profile data if missing
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updateData: any = {}
             if (!existingUser.image && user.image) {
               updateData.image = user.image

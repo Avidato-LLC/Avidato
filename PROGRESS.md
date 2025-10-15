@@ -179,3 +179,11 @@ public/window.svg
         src/components/layout/PublicNavbar.tsx
 tailwind.config.ts
 tsconfig.json
+
+
+git ls-files | awk '{
+    n = gsub(/\//,"/");
+    indent = ""; for(i=1;i<n;i++){indent=indent"    "}
+    print indent $0
+}' > folder_structure.txt 
+
