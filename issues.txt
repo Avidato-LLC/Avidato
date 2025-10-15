@@ -1,53 +1,105 @@
-TITLE: Setup: Integrate Prisma and Connect to Database
+// ==========================================
+// COMPLETED ISSUES - AUTHENTICATION SYSTEM
+// ==========================================
+
+COMPLETED ✅ - TITLE: Setup: Integrate Prisma and Connect to Database
+COMPLETED ✅ - TITLE: Feat(Auth): Configure Next-Auth with Prisma Adapter
+COMPLETED ✅ - TITLE: Feat(Auth): Implement Session & Protected Middleware
+COMPLETED ✅ - TITLE: UI(Auth): Create Login and Signup Pages
+COMPLETED ✅ - TITLE: Feat(Auth): Create Server Actions for Signup/Login
+COMPLETED ✅ - TITLE: Feat(Auth): Add Google OAuth Provider
+COMPLETED ✅ - TITLE: Fix(Auth): Resolve OAuth Account Linking Issues
+COMPLETED ✅ - TITLE: Security: Implement Enterprise-Grade Authentication
+COMPLETED ✅ - TITLE: Cleanup: Remove Debug Logging from Authentication System
+
+// ==========================================
+// CURRENT PRIORITY - SETTINGS & ENHANCED AUTH
+// ==========================================
+
+TITLE: Feat(Auth): Implement Password Reset Flow with Industry Standards
 BODY:
-**Goal:** Establish the database layer for the application.
+**Goal:** Add secure password reset functionality following security best practices.
 **Key Steps:**
-1. Install Prisma CLI (`prisma`) and Prisma Client (`@prisma/client`).
-2. Initialize Prisma with `npx prisma init --datasource-provider postgresql`.
-3. Configure the `schema.prisma` file with the database connection URL (using an environment variable).
-4. Create the initial data models required for Next-Auth (User, Account, Session, VerificationToken).
-5. Run the initial migration with `npx prisma migrate dev --name init`.
-6. Verify the connection to the database is successful.
-LABELS: database, backend, setup
----
-TITLE: Feat(Auth): Configure Next-Auth with Prisma Adapter
+1. Create password reset token model in Prisma schema with expiration
+2. Build `/forgot-password` page with email input form
+3. Create server action to generate secure reset tokens (crypto.randomBytes)
+4. Implement email sending service (Nodemailer/Resend) with reset links
+5. Create `/reset-password/[token]` page to handle password updates
+6. Add token validation, expiration checks, and secure password hashing
+7. Include rate limiting to prevent abuse (max 3 requests per hour)
+8. Add proper error handling and user feedback
+**Security Requirements:**
+- Tokens expire after 1 hour
+- Single-use tokens (invalidated after use)
+- Secure random token generation (32+ bytes)
+- Rate limiting on reset requests
+- No user enumeration (same response for valid/invalid emails)
+LABELS: auth, security, feature, industry-standard
+
+TITLE: Feat(Settings): Create Tutor Settings/Profile Management Page
 BODY:
-**Goal:** Integrate Next-Auth with the Prisma database schema.
-**Dependencies:** Issue #3
+**Goal:** Build comprehensive settings page for tutor profile management.
 **Key Steps:**
-1. Install Next-Auth (`next-auth`) and the Prisma Adapter (`@next-auth/prisma-adapter`).
-2. Create the dynamic API route handler at `src/app/api/auth/[...nextauth]/route.ts`.
-3. Configure the `authOptions` with a credentials provider (for email/password) and link the Prisma Adapter.
-4. Ensure the `User`, `Account`, `Session`, and `VerificationToken` models in `schema.prisma` match Next-Auth requirements exactly.
-5. Set up the `NEXTAUTH_SECRET` and `NEXTAUTH_URL` environment variables.
-LABELS: auth, backend, feature
----
-TITLE: Feat(Auth): Implement Session & Protected Middleware
+1. Create `/dashboard/settings` route and page
+2. Implement tabbed interface: Profile, Security, Account Linking
+3. **Profile Tab:**
+   - Update display name, email, profile picture
+   - Change username (unique validation)
+   - Bio/description field for tutor profile
+4. **Security Tab:**
+   - Change password (for credential users)
+   - Set password (for OAuth-only users)
+   - Two-factor authentication setup (future)
+   - Active sessions management
+5. **Account Linking Tab:**
+   - Connect/disconnect Google account
+   - Show linked providers
+   - Account merge functionality
+6. Form validation with proper error handling
+7. Success/error toast notifications
+8. Responsive design for mobile/desktop
+LABELS: ui, settings, profile, feature
+
+TITLE: Feat(Auth): Account Linking & Provider Management
 BODY:
-**Goal:** Protect application routes and ensure only authenticated users can access the dashboard.
-**Dependencies:** Issue #4
+**Goal:** Allow users to link/unlink authentication providers (Google + email/password).
+**Dependencies:** Settings page
 **Key Steps:**
-1. Create a `middleware.ts` file at the root of the `src/` directory.
-2. The middleware should check for a valid user session on all routes matching `/dashboard/:path*`.
-3. If no session exists, the user should be redirected to the `/login` page.
-4. Public routes (like `/`, `/login`, `/signup`) should remain accessible.
-LABELS: auth, backend, feature
----
-TITLE: UI(Auth): Create Login and Signup Pages
+1. Extend User model to track authentication methods
+2. Create server actions for:
+   - Linking Google account to existing email/password account
+   - Setting password for OAuth-only users
+   - Unlinking providers (with safety checks)
+3. Add provider status indicators in settings
+4. Implement account merge logic for duplicate emails
+5. Add security confirmations for account changes
+6. Prevent users from removing their only authentication method
+**Security Features:**
+- Email verification for new email addresses
+- Password confirmation for sensitive changes
+- Audit log of account modifications
+LABELS: auth, security, feature, industry-standard
+
+TITLE: Feat(Email): Setup Transactional Email Service
 BODY:
-**Goal:** Build the frontend forms for user authentication.
+**Goal:** Implement reliable email service for password resets and notifications.
 **Key Steps:**
-1. Create a route and page for `/login`.
-2. Create a route and page for `/signup`.
-3. Each page should contain a form with fields for "Email" and "Password".
-4. Forms should have a "Submit" button.
-5. Basic styling should adhere to the project's theme. Functionality will be added in a separate issue.
-LABELS: ui, auth, feature
----
-TITLE: Feat(Auth): Create Server Actions for Signup/Login
-BODY:
-**Goal:** Connect the authentication UI to the backend logic.
-**Dependencies:** Issue #4, Issue #6
+1. Choose email provider (Resend/SendGrid/Nodemailer+SMTP)
+2. Set up email templates for:
+   - Password reset emails
+   - Email verification
+   - Account linking confirmations
+   - Security notifications
+3. Configure environment variables for email service
+4. Create reusable email utility functions
+5. Add email queue for reliability (future: Redis/Bull)
+6. Implement email delivery tracking and error handling
+**Note:** Can be implemented locally with development SMTP or email service API keys
+LABELS: email, infrastructure, feature
+
+// ==========================================
+// EXISTING ISSUES - STUDENTS & LESSONS
+// ==========================================
 **Key Steps:**
 1. Create a `signup` server action that takes form data, hashes the password (using `bcrypt`), and creates a new user in the database via Prisma.
 2. Create a `login` server action that uses Next-Auth's `signIn` function with the "credentials" provider.

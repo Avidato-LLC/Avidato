@@ -1,10 +1,4 @@
-Of course. Here is the complete, updated `PROGRESS.md` file.
-
----
-
-### 📄 `PROGRESS.md`
-
-🚀 **Avidato Rebuild Progress Tracker (v1.1)**
+ **Avidato Development Progress (v2.0)**
 
 ### 📘 Avidato (MVP)
 
@@ -18,122 +12,201 @@ Avidato is an AI-powered productivity tool that helps language tutors prepare le
 
 ### 📌 **Guiding Principles & Rules**
 
-1.  **Consistent Fonts:** All typography (headings, paragraphs, etc.) must be consistent, using the primary project font (Inter).
-2.  **Theme Adherence:** All components must use the defined theme colors (e.g., `bg-background`, `text-foreground`, `bg-primary`). Buttons, backgrounds, and other elements must adapt correctly to both light and dark modes.
-3.  **Thorough Code Comments:** All non-obvious code, components, and functions must be well-commented to explain their purpose and logic.
-4.  **Complete File Structure:** When requested, the complete and accurate file structure of the relevant directories must be provided.
-5.  **Strict Modularity:** The application must be built with small, single-purpose, and reusable components whenever possible to ensure maintainability.
+1.  **Industry Standards:** All authentication, security, and user management features must follow enterprise-grade industry standards
+2.  **Consistent Fonts:** All typography (headings, paragraphs, etc.) must be consistent, using the primary project font (Inter).
+3.  **Theme Adherence:** All components must use the defined theme colors and adapt correctly to both light and dark modes.
+4.  **Thorough Code Comments:** All non-obvious code, components, and functions must be well-commented.
+5.  **Strict Modularity:** Build with small, single-purpose, and reusable components for maintainability.
+6.  **Security First:** Implement proper validation, sanitization, rate limiting, and secure token handling.
 
 ---
 
 ### 🛠 Tech Stack
 
-| Area           | Tool                               |
-| :------------- | :--------------------------------- |
-| Framework      | Next.js 14 (App Router, TypeScript) |
-| Styling        | **Tailwind CSS v3.4.0** (with Dark Mode) |
-| Auth & Database| Next-Auth, PostgreSQL & Prisma     |
-| AI Integration | Google Gemini API (Gemini 1.5 Pro) |
-| Hosting        | Vercel                             |
+| Area              | Tool                                    |
+| :---------------- | :-------------------------------------- |
+| Framework         | Next.js 15 (App Router, TypeScript)    |
+| Styling           | **Tailwind CSS v3.4.0** (with Dark Mode) |
+| Auth & Database   | Next-Auth v4, PostgreSQL & Prisma      |
+| AI Integration    | Google Gemini API (Gemini 1.5 Pro)     |
+| Email Service     | Resend/Nodemailer (for password reset) |
+| Hosting           | Vercel                                  |
 
 ---
 
-### ✅ **Completed Milestones**
+### ✅ **COMPLETED: Enterprise Authentication System**
 
-✨ **Milestone Complete: Foundational UI & Theming System**
+🎉 **MAJOR MILESTONE COMPLETE: Production-Ready Authentication**
 
-The project's visual foundation is now **complete and stable**. This involved porting the existing public UI and building a robust, production-ready theming system from the ground up, ensuring full compatibility with Tailwind CSS v3.4.0 and resolving all previous visibility and hydration issues.
+The authentication system has been completely rebuilt to enterprise standards and is now **production-ready**:
 
-*   **Public UI Ported:** The landing page, a fully responsive public navbar, and a public footer are implemented with a modular component structure.
-*   **Theming System Established:** A comprehensive theming system has been built, featuring:
-    *   A brand-aligned, high-contrast color palette with custom brand colors.
-    *   A semantic color system (`background`, `foreground`, `primary`, `border`, etc.).
-    *   Automatic light/dark mode switching that respects user system preferences.
-*   **Custom Font Integrated:** The Inter font is configured as the primary typeface for the entire application.
-*   **Configuration Stabilized:** All build tool configurations (`tailwind.config.ts`, `postcss.config.mjs`) are now correct and stable.
+**🔐 Core Authentication Features:**
+*   ✅ **NextAuth.js v4** with database session strategy
+*   ✅ **Google OAuth Provider** with account switching protection  
+*   ✅ **Email/Password Authentication** with secure bcrypt hashing
+*   ✅ **Database Session Management** using Prisma adapter
+*   ✅ **Protected Route Middleware** with proper redirects
+*   ✅ **Account Linking Resolution** - fixed OAuthAccountNotLinked errors
 
-✨ **Milestone Complete: Authentication System & Database Integration**
+**🏢 Enterprise-Grade Security:**
+*   ✅ **Database Sessions** for scalability and security
+*   ✅ **Secure Password Hashing** with bcrypt and salt rounds
+*   ✅ **OAuth Profile Validation** with error handling
+*   ✅ **Client-Side Protection** in dashboard layout
+*   ✅ **Clean Production Code** - all debug logging removed
 
-A complete, production-ready authentication system has been implemented with full database integration and smart user flow management.
+**📁 Authentication File Structure:**
+*   ✅ `src/lib/auth.ts` - Core NextAuth configuration
+*   ✅ `src/middleware.ts` - Request routing (simplified)
+*   ✅ `src/app/login/page.tsx` - Login page with OAuth + credentials
+*   ✅ `src/app/signup/page.tsx` - User registration
+*   ✅ `src/app/dashboard/layout.tsx` - Authentication protection
+*   ✅ `src/app/api/auth/[...nextauth]/route.ts` - NextAuth endpoint
+*   ✅ `src/app/api/auth/signup/route.ts` - User registration API
 
-*   **Database Setup:** PostgreSQL database configured with Prisma ORM and complete user schema.
-*   **NextAuth Integration:** Full NextAuth.js implementation with database sessions and user management.
-*   **Smart Authentication Flow:** 
-    *   Automatic redirects: logged-in users visiting login/signup pages are redirected to dashboard
-    *   Dynamic navbar: authentication-aware navigation that shows dashboard link for logged-in users
-    *   Protected routes with middleware-based session checking
-*   **User Interface:** Complete login and signup pages with brand-consistent styling and form validation.
-*   **Dashboard Foundation:** Interactive dashboard with real-time date/time display and enhanced visual design.
+**🧹 System Cleanup:**
+*   ✅ **Debug endpoints removed** (security improvement)
+*   ✅ **Console logs cleaned** (production-ready)
+*   ✅ **Code quality improved** (enterprise standards)
 
-✨ **Milestone Complete: Brand Identity & Visual Enhancement**
+---
 
-A comprehensive brand identity system has been implemented across the entire application with enhanced visual hierarchy and user experience.
+### 🚧 **CURRENT FOCUS: Settings & Enhanced Authentication**
 
-*   **Brand Color System:** Custom Tailwind configuration with semantic brand colors:
-    *   Primary (#3d74b5), Secondary (#5ebbc8), Dark (#252e48), Accent (#467bab)
-*   **Consistent Application:** Brand colors applied systematically across all components and pages.
-*   **Enhanced Dashboard Icons:** Prominent gradient-styled stat card icons with improved visual hierarchy.
-*   **Professional Design:** Modern, cohesive visual design that maintains consistency in both light and dark modes.
+**🎯 Active Development Phase:** Tutor Settings & Advanced Auth Features
+
+**Priority 1: Password Reset System (Industry Standards)**
+*   🔄 Secure token generation with crypto.randomBytes
+*   🔄 Email service integration (Resend/Nodemailer)
+*   🔄 Token expiration and single-use validation
+*   🔄 Rate limiting to prevent abuse
+*   🔄 No user enumeration security
+*   🔄 `/forgot-password` and `/reset-password/[token]` pages
+
+**Priority 2: Tutor Settings Page**
+*   🔄 `/dashboard/settings` with tabbed interface
+*   🔄 Profile management (name, email, username, bio)
+*   🔄 Security settings (password change, active sessions)
+*   🔄 Account linking (connect/disconnect Google)
+*   🔄 Responsive design with proper validation
+
+**Priority 3: Account Linking & Provider Management**
+*   🔄 Link Google to existing email/password accounts
+*   🔄 Set password for OAuth-only users
+*   🔄 Account merge functionality for duplicate emails
+*   🔄 Security confirmations and audit logging
+
+---
+
+### 🗂 **Database Schema Status**
+
+*   User table with profile fields (name, email, username, bio)
+*   Account table for OAuth provider linking
+*   Session table for secure session management  
+*   VerificationToken table for password resets
+
+**🔄 Next: Password Reset Tables:**
+*   PasswordResetToken model (token, email, expires, used)
+*   Enhanced User model for password reset tracking
 
 ---
 
 ### 🗺️ Project Roadmap
 
-#### **Phase 1: Foundation & Authentication**
-*Goal: Establish a stable project foundation with a complete, secure authentication system.*
+#### **✅ Phase 1: Foundation & Enterprise Authentication (COMPLETE)**
+*Goal: Establish production-ready authentication system following industry standards.*
 
-| ID          | Task                                                   | Status                |
-| :---------- | :----------------------------------------------------- | :-------------------- |
-| **#1**      | `Setup: Initialize Next.js 14 Project`                 | ✅ Completed          |
-| **#2**      | `Feat: Port Landing Page, Navbar, and Footer`          | ✅ Completed          |
-| **#2B**     | `Feat: Implement Theme System (Colors, Fonts, Dark Mode)`| ✅ Completed          |
-| **#3**      | `Setup: Integrate Prisma and Connect to Database`      | ✅ Completed          |
-| **#4**      | `Feat(Auth): Configure Next-Auth with Prisma Adapter`  | ✅ Completed          |
-| **#5**      | `Feat(Auth): Implement Session & Protected Middleware` | ✅ Completed          |
-| **#6**      | `UI(Auth): Create Login and Signup Pages`              | ✅ Completed          |
-| **#7**      | `Feat(Auth): Create Server Actions for Signup/Login`   | ✅ Completed          |
-| **#8**      | `UI(Dashboard): Create Main Dashboard Layout`          | ✅ Completed          |
-| **#8B**     | `Feat(Auth): Smart Redirects & Authentication Flow`    | ✅ Completed          |
-| **#8C**     | `UI(Brand): Apply Brand Colors & Visual Enhancement`   | ✅ Completed          |
+| Task                                                   | Status         |
+| :----------------------------------------------------- | :------------- |
+| Initialize Next.js 15 Project with TypeScript         | ✅ Completed   |
+| Port Landing Page, Navbar, and Footer                 | ✅ Completed   |
+| Implement Theme System (Colors, Fonts, Dark Mode)     | ✅ Completed   |
+| Integrate Prisma and Connect to Database              | ✅ Completed   |
+| Configure NextAuth with Prisma Adapter                | ✅ Completed   |
+| Implement Session & Protected Middleware              | ✅ Completed   |
+| Create Login and Signup Pages                         | ✅ Completed   |
+| Create Server Actions for Signup/Login                | ✅ Completed   |
+| Add Google OAuth Provider                             | ✅ Completed   |
+| Fix OAuth Account Linking Issues                      | ✅ Completed   |
+| Implement Enterprise-Grade Security                   | ✅ Completed   |
+| Remove Debug Logging (Production Ready)               | ✅ Completed   |
 
-#### **Phase 2: Core CRUD Functionality (Students)**
-*Goal: Implement the complete lifecycle for student management.*
+#### **🚧 Phase 2: Settings & Enhanced Authentication (CURRENT)**
+*Goal: Build comprehensive user management and password recovery following industry standards.*
 
-| ID      | Task                                                  | Status   |
-| :------ | :---------------------------------------------------- | :------- |
-| **#9**  | `UI(Students): Create "Add Student" Page and Form`    | 🚧 **[Next Priority]** |
-| **#10** | `Feat(Students): Create Server Action to Add Student` | ⬜️ To Do |
-| **#11** | `Feat(Students): Display List of All Students`        | ⬜️ To Do |
-| **#12** | `Feat(Students): Create Dynamic Page for Student`     | ⬜️ To Do |
-| **#13** | `UI(Students): Create "Edit Student" Page`            | ⬜️ To Do |
-| **#14** | `Feat(Students): Create Server Action to Update`      | ⬜️ To Do |
-| **#15** | `Feat(Students): Create Server Action to Archive`     | ⬜️ To Do |
+| Task                                                   | Priority | Status    |
+| :----------------------------------------------------- | :------- | :-------- |
+| **Password Reset Flow with Industry Standards**       | P0       | 🔄 Active |
+| **Tutor Settings/Profile Management Page**            | P1       | 🔄 Next   |
+| **Account Linking & Provider Management**             | P2       | 📋 Planned |
+| **Email Service Integration (Transactional)**         | P1       | 📋 Planned |
 
-#### **Phase 3: AI & Lesson Management (Upcoming)**
-*Goal: Integrate the core AI features for generating and viewing lessons.*
+#### **⏳ Phase 3: Core CRUD Functionality (Students)**
+*Goal: Implement complete student management lifecycle.*
 
-| ID   | Task                                                     | Status   |
-| :--- | :------------------------------------------------------- | :------- |
-| TBD  | `UI(Lessons): Display Generated Lessons in Dashboard`    | ⬜️ To Do |
-| TBD  | `Feat(AI): Generate Course Outlines via Server Action`   | ⬜️ To Do |
-| TBD  | `Feat(AI): Generate Detailed Lesson Plans via Server Action` | ⬜️ To Do |
-| TBD  | `Feat(Lessons): Create Public View Page for Shared Links`| ⬜️ To Do |
-| TBD  | `Feat(Lessons): Server Action to Edit/Delete a Lesson`   | ⬜️ To Do |
+| Task                                                   | Status     |
+| :----------------------------------------------------- | :--------- |
+| Create "Add Student" Page and Form                    | 📋 Planned |
+| Create Server Action to Add Student                   | 📋 Planned |
+| Display List of All Students                          | 📋 Planned |
+| Create Dynamic Page for Student Details               | 📋 Planned |
+| Create "Edit Student" Page                            | 📋 Planned |
+| Create Server Action to Update Student                | 📋 Planned |
+| Create Server Action to Archive Student               | 📋 Planned |
+
+#### **🤖 Phase 4: AI & Lesson Management (Future)**
+*Goal: Integrate core AI features for generating and viewing lessons.*
+
+| Task                                                     | Status     |
+| :------------------------------------------------------- | :--------- |
+| Display Generated Lessons in Dashboard                  | 📋 Planned |
+| Generate Course Outlines via Server Action              | 📋 Planned |
+| Generate Detailed Lesson Plans via Server Action        | 📋 Planned |
+| Create Public View Page for Shared Links                | 📋 Planned |
+| Server Action to Edit/Delete a Lesson                   | 📋 Planned |
 
 ---
 
-### 🚨 Current Status & Next Steps
+### 🚨 **Current Status & Next Immediate Steps**
 
-**Current Status:** **Phase 1 is COMPLETE!** 🎉 The application now has a fully functional authentication system, complete database integration, smart user flows, and a professionally branded interface. All foundational components are stable and production-ready.
+**🎯 CURRENT FOCUS:** Settings Page & Password Reset Implementation
 
-**Completed in Phase 1:**
-- ✅ Complete authentication system with NextAuth and Prisma
-- ✅ Smart redirect logic and authentication-aware navigation  
-- ✅ Professional dashboard with enhanced visual design
-- ✅ Comprehensive brand identity system
-- ✅ Stable Tailwind CSS v3.4.0 configuration
+**✅ MAJOR WIN:** Authentication system is **enterprise-ready** and **production-complete**!
 
-**Next Steps:** With the authentication foundation complete, we're ready to proceed with **Phase 2: Core CRUD Functionality (Students)**. The immediate priority is **Issue #9: Create "Add Student" Page and Form** to begin building the student management system.
+**🔄 ACTIVE DEVELOPMENT:** 
+1. **Password Reset System** - implementing secure token-based password reset
+2. **Settings Page** - comprehensive tutor profile management 
+3. **Account Linking** - Google OAuth + email/password integration
+
+**🚀 READY TO START:** Settings page development with industry-standard security practices
+
+---
+
+### 💡 **Domain Requirements Answer**
+
+**❓ Do you need a domain for password reset emails?**
+
+**✅ NO DOMAIN REQUIRED** - You can implement the full password reset system locally/development:
+
+**Option 1: Development SMTP (Recommended)**
+- Use Nodemailer with Gmail/Outlook SMTP 
+- Set app-specific passwords in Gmail
+- Test locally with real email delivery
+- **Cost:** Free
+
+**Option 2: Email Service APIs**
+- Resend.com: 3,000 free emails/month
+- SendGrid: 100 free emails/day  
+- **Cost:** Free tier available
+
+**Option 3: Local Email Testing**
+- Ethereal Email (fake SMTP for testing)
+- MailHog (local email testing)
+- **Cost:** Free, development only
+
+**🎯 Recommendation:** Start with **Resend.com** - simple API, generous free tier, production-ready when you get a domain.
+
+**🚀 Let's start building the settings page!** 🎨
 
 
 Folder structure 
