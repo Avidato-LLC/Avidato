@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased bg-white text-gray-900" suppressHydrationWarning>
         <AuthProvider>
-          <main className="min-h-screen">
+          <main>
             {children}
           </main>
         </AuthProvider>
