@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const nameSrc = mounted && theme === 'light' ? '/name.svg' : '/white-name.svg'
 
   return (
-    <div className="h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
@@ -56,7 +56,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Sidebar - both desktop and mobile */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0
+        fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 h-full
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}
         w-64
@@ -78,9 +78,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full">
         {/* Mobile header with hamburger menu */}
-        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-30">
+        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-30 flex-shrink-0">
           <div className="flex items-center justify-between">
             {/* Mobile menu button */}
             <button
@@ -118,7 +118,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         {/* Page content with independent scrolling */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-h-0">
           {children}
         </main>
       </div>
