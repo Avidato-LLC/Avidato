@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const nameSrc = mounted && theme === 'light' ? '/name.svg' : '/white-name.svg'
 
   return (
-    <div className="min-h-screen flex">
+    <div className="h-screen flex">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
@@ -117,11 +117,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
 
-        {/* Page content with natural flow */}
-        <main className="flex-1">
-          <div>
-            {children}
-          </div>
+        {/* Page content with independent scrolling */}
+        <main className="flex-1 overflow-y-auto">
+          {children}
         </main>
       </div>
     </div>
