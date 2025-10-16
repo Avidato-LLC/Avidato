@@ -38,6 +38,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     setMounted(true)
   }, [])
 
+  // Prevent body scrolling when component mounts
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+    }
+  }, [])
+
   // Theme-aware logo paths with fallback for SSR
   const logoSrc = mounted && theme === 'light' ? '/logo.svg' : '/white-logo.svg'
   const nameSrc = mounted && theme === 'light' ? '/name.svg' : '/white-name.svg'
@@ -56,7 +67,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Sidebar - both desktop and mobile */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 h-screen
+        fixed inset-y-0 left-0 z-50 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 h-screen overflow-hidden
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'}
         w-64
@@ -78,9 +89,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-screen">
         {/* Mobile header with hamburger menu */}
-        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-30 flex-shrink-0">
+        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             {/* Mobile menu button */}
             <button
@@ -118,7 +129,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         {/* Page content with independent scrolling */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto h-0">
           {children}
         </main>
       </div>
