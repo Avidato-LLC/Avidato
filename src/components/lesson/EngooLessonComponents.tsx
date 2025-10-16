@@ -9,6 +9,11 @@ import React, { useState } from 'react'
  * character dialogues, and exercise layouts
  */
 
+// Utility function to safely handle string replacements
+const safeReplace = (text: string | undefined | null): string => {
+  return (text || '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+}
+
 interface VocabularyItem {
   word: string
   partOfSpeech: string
@@ -65,11 +70,11 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
               <div className="mb-3">
                 {/* Phonetics only show on desktop */}
                 <span className="hidden lg:inline text-orange-600 dark:text-orange-400 font-mono text-sm mr-3 break-all">
-                  {item.phonetics}
+                  {item.phonetics || ''}
                 </span>
                 <span className="text-gray-700 dark:text-gray-300 text-sm lg:text-sm break-words">
                   <span dangerouslySetInnerHTML={{ 
-                    __html: item.definition.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                    __html: safeReplace(item.definition) 
                   }} />
                 </span>
               </div>
@@ -77,7 +82,7 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
               {/* Example sentence */}
               <div className="text-gray-600 dark:text-gray-400 text-sm break-words leading-relaxed">
                 <span dangerouslySetInnerHTML={{ 
-                  __html: item.example.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                  __html: safeReplace(item.example) 
                 }} />
               </div>
             </div>
@@ -95,7 +100,7 @@ export function WarmupExercise({ questions, instructions }: { questions: string[
       {instructions && (
         <p className="text-gray-600 dark:text-gray-400 italic">
           <span dangerouslySetInnerHTML={{ 
-            __html: instructions.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+            __html: safeReplace(instructions) 
           }} />
         </p>
       )}
@@ -107,7 +112,7 @@ export function WarmupExercise({ questions, instructions }: { questions: string[
             </span>
             <p className="text-gray-900 dark:text-white">
               <span dangerouslySetInnerHTML={{ 
-                __html: question.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                __html: safeReplace(question) 
               }} />
             </p>
           </div>
@@ -193,7 +198,7 @@ export function DialogueExercise({
           <p className="text-blue-800 dark:text-blue-400 text-sm">
             <strong>Context:</strong>{' '}
             <span dangerouslySetInnerHTML={{ 
-              __html: context.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+              __html: safeReplace(context) 
             }} />
           </p>
         </div>
@@ -305,7 +310,7 @@ export function ComprehensionExercise({
             <div className="flex-1">
               <p className="text-gray-900 dark:text-white mb-4">
                 <span dangerouslySetInnerHTML={{ 
-                  __html: q.question.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                  __html: safeReplace(q.question) 
                 }} />
               </p>
 
@@ -354,7 +359,7 @@ export function ComprehensionExercise({
                         </div>
                         <span className={`${isSelected ? 'font-medium' : ''}`}>
                           <span dangerouslySetInnerHTML={{ 
-                            __html: option.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                            __html: safeReplace(option) 
                           }} />
                         </span>
                       </label>
