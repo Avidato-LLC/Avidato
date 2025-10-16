@@ -330,25 +330,23 @@ export default function LessonPage() {
 
   return (
     <DashboardLayout>
-      <div className="h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6 lg:p-8">
-            {/* Loading State */}
-            {loading && (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
-                  <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading lesson...</p>
-                </div>
-              </div>
-            )}
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading lesson...</p>
+            </div>
+          </div>
+        )}
 
-            {/* Error State */}
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 sm:p-6">
-                <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 sm:p-6">
+            <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
 
             {/* Lesson Content */}
             {!loading && !error && lesson && (
@@ -514,8 +512,6 @@ export default function LessonPage() {
             </div>
           </div>
         )}
-          </div>
-        </div>
       </div>
     </DashboardLayout>
   )

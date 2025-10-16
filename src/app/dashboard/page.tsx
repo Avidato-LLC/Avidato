@@ -335,38 +335,136 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Feature Preview */}
+        {/* Upcoming Features */}
         <div className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">What&apos;s Coming Next</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            <div className="text-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-primary/10 dark:bg-brand-primary/20 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                </svg>
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Upcoming Features</h2>
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+              Q1 2026
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg p-4 sm:p-6 border border-red-200 dark:border-red-800">
+              <div className="flex items-start justify-between mb-3">
+                <div className="p-2 bg-red-500 rounded-lg">
+                  <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </div>
+                <span className="text-xs font-medium text-red-600 dark:text-red-400 bg-red-200 dark:bg-red-900/40 px-2 py-1 rounded-full">
+                  New
+                </span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Student Management</h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Add and manage student profiles with learning goals and preferences.</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">YouTube ESL Generator</h3>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">Turn any YouTube video into a structured ESL lesson with vocabulary, exercises, and discussion questions.</p>
+              <div className="flex items-center text-xs text-red-600 dark:text-red-400">
+                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Coming in February 2026
+              </div>
             </div>
             
-            <div className="text-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-secondary/10 dark:bg-brand-secondary/20 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-brand-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+            <div className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4 sm:p-6 border border-purple-200 dark:border-purple-800">
+              <div className="flex items-start justify-between mb-3">
+                <div className="p-2 bg-purple-500 rounded-lg">
+                  <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-medium text-purple-600 dark:text-purple-400 bg-purple-200 dark:bg-purple-900/40 px-2 py-1 rounded-full">
+                  Analytics
+                </span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">AI Lesson Generation</h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Generate personalized lesson plans using advanced AI technology.</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Progress Tracking</h3>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">Advanced analytics dashboard to track student progress, lesson completion rates, and learning outcomes.</p>
+              <div className="flex items-center text-xs text-purple-600 dark:text-purple-400">
+                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Coming in March 2026
+              </div>
             </div>
             
-            <div className="text-center sm:col-span-2 md:col-span-1">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-accent/10 dark:bg-brand-accent/20 rounded-lg flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <svg className="h-5 w-5 sm:h-6 sm:w-6 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+            <div className="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg p-4 sm:p-6 border border-green-200 dark:border-green-800 sm:col-span-2 lg:col-span-1">
+              <div className="flex items-start justify-between mb-3">
+                <div className="p-2 bg-green-500 rounded-lg">
+                  <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-200 dark:bg-green-900/40 px-2 py-1 rounded-full">
+                  Collaboration
+                </span>
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Team Workspace</h3>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">Collaborate with other teachers, share lesson plans, and build a community-driven lesson library.</p>
+              <div className="flex items-center text-xs text-green-600 dark:text-green-400">
+                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Coming in April 2026
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Feature Highlights */}
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 sm:p-8 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-blue-500 rounded-xl mr-4">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Share & Collaborate</h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Share lesson plans and collaborate with students and colleagues.</p>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Mobile App</h3>
+                <p className="text-sm text-blue-600 dark:text-blue-400">Native iOS & Android</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Take your lesson planning on the go with our upcoming mobile app. Create, edit, and share lessons from anywhere.
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Expected: Summer 2026</span>
+              <div className="flex space-x-2">
+                <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                  </svg>
+                </div>
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1518-.5712.416.416 0 00-.5712.1518l-2.0223 3.5014c-1.5185-.7391-3.2583-1.1567-5.2064-1.1567-1.9481 0-3.6879.4176-5.2064 1.1567l-2.0223-3.5014a.416.416 0 00-.5712-.1518.416.416 0 00-.1518.5712l1.9973 3.4592c-2.1253 1.1393-3.6048 2.9183-4.1895 5.0781h16.4755c-.5847-2.1598-2.0642-3.9388-4.1895-5.0781"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-6 sm:p-8 border border-amber-200 dark:border-amber-800">
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-amber-500 rounded-xl mr-4">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 016 0v6a3 3 0 01-3 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">AI Voice Integration</h3>
+                <p className="text-sm text-amber-600 dark:text-amber-400">Smart pronunciation tools</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Advanced AI-powered pronunciation exercises, voice recognition, and speaking practice tools for interactive lessons.
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">Expected: Fall 2026</span>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+              </div>
             </div>
           </div>
         </div>

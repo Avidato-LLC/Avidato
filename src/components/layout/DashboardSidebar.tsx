@@ -30,6 +30,7 @@ interface SidebarNavItem {
   label: string
   icon: React.ReactNode
   badge?: string
+  comingSoon?: boolean
 }
 
 interface DashboardSidebarProps {
@@ -84,6 +85,16 @@ export default function DashboardSidebar({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
         </svg>
       )
+    },
+    {
+      href: '#',
+      label: 'YouTube ESL Generator',
+      icon: (
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1a3 3 0 000-6h-1m1 6V4a3 3 0 00-3-3H6a3 3 0 00-3 3v6h1m7-6h.01M15 10h1a3 3 0 010 6h-1m-1-6V4a3 3 0 013-3h1a3 3 0 013 3v6h-1" />
+        </svg>
+      ),
+      comingSoon: true
     }
   ]
 
@@ -180,6 +191,28 @@ export default function DashboardSidebar({
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navigationItems.map((item) => {
           const isActive = isActiveRoute(item.href)
+          
+          if (item.comingSoon) {
+            return (
+              <div
+                key={item.href}
+                className="group flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-not-allowed opacity-60"
+                title={sidebarCollapsed ? `${item.label} - Coming Soon` : undefined}
+              >
+                <span className={`${sidebarCollapsed ? 'mr-0' : 'mr-3'} flex-shrink-0 text-gray-500 dark:text-gray-400`}>
+                  {item.icon}
+                </span>
+                {!sidebarCollapsed && (
+                  <>
+                    <span className="flex-1 text-gray-500 dark:text-gray-400">{item.label}</span>
+                    <span className="ml-2 px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full">
+                      Coming Soon
+                    </span>
+                  </>
+                )}
+              </div>
+            )
+          }
           
           return (
             <Link

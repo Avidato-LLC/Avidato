@@ -1,5 +1,6 @@
 // src/hooks/useLessonCache.ts
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+// TODO: Install @tanstack/react-query before using this hook
+// import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface Lesson {
   id: string
@@ -13,18 +14,22 @@ interface Lesson {
 }
 
 export function useLessonCache() {
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   const prefetchLesson = async (lessonId: string) => {
-    await queryClient.prefetchQuery({
-      queryKey: ['lesson', lessonId],
-      queryFn: () => fetchLesson(lessonId),
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    })
+    // TODO: Implement with React Query when available
+    console.log('Prefetching lesson:', lessonId)
+    // await queryClient.prefetchQuery({
+    //   queryKey: ['lesson', lessonId],
+    //   queryFn: () => fetchLesson(lessonId),
+    //   staleTime: 5 * 60 * 1000, // 5 minutes
+    // })
   }
 
   const invalidateLesson = (lessonId: string) => {
-    queryClient.invalidateQueries({ queryKey: ['lesson', lessonId] })
+    // TODO: Implement with React Query when available
+    console.log('Invalidating lesson:', lessonId)
+    // queryClient.invalidateQueries({ queryKey: ['lesson', lessonId] })
   }
 
   return { prefetchLesson, invalidateLesson }
@@ -39,10 +44,13 @@ async function fetchLesson(lessonId: string): Promise<Lesson> {
 }
 
 export function useLesson(lessonId: string) {
-  return useQuery({
-    queryKey: ['lesson', lessonId],
-    queryFn: () => fetchLesson(lessonId),
-    staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
-    cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
-  })
+  // TODO: Implement with React Query when available
+  console.log('Using lesson hook for:', lessonId)
+  return { data: null, isLoading: false, error: null }
+  // return useQuery({
+  //   queryKey: ['lesson', lessonId],
+  //   queryFn: () => fetchLesson(lessonId),
+  //   staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
+  //   cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+  // })
 }

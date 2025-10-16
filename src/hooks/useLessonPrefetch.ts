@@ -1,5 +1,4 @@
 // src/hooks/useLessonPrefetch.ts
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export function useLessonPrefetch() {
