@@ -262,6 +262,7 @@ export function ComprehensionExercise({
   const handleAnswerSelect = (questionIndex: number, answer: string, event?: React.ChangeEvent<HTMLInputElement>) => {
     if (event) {
       event.preventDefault()
+      event.stopPropagation()
     }
     setSelectedAnswers(prev => ({
       ...prev,
@@ -325,13 +326,18 @@ export function ComprehensionExercise({
                               : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
                             : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleAnswerSelect(index, option)
+                        }}
                       >
                         <input
                           type="radio"
                           name={`question-${index}`}
                           value={option}
                           checked={isSelected}
-                          onChange={(e) => handleAnswerSelect(index, option, e)}
+                          readOnly
                           className="sr-only"
                         />
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
@@ -373,13 +379,18 @@ export function ComprehensionExercise({
                               : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
                             : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleAnswerSelect(index, option)
+                        }}
                       >
                         <input
                           type="radio"
                           name={`question-${index}`}
                           value={option}
                           checked={isSelected}
-                          onChange={(e) => handleAnswerSelect(index, option, e)}
+                          readOnly
                           className="sr-only"
                         />
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
