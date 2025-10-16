@@ -259,7 +259,10 @@ export function ComprehensionExercise({
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string }>({})
   const [showAnswers, setShowAnswers] = useState<{ [key: number]: boolean }>({})
 
-  const handleAnswerSelect = (questionIndex: number, answer: string) => {
+  const handleAnswerSelect = (questionIndex: number, answer: string, event?: React.ChangeEvent<HTMLInputElement>) => {
+    if (event) {
+      event.preventDefault()
+    }
     setSelectedAnswers(prev => ({
       ...prev,
       [questionIndex]: answer
@@ -328,7 +331,7 @@ export function ComprehensionExercise({
                           name={`question-${index}`}
                           value={option}
                           checked={isSelected}
-                          onChange={() => handleAnswerSelect(index, option)}
+                          onChange={(e) => handleAnswerSelect(index, option, e)}
                           className="sr-only"
                         />
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
@@ -376,7 +379,7 @@ export function ComprehensionExercise({
                           name={`question-${index}`}
                           value={option}
                           checked={isSelected}
-                          onChange={() => handleAnswerSelect(index, option)}
+                          onChange={(e) => handleAnswerSelect(index, option, e)}
                           className="sr-only"
                         />
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
