@@ -341,6 +341,8 @@ interface StudentFilters {
   sortBy?: 'name' | 'level' | 'occupation' | 'lessonCount' | 'createdAt' | 'updatedAt'
   sortOrder?: 'asc' | 'desc'
   archived?: boolean
+  page?: number // For pagination: current page
+  pageSize?: number // For pagination: students per page
 }
 
 /**
@@ -395,10 +397,16 @@ export async function getStudents(filters: StudentFilters = {}): Promise<Student
       orderBy = { [sortBy]: sortOrder }
     }
 
-    // Fetch students with optimized query
+    // Add pagination: default 10 per page
+    const page = typeof filters.page === 'number' && filters.page > 0 ? filters.page : 1
+    const pageSize = typeof filters.pageSize === 'number' && filters.pageSize > 0 ? filters.pageSize : 10
+
+    // Fetch students with pagination
     const students = await prisma.student.findMany({
       where: whereClause,
       orderBy,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
         name: true,
@@ -421,6 +429,8 @@ export async function getStudents(filters: StudentFilters = {}): Promise<Student
       }
     })
 
+    // Get total count for pagination controls
+    const total = await prisma.student.count({ where: whereClause })
     // Transform data to include lesson count
     const studentsWithCounts: StudentData[] = students.map(student => ({
       id: student.id,
@@ -443,7 +453,7 @@ export async function getStudents(filters: StudentFilters = {}): Promise<Student
       success: true,
       data: {
         students: studentsWithCounts,
-        total: studentsWithCounts.length
+        total // total students for pagination
       }
     }
 

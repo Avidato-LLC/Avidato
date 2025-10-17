@@ -56,6 +56,9 @@ export default function StudentsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [students, setStudents] = useState<StudentData[]>([])
+  const [total, setTotal] = useState(0) // Total students for pagination
+  const [page, setPage] = useState(1)
+  const pageSize = 10 // Students per page
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('active')
@@ -67,16 +70,19 @@ export default function StudentsPage() {
   })
 
   // Fetch students data
+  // Fetch students with pagination
   useEffect(() => {
     const fetchStudents = async () => {
       if (session) {
         try {
           setLoading(true)
           setError(null)
-          const updatedFilters = { ...filters, archived: activeTab === 'archived' }
+          // Add pagination params to filters
+          const updatedFilters = { ...filters, archived: activeTab === 'archived', page, pageSize }
           const response = await getStudents(updatedFilters)
           if (response.success && response.data) {
             setStudents(response.data.students)
+            setTotal(response.data.total)
           } else {
             setError(response.error || 'Failed to load students')
           }
@@ -90,7 +96,7 @@ export default function StudentsPage() {
     }
 
     fetchStudents()
-  }, [session, filters, activeTab])
+  }, [session, filters, activeTab, page])
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -104,12 +110,13 @@ export default function StudentsPage() {
     }
   }, [openMenuId])
 
-  // Update filters when tab changes
+  // Update filters when tab changes, reset to page 1
   useEffect(() => {
     setFilters(prev => ({
       ...prev,
       archived: activeTab === 'archived'
     }))
+    setPage(1)
   }, [activeTab])
 
   // Redirect if not authenticated
@@ -121,12 +128,13 @@ export default function StudentsPage() {
     }
   }, [session, status, router])
 
-  // Handle filter changes
+  // Handle filter changes, reset to page 1
   const handleFilterChange = (key: keyof StudentFilters, value: string) => {
     setFilters(prev => ({
       ...prev,
       [key]: value || undefined
     }))
+    setPage(1)
   }
 
   // Handle sort changes
@@ -384,11 +392,12 @@ export default function StudentsPage() {
           </div>
         )}
 
-        {/* Students Count */}
+        {/* Students Count (paginated) */}
         {!loading && !error && (
           <div className="mb-3 sm:mb-4">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              {students.length} {activeTab} student{students.length !== 1 ? 's' : ''} found
+              Showing {students.length > 0 ? (page - 1) * pageSize + 1 : 0}
+              -{(page - 1) * pageSize + students.length} of {total} {activeTab} student{total !== 1 ? 's' : ''}
             </p>
           </div>
         )}
@@ -678,6 +687,39 @@ export default function StudentsPage() {
               </div>
             </>
           )}
+        {/* Pagination Controls */}
+        {!loading && !error && total > pageSize && (
+          <div className="flex justify-center mt-6">
+            <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                aria-label="Previous"
+              >
+                &lt;
+              </button>
+              {Array.from({ length: Math.ceil(total / pageSize) }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium ${p === page ? 'text-brand-primary font-bold bg-gray-100 dark:bg-gray-700' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                  aria-current={p === page ? 'page' : undefined}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage((p) => Math.min(Math.ceil(total / pageSize), p + 1))}
+                disabled={page === Math.ceil(total / pageSize)}
+                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 ${page === Math.ceil(total / pageSize) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                aria-label="Next"
+              >
+                &gt;
+              </button>
+            </nav>
+          </div>
+        )}
         </div>
       </div>
     </DashboardLayout>

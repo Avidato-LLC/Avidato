@@ -67,6 +67,7 @@ export async function getDashboardStats(): Promise<DashboardResponse> {
                 }
               }
             }),
+            // Only return the 2 most recently created students for dashboard
             tx.student.findMany({
               where: {
                 tutorId: userId,
@@ -82,7 +83,7 @@ export async function getDashboardStats(): Promise<DashboardResponse> {
               orderBy: {
                 createdAt: 'desc'
               },
-              take: 5
+              take: 2 // Limit to 2 most recent students
             })
           ])
 

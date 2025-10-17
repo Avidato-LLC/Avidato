@@ -10,6 +10,13 @@ Avidato is an AI-powered productivity tool that helps language tutors prepare le
 
 ---
 
+
+### 🚩 Branching Policy (as of October 2025)
+
+All new features and significant changes must be developed on a separate git branch (feature/your-feature-name), then merged into main after review and testing. Do not work directly on main for new features.
+
+---
+
 ### 📌 **Guiding Principles & Rules**
 
 1.  **Industry Standards:** All authentication, security, and user management features must follow enterprise-grade industry standards
