@@ -71,6 +71,7 @@ export default function PublicFooter() {
             <div className="flex flex-col space-y-3 text-sm">
               <FooterLink href="/terms">Terms of Service</FooterLink>
               <FooterLink href="/privacy">Privacy Policy</FooterLink>
+              <FooterLink href="/fair-use">Fair Use Policy</FooterLink>
             </div>
           </div>
 

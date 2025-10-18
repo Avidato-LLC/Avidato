@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth"
+import { NextauthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: NextauthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "database",

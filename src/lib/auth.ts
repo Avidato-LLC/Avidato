@@ -9,7 +9,7 @@ const prisma = new PrismaClient()
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt", // Changed from database to jwt for better reliability
+    strategy: 'jwt', // Changed from database to jwt for better reliability
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   debug: false, // Clean production configuration
