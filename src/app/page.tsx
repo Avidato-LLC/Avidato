@@ -63,7 +63,7 @@ const LandingPage: React.FC = () => {
 
   // --- Typewriter Effect Hook ---
   const [text] = useTypewriter({
-    words: ['Stop Planning, Start Teaching.', 'Personalize lessons.', 'Focus On Your Students.'],
+    words: ['Stop Planning, Start Teaching.', 'Personalize lessons.', 'Focus On Your Students.','Augment your creativity'],
     loop: 0, typeSpeed: 60, deleteSpeed: 40, delaySpeed: 1500,
   });
 
