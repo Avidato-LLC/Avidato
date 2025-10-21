@@ -62,6 +62,7 @@ export default function PublicFooter() {
               <FooterLink href="/#pedagogy">Pedagogy</FooterLink>
               <FooterLink href="/#pricing">Pricing</FooterLink>
               <FooterLink href="/#faq">FAQ</FooterLink>
+              <FooterLink href="/careers">Careers</FooterLink>
             </div>
           </div>
 
