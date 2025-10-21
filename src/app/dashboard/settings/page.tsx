@@ -802,7 +802,6 @@ function AccountLinkingTab() {
     try {
       // TODO: Implement account unlinking
       // This would require a server action to remove the account record
-      console.log('Unlinking provider:', providerId)
       setMessage({ 
         type: 'error', 
         text: 'Account unlinking feature coming soon. Please contact support for assistance.' 

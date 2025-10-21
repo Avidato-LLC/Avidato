@@ -91,12 +91,9 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    console.log('Dashboard - Session status:', status)
-    console.log('Dashboard - Session data:', session)
     
     if (status === 'loading') return // Still loading
     if (!session) {
-      console.log('No session found, redirecting to login')
       router.push('/login')
       return
     }

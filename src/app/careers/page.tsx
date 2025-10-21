@@ -2,7 +2,10 @@
 import Link from 'next/link';
 
 async function getCareers() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/careers`, {
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/careers`, {
     next: { revalidate: 60 },
     cache: 'no-store',
   });

@@ -28,14 +28,14 @@ const PublicNavbar: React.FC = () => {
             <Image
               src="/logo.svg"
               alt="Avidato Icon"
-              width={32} // Sets the icon size (adjust as needed)
+              width={32}
               height={32}
-              priority // Helps load the logo faster on initial page load
+              priority
             />
             <Image
               src="/name.svg"
               alt="Avidato"
-              width={110} // Sets the logotype size (adjust as needed)
+              width={110}
               height={26}
               priority
             />
@@ -60,7 +60,7 @@ const PublicNavbar: React.FC = () => {
             {session ? (
               <Link
                 href="/dashboard"
-                className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors"
+                className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-blue-600 bg-transparent text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
               >
                 Dashboard
               </Link>
@@ -74,7 +74,7 @@ const PublicNavbar: React.FC = () => {
                 </Link>
                 <Link
                   href="/signup"
-                  className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors"
+                  className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-black bg-transparent text-black hover:bg-[#3d74b5] hover:text-white transition-colors"
                 >
                   Sign Up
                 </Link>
@@ -127,7 +127,7 @@ const PublicNavbar: React.FC = () => {
               <Link
                 href="/dashboard"
                 onClick={() => setIsMenuOpen(false)}
-                className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors text-center"
+                className="block mt-2 px-3 py-2 rounded-full font-semibold border border-blue-600 bg-transparent text-blue-600 hover:bg-blue-600 hover:text-white transition-colors text-center"
               >
                 Dashboard
               </Link>
@@ -143,7 +143,7 @@ const PublicNavbar: React.FC = () => {
                 <Link
                   href="/signup"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-black hover:text-white transition-colors text-center"
+                  className="block mt-2 px-3 py-2 rounded-full font-semibold border border-black bg-transparent text-black hover:bg-[#3d74b5] hover:text-white transition-colors text-center"
                 >
                   Sign Up
                 </Link>

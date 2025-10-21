@@ -65,16 +65,13 @@ function LoginPageContent() {
         redirect: false,
       })
 
-      console.log('Login result:', result)
 
       if (result?.error) {
         setError('Invalid email or password')
-        console.log('Login error:', result.error)
       } else if (result?.ok) {
         // Wait a moment for session to be established
         setTimeout(async () => {
           const session = await getSession()
-          console.log('Session after login:', session)
           
           if (session) {
             const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
