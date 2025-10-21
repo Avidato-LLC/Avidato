@@ -1,3 +1,11 @@
+model Career {
+  id          String   @id @default(cuid())
+  title       String   @unique
+  description String?
+  location    String?
+  typeformUrl String   @default("https://form.typeform.com/to/almI6bRO")
+  createdAt   DateTime @default(now())
+}
 generator client {
   provider = "prisma-client-js"
 }
@@ -91,5 +99,6 @@ model Lesson {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   studentId String
+  isPublic  Boolean? @default(false)
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
