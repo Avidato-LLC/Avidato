@@ -1,0 +1,61 @@
+
+Comprehensive Test Plan for Avidato App (October 21, 2025)
+
+---
+
+1. Authentication & Access
+	- Test email/password login and signup
+	- Test Google OAuth login and signup
+	- Verify session fields: user id, name, email, image, dailyGenerationCount, dailyLimit
+	- Test login redirect to dashboard
+	- Test logout and session expiration
+
+2. Student Management
+	- Add new student (all required fields, validation)
+	- Edit student profile (all fields)
+	- Archive/unarchive student
+	- Delete student (with confirmation)
+	- View student details (profile, goals, weaknesses, interests)
+	- Filter, search, and sort students by name, language, level, occupation, lesson count, created date
+	- Paginate student list
+
+3. Learning Plan Generation
+	- Generate AI-powered learning plan (10 topics) for a student
+	- Regenerate learning plan
+	- Verify methodology selection and reasoning (CLT, TBLT, PPP, TTT)
+	- Display learning topics with difficulty, skills, and description
+
+4. Lesson Generation & Viewing
+	- Generate lesson for a selected topic (AI)
+	- Generate instant lesson for a specific prompt/need
+	- View generated lesson (all exercise types)
+	- View lesson header: title, objective, skills, vocabulary, context, difficulty, duration
+	- View lesson exercises: vocabulary, warmup, dialogue, comprehension, roleplay, discussion, grammar, preparation, final prep
+	- Test dynamic and lazy loading of exercises (LessonLoader, LazyLessonContent)
+	- Test lesson share link (copy to clipboard)
+	- View shared lesson (public, no login required)
+	- Test lesson not found/error states
+
+5. Lesson Data & API
+	- Verify lesson data is fetched from /api/lessons/[id] and /api/lessons/[id]/share
+	- Verify student lessons list is fetched from /api/students/[studentId]/lessons
+
+6. Limits & Stats
+	- Test daily lesson generation limits (session fields)
+	- View dashboard stats: student count, lesson count, recent students, lessons generated today, remaining generations
+
+7. UI & Navigation
+	- Test dashboard layout, sidebar, navbar, theme switching
+	- Test navigation between dashboard, students, lessons, add/edit student, learning plan, lesson generation, instant lesson
+	- Test mobile and desktop responsiveness
+
+8. Error Handling
+	- Test error states for failed API calls, invalid data, lesson not found, student not found
+	- Test validation errors on forms
+
+---
+
+Excluded (not implemented):
+- Public lessons directory or ESL plans
+- Lesson caching via React Query
+- YouTube ESL generator, analytics dashboard, team workspace, mobile app, AI voice integration

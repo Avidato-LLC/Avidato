@@ -44,9 +44,9 @@ export default function PublicFooter() {
                 Empowering tutors with AI-powered tools to create impactful, pedagogically-sound lessons faster than ever before.
               </p>
               <div className="flex space-x-4">
-                <a href="#" target="_blank" className="text-gray-400 transition-colors hover:text-white"><TwitterIcon className="h-5 w-5" /></a>
-                <a href="#" target="_blank" className="text-gray-400 transition-colors hover:text-white"><LinkedInIcon className="h-5 w-5" /></a>
-                <a href="#" target="_blank" className="text-gray-400 transition-colors hover:text-white"><InstagramIcon className="h-5 w-5" /></a>
+                <a href="https://x.com/AppAvidato" target="_blank" className="text-gray-400 transition-colors hover:text-white"><TwitterIcon className="h-5 w-5" /></a>
+                <a href="https://www.linkedin.com/company/avidato" target="_blank" className="text-gray-400 transition-colors hover:text-white"><LinkedInIcon className="h-5 w-5" /></a>
+                <a href="https://www.instagram.com/avidato.ai/" target="_blank" className="text-gray-400 transition-colors hover:text-white"><InstagramIcon className="h-5 w-5" /></a>
               </div>
             </div>
           </div>
