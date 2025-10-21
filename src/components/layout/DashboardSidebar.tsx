@@ -166,8 +166,8 @@ export default function DashboardSidebar({
             <Image
               src={nameSrc}
               alt="Avidato"
-              width={80}
-              height={24}
+              width={110}
+              height={26}
               className="flex-shrink-0"
               style={{ width: 'auto', height: '1.5rem' }}
             />

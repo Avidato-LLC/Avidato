@@ -60,7 +60,7 @@ const PublicNavbar: React.FC = () => {
             {session ? (
               <Link
                 href="/dashboard"
-                className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-blue-600 bg-transparent text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                className="hidden sm:inline-block px-4 py-2 text-sm font-semibold rounded-full border border-blue-600 bg-transparent text-blue-600 hover:bg-[#3d74b5] hover:text-white transition-colors"
               >
                 Dashboard
               </Link>
