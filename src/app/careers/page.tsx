@@ -1,11 +1,17 @@
 
-import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
 
-const prisma = new PrismaClient();
+async function getCareers() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/careers`, {
+    next: { revalidate: 60 },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch careers');
+  return res.json();
+}
 
 export default async function CareersPage() {
-  const careers = await prisma.career.findMany({ orderBy: { title: 'asc' } });
+  const careers = await getCareers();
 
   return (
     <main className="max-w-4xl mx-auto py-20 px-4 bg-[#f6f6f6] min-h-screen">
