@@ -1,61 +1,100 @@
-
 Comprehensive Test Plan for Avidato App (October 21, 2025)
 
----
 
 1. Authentication & Access
-	- Test email/password login and signup
-	- Test Google OAuth login and signup
-	- Verify session fields: user id, name, email, image, dailyGenerationCount, dailyLimit
-	- Test login redirect to dashboard
-	- Test logout and session expiration
+	Unit Tests:
+	- Test utility functions for authentication (e.g., password hashing, session creation).
+	Integration Tests:
+	- Test API endpoints for email/password and Google OAuth login/signup, including database interaction.
+	End-to-End Tests:
+	- Simulate user signup/login via UI, verify redirect to dashboard, and session persistence.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., session expiration, login redirect) do not reappear.
+
+	Note: Google OAuth E2E test is skipped due to cross-origin automation limitations. Manual completion is required for full flow verification. All other authentication tests are completed and passing.
 
 2. Student Management
-	- Add new student (all required fields, validation)
-	- Edit student profile (all fields)
-	- Archive/unarchive student
-	- Delete student (with confirmation)
-	- View student details (profile, goals, weaknesses, interests)
-	- Filter, search, and sort students by name, language, level, occupation, lesson count, created date
-	- Paginate student list
+	Unit Tests:
+	- Test validation logic for student fields.
+	- Test utility functions for filtering, searching, and sorting students.
+	Integration Tests:
+	- Test API endpoints for adding, editing, archiving, deleting, and fetching students.
+	End-to-End Tests:
+	- Simulate adding, editing, archiving, deleting students via UI, including confirmation dialogs and pagination.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., deletion confirmation, archiving logic) do not reappear.
 
 3. Learning Plan Generation
-	- Generate AI-powered learning plan (10 topics) for a student
-	- Regenerate learning plan
-	- Verify methodology selection and reasoning (CLT, TBLT, PPP, TTT)
-	- Display learning topics with difficulty, skills, and description
+	Unit Tests:
+	- Test topic generation logic and methodology selection functions.
+	Integration Tests:
+	- Test API endpoint for generating and regenerating learning plans.
+	End-to-End Tests:
+	- Simulate generating and viewing learning plans via UI, verify correct display of topics and methodology.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., incorrect topic count, methodology mismatch) do not reappear.
 
 4. Lesson Generation & Viewing
-	- Generate lesson for a selected topic (AI)
-	- Generate instant lesson for a specific prompt/need
-	- View generated lesson (all exercise types)
-	- View lesson header: title, objective, skills, vocabulary, context, difficulty, duration
-	- View lesson exercises: vocabulary, warmup, dialogue, comprehension, roleplay, discussion, grammar, preparation, final prep
-	- Test dynamic and lazy loading of exercises (LessonLoader, LazyLessonContent)
-	- Test lesson share link (copy to clipboard)
-	- View shared lesson (public, no login required)
-	- Test lesson not found/error states
+	Unit Tests:
+	- Test lesson generation logic and exercise component rendering.
+	Integration Tests:
+	- Test API endpoints for lesson generation, fetching, and sharing.
+	End-to-End Tests:
+	- Simulate generating, viewing, and sharing lessons via UI, including public access and error states.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., lesson not found, share link issues) do not reappear.
 
 5. Lesson Data & API
-	- Verify lesson data is fetched from /api/lessons/[id] and /api/lessons/[id]/share
-	- Verify student lessons list is fetched from /api/students/[studentId]/lessons
+	Unit Tests:
+	- Test data mapping and transformation functions for lessons.
+	Integration Tests:
+	- Test API endpoints for lesson and student lesson data retrieval.
+	End-to-End Tests:
+	- Simulate fetching and displaying lesson data in the UI.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., incorrect lesson data, API errors) do not reappear.
 
 6. Limits & Stats
-	- Test daily lesson generation limits (session fields)
-	- View dashboard stats: student count, lesson count, recent students, lessons generated today, remaining generations
+	Unit Tests:
+	- Test logic for calculating limits and stats.
+	Integration Tests:
+	- Test API endpoints for stats and limit enforcement.
+	End-to-End Tests:
+	- Simulate reaching daily limits and viewing dashboard stats via UI.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., incorrect limit enforcement, stat display) do not reappear.
 
 7. UI & Navigation
-	- Test dashboard layout, sidebar, navbar, theme switching
-	- Test navigation between dashboard, students, lessons, add/edit student, learning plan, lesson generation, instant lesson
-	- Test mobile and desktop responsiveness
+	Unit Tests:
+	- Test individual UI components for correct rendering and props.
+	Integration Tests:
+	- Test component interaction and navigation logic.
+	End-to-End Tests:
+	- Simulate user navigation across all major app sections, test theme switching and responsiveness.
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., navigation errors, layout issues) do not reappear.
 
 8. Error Handling
-	- Test error states for failed API calls, invalid data, lesson not found, student not found
-	- Test validation errors on forms
+	Unit Tests:
+	- Test error handling logic in utility functions and components.
+	Integration Tests:
+	- Test API error responses and form validation.
+	End-to-End Tests:
+	- Simulate error scenarios in the UI (e.g., failed API calls, invalid form submissions, not found pages).
+	Regression Tests:
+	- Ensure previously fixed bugs (e.g., missing error messages, unhandled errors) do not reappear.
+
+
+Excluded (not implemented):
 
 ---
 
-Excluded (not implemented):
-- Public lessons directory or ESL plans
-- Lesson caching via React Query
-- YouTube ESL generator, analytics dashboard, team workspace, mobile app, AI voice integration
+9. Test Automation & GitHub Workflows
+	- All unit, integration, E2E, and regression tests must run automatically on every pull request using CI (e.g., GitHub Actions).
+	- If any test fails, the pull request is blocked from merging.
+	- Workflow should include:
+		- Install dependencies
+		- Run linting and formatting checks
+		- Run all test suites (unit, integration, E2E)
+		- Report results in PR status
+	- Branch protection rules must enforce passing status checks before merge to main.
