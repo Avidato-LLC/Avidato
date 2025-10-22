@@ -422,7 +422,6 @@ export default function StudentProfilePage() {
                   >
                     <option value="details">Student Details</option>
                     <option value="learning-plan">Learning Plan</option>
-                    <option value="generate-lesson">Generate Lesson</option>
                     <option value="generated-lessons">Generated Lessons</option>
                     <option value="instant-lesson">Instant Lesson</option>
                   </select>
@@ -460,22 +459,6 @@ export default function StudentProfilePage() {
                       </svg>
                       <span className="hidden lg:inline">Learning Plan</span>
                       <span className="lg:hidden">Plan</span>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('generate-lesson')}
-                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
-                      activeTab === 'generate-lesson'
-                        ? 'border-brand-primary text-brand-primary'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-1 sm:space-x-2">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                      <span className="hidden lg:inline">Generate Lesson</span>
-                      <span className="lg:hidden">Generate</span>
                     </div>
                   </button>
                   <button
@@ -693,40 +676,51 @@ export default function StudentProfilePage() {
 
                     {learningTopics.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {learningTopics.map((topic, index) => (
-                        <div key={topic.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center space-x-3">
-                              <span className="w-8 h-8 bg-brand-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                                {index + 1}
-                              </span>
-                              <div>
-                                <h4 className="font-medium text-gray-900 dark:text-white">
-                                  {topic.title}
-                                </h4>
-                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(topic.difficulty)}`}>
-                                  {topic.difficulty}
-                                </span>
+                      {learningTopics.map((topic, index) => {
+                        const isGenerated = isLessonGenerated(topic.title)
+                        return (
+                          <div key={topic.id} className={`bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border ${isGenerated ? 'border-green-400 dark:border-green-600' : 'border-gray-200 dark:border-gray-600'}`}>
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center space-x-3">
+                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${isGenerated ? 'bg-green-500 text-white' : 'bg-brand-primary text-white'}`}>{isGenerated ? '✓' : index + 1}</span>
+                                <div>
+                                  <h4 className={`font-medium ${isGenerated ? 'text-green-700 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>{topic.title}</h4>
+                                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getDifficultyColor(topic.difficulty)}`}>{topic.difficulty}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                            {topic.description}
-                          </p>
-                          
-                          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                            <span>{topic.estimatedLessons} lesson{topic.estimatedLessons !== 1 ? 's' : ''}</span>
-                            <div className="flex space-x-1">
-                              {topic.skills.map((skill) => (
-                                <span key={skill} className="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
-                                  {skill}
-                                </span>
-                              ))}
+                            <p className={`text-sm mb-3 ${isGenerated ? 'text-green-600 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'}`}>{topic.description}</p>
+                            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                              <span>{topic.estimatedLessons} lesson{topic.estimatedLessons !== 1 ? 's' : ''}</span>
+                              <div className="flex space-x-1">
+                                {topic.skills.map((skill) => (
+                                  <span key={skill} className="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">{skill}</span>
+                                ))}
+                              </div>
                             </div>
+                            {/* Generate/View Button */}
+                            {!isGenerated ? (
+                              <button
+                                onClick={async () => {
+                                  setSelectedTopic(topic.id);
+                                  await handleGenerateLesson();
+                                }}
+                                disabled={isGeneratingLesson || generationStats.remaining <= 0}
+                                className="w-full mt-2 bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-accent transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                              >
+                                {isGeneratingLesson ? 'Generating...' : 'Generate Lesson'}
+                              </button>
+                            ) : (
+                              <Link
+                                href={`/lessons/${lessons.find(l => l.title.toLowerCase().includes(topic.title.toLowerCase()))?.id}`}
+                                className="w-full mt-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium flex items-center justify-center"
+                              >
+                                View Lesson
+                              </Link>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                     )}
                   </div>
