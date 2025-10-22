@@ -419,7 +419,7 @@ Example: "time management", "work-life balance", "put forward"`;
     topic: LearningTopic, 
     duration: 25 | 50 = 50
   ): Promise<GeneratedLesson> {
-    const prompt = `You are an expert English teacher creating lessons in the Engoo format. Generate a comprehensive lesson following the EXACT Engoo structure.
+  const prompt = `You are an expert English teacher creating lessons in the Engoo format. Generate a comprehensive lesson following the EXACT Engoo structure.
 
 STUDENT PROFILE:
 - Name: ${student.name}
@@ -463,6 +463,9 @@ ${this.getOccupationExclusions(student.occupation || '')}
 - Focus on advanced expressions, nuanced communication, complex linguistic structures
 - Include advanced idioms, phrasal verbs, and sophisticated terminology from OTHER fields
 - Challenge their English proficiency, not their domain expertise
+
+IMPORTANT DIALOGUE RULE:
+In the dialogue exercise, the character assigned to the student must speak after every other character. If there are more than two characters, ensure the student always speaks after each character, so the student is never left out of the conversation. Do not allow other characters to have consecutive turns without the student responding. This is a 1-on-1 lesson with the student as the main participant.
 
 ENGOO LESSON STRUCTURE:
 
@@ -624,7 +627,7 @@ ADVANCED (C1-C2):
 OUTPUT FORMAT (JSON):
 {
   "title": "${topic.title}",
-  "lessonType": "engoo",
+  "lessonType": "interactive",
   "difficulty": ${student.level === 'beginner' ? '3-4' : student.level === 'intermediate' ? '5-6' : '7-8'},
   "duration": ${duration},
   "objective": "${topic.objective}",
