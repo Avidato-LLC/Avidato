@@ -2,13 +2,13 @@ Comprehensive Test Plan for Avidato App (October 21, 2025)
 
 
 1. Authentication & Access
-	Unit Tests:
+	Unit Tests: ✅
 	- Test utility functions for authentication (e.g., password hashing, session creation).
-	Integration Tests:
+	Integration Tests: ✅
 	- Test API endpoints for email/password and Google OAuth login/signup, including database interaction.
-	End-to-End Tests:
+	End-to-End Tests: ✅
 	- Simulate user signup/login via UI, verify redirect to dashboard, and session persistence.
-	Regression Tests:
+	Regression Tests: ✅
 	- Ensure previously fixed bugs (e.g., session expiration, login redirect) do not reappear.
 
 	Note: Google OAuth E2E test is skipped due to cross-origin automation limitations. Manual completion is required for full flow verification. All other authentication tests are completed and passing.
