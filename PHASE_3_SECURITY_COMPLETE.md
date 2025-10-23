@@ -6,7 +6,6 @@
 
 **Phase 3** has been successfully completed with a comprehensive Security Tab that provides enterprise-level password management and security oversight for Avidato users.
 
----
 
 ## 🚀 **New Features Implemented**
 
