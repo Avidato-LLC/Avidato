@@ -6,8 +6,6 @@
 
 **Phase 4** has been successfully implemented with a comprehensive Account Linking Tab that provides enterprise-grade social account management for Avidato users.
 
----
-
 ## 🎯 **Features Implemented**
 
 ### 🔗 **Social Account Management**
