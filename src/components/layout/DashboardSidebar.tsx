@@ -87,14 +87,13 @@ export default function DashboardSidebar({
       )
     },
     {
-      href: '#',
-      label: 'YouTube ESL Generator',
+      href: '/dashboard/placement-tests',
+      label: 'Placement Tests',
       icon: (
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1a3 3 0 000-6h-1m1 6V4a3 3 0 00-3-3H6a3 3 0 00-3 3v6h1m7-6h.01M15 10h1a3 3 0 010 6h-1m-1-6V4a3 3 0 013-3h1a3 3 0 013 3v6h-1" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-6.13a4 4 0 11-8 0 4 4 0 018 0zm6 6a4 4 0 00-3-3.87" />
         </svg>
       ),
-      comingSoon: true
     }
   ]
 

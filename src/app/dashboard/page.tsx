@@ -341,26 +341,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <div className="relative overflow-hidden bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg p-4 sm:p-6 border border-red-200 dark:border-red-800">
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2 bg-red-500 rounded-lg">
-                  <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                </div>
-                <span className="text-xs font-medium text-red-600 dark:text-red-400 bg-red-200 dark:bg-red-900/40 px-2 py-1 rounded-full">
-                  New
-                </span>
-              </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">YouTube ESL Generator</h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">Turn any YouTube video into a structured ESL lesson with vocabulary, exercises, and discussion questions.</p>
-              <div className="flex items-center text-xs text-red-600 dark:text-red-400">
-                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Coming in February 2026
-              </div>
-            </div>
+            {/* YouTube ESL Generator card removed: hidden until release */}
             
             <div className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-4 sm:p-6 border border-purple-200 dark:border-purple-800">
               <div className="flex items-start justify-between mb-3">
