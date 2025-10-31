@@ -1,3 +1,55 @@
+// Legacy/compatibility exports for GeminiService
+export interface StudentProfile {
+  name: string;
+  targetLanguage: string;
+  nativeLanguage: string;
+  ageGroup: string;
+  level: string;
+  endGoals: string;
+  occupation?: string;
+  weaknesses?: string;
+  interests?: string;
+}
+
+export interface LearningTopic {
+  lessonNumber: number;
+  title: string;
+  objective: string;
+  vocabulary: string[];
+  grammarFocus?: string;
+  skills: string[];
+  context: string;
+  methodology: 'CLT' | 'TBLT' | 'PPP' | 'TTT';
+}
+
+export interface LearningPlan {
+  selectedMethodology: 'CLT' | 'TBLT' | 'PPP' | 'TTT';
+  methodologyReasoning: string;
+  topics: LearningTopic[];
+}
+
+export interface LessonExercise {
+  type: 'vocabulary' | 'expressions' | 'dialogue' | 'roleplay' | 'discussion' | 'grammar' | 'article' | 'fill_blanks' | 'sentence_building' | 'pronunciation' | 'listening';
+  title: string;
+  description: string;
+  content: string | string[] | object;
+  timeMinutes: number;
+}
+
+export interface GeneratedLesson {
+  title: string;
+  lessonType: 'business' | 'grammar' | 'article' | 'conversation' | 'mixed';
+  difficulty: number;
+  duration: number;
+  objective: string;
+  skills: string[];
+  vocabulary: string[];
+  context: string;
+  exercises: LessonExercise[];
+  homework?: string;
+  materials: string[];
+  teachingNotes?: string;
+}
 /**
  * Comprehensive Lesson Template Types
  * Based on Engoo lesson structure with proper vocabulary and dialogue formatting

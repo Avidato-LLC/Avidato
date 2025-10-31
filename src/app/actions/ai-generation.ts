@@ -4,7 +4,7 @@
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { geminiService, StudentProfile, LearningPlan, GeneratedLesson } from '@/lib/gemini';
+import geminiService, { StudentProfile, LearningPlan, GeneratedLesson } from '@/lib/gemini';
 import { revalidatePath } from 'next/cache';
 import type { Session } from 'next-auth';
 
@@ -398,7 +398,7 @@ export async function generateInstantLesson(
     };
 
     // Generate instant lesson
-    const generatedLesson = await geminiService.generateInstantLesson(
+    const generatedLesson = await geminiService.generateLesson(
       studentProfile,
       prompt,
       focus,
