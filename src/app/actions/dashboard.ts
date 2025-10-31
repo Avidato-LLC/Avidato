@@ -94,7 +94,7 @@ export async function getDashboardStats(): Promise<DashboardResponse> {
           }
         }),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Database timeout')), 3000)
+          setTimeout(() => reject(new Error('Database timeout')), 5000)
         )
       ])
 
