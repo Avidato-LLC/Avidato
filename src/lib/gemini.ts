@@ -373,6 +373,30 @@ EXPRESSIONS/COLLOCATIONS RULES (Issue #42):
 
 **Exercise 3: Dialogue**
 Realistic conversation between 3-4 characters using ALL vocabulary:
+
+⚠️ CRITICAL DIALOGUE RULES:
+- NEVER have characters introduce themselves unnecessarily (e.g., after being introduced, don't say "I'm James")
+- ALWAYS write NATURAL dialogue as people actually speak, not mechanical/stilted
+- Characters should build on previous context, not repeat it
+- GOOD: "You mentioned the proposal yesterday. What do you think about the timeline?"
+- BAD: "Hi, I'm James. I'm an employee. What do you think about the proposal?"
+- Each character should speak naturally, using the vocabulary in context, not forcing it
+- Avoid having the same character speak twice in a row without a response from another character
+
+EXAMPLE OF NATURAL DIALOGUE:
+{
+  "character": "James",
+  "text": "I've been thinking about the timeline for this project. Do you think we can streamline the approval process?"
+},
+{
+  "character": "Chairman",
+  "text": "That's a good point. What changes would you suggest to implement?"
+},
+{
+  "character": "James",
+  "text": "If we could reduce the review stages, we'd save at least two weeks."
+}
+
 {
   "type": "dialogue",
   "title": "Exercise 3: Dialogue",

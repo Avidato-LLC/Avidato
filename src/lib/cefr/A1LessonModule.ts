@@ -133,6 +133,50 @@ export class A1LessonModule implements CEFRLessonModule {
   }
 
   /**
+   * Gets the list of acceptable vocabulary words for A1 level (first 1000 most common words)
+   * Used to validate AI-generated vocabulary
+   */
+  getAcceptableVocabulary(): string[] {
+    // A1: First 1000 most common English words (simplified subset)
+    return [
+      'hello', 'hi', 'goodbye', 'bye', 'please', 'thank', 'yes', 'no', 'okay', 'ok',
+      'good', 'bad', 'happy', 'sad', 'tired', 'hungry', 'thirsty', 'cold', 'hot', 'big',
+      'small', 'old', 'new', 'young', 'beautiful', 'ugly', 'clean', 'dirty', 'fast', 'slow',
+      'easy', 'hard', 'difficult', 'simple', 'cheap', 'expensive', 'good', 'bad', 'better', 'worse',
+      'family', 'mother', 'father', 'sister', 'brother', 'son', 'daughter', 'wife', 'husband', 'child',
+      'man', 'woman', 'boy', 'girl', 'people', 'person', 'friend', 'teacher', 'student', 'doctor',
+      'nurse', 'police', 'worker', 'farmer', 'cook', 'driver', 'pilot', 'engineer', 'artist', 'musician',
+      'sport', 'play', 'game', 'ball', 'football', 'basketball', 'tennis', 'swimming', 'running', 'walking',
+      'eat', 'drink', 'sleep', 'wake', 'work', 'study', 'read', 'write', 'speak', 'listen',
+      'see', 'look', 'watch', 'hear', 'talk', 'walk', 'run', 'jump', 'sit', 'stand',
+      'house', 'home', 'room', 'door', 'window', 'bed', 'table', 'chair', 'kitchen', 'bathroom',
+      'school', 'office', 'hospital', 'shop', 'market', 'street', 'car', 'bus', 'train', 'plane',
+      'book', 'pen', 'paper', 'pencil', 'desk', 'computer', 'phone', 'camera', 'watch', 'clock',
+      'food', 'apple', 'banana', 'bread', 'rice', 'meat', 'fish', 'chicken', 'milk', 'cheese',
+      'water', 'coffee', 'tea', 'juice', 'wine', 'beer', 'breakfast', 'lunch', 'dinner', 'restaurant',
+      'color', 'red', 'blue', 'green', 'yellow', 'black', 'white', 'pink', 'purple', 'orange',
+      'number', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+      'day', 'night', 'morning', 'afternoon', 'evening', 'week', 'month', 'year', 'time', 'hour',
+      'minute', 'second', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+      'weather', 'sun', 'rain', 'snow', 'wind', 'cloud', 'temperature', 'warm', 'cool', 'dry',
+      'money', 'dollar', 'euro', 'price', 'buy', 'sell', 'pay', 'cost', 'expensive', 'cheap',
+      'country', 'city', 'town', 'village', 'mountain', 'river', 'sea', 'beach', 'park', 'nature',
+      'animal', 'dog', 'cat', 'bird', 'fish', 'cow', 'horse', 'pig', 'sheep', 'chicken',
+      'love', 'like', 'want', 'need', 'help', 'start', 'stop', 'begin', 'end', 'continue',
+      'go', 'come', 'stay', 'leave', 'arrive', 'depart', 'return', 'travel', 'visit', 'explore',
+      'weather', 'hot', 'cold', 'warm', 'cool', 'rainy', 'sunny', 'cloudy', 'stormy', 'windy',
+    ];
+  }
+
+  /**
+   * Validates if a word is appropriate for A1 level
+   */
+  isWordAcceptableForLevel(word: string): boolean {
+    const normalized = word.toLowerCase().trim();
+    return this.getAcceptableVocabulary().some(w => w.includes(normalized) || normalized.includes(w));
+  }
+
+  /**
    * Filters vocabulary for A1 level using CEFR word-level system
    */
   getVocabularyForLevel(words: string[]): string[] {

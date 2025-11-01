@@ -116,6 +116,78 @@ export class C1LessonModule implements CEFRLessonModule {
   }
 
   /**
+   * Gets the list of acceptable vocabulary words for C1 level (advanced/specialized only)
+   * Used to validate AI-generated vocabulary - REJECTS basic professional/common words
+   */
+  getAcceptableVocabulary(): string[] {
+    // C1: ONLY advanced, sophisticated vocabulary
+    // Explicitly EXCLUDES basic professional terms that appear in A2-B2
+    return [
+      // Sophisticated synonyms and alternatives
+      'paradigm', 'juxtaposition', 'obfuscate', 'obfuscation', 'serendipitous', 'ubiquitous', 'quintessential',
+      'ephemeral', 'esoteric', 'enigmatic', 'perspicacious', 'sagacious', 'propitious', 'auspicious',
+      'mellifluous', 'sonorous', 'dulcet', 'euphonious', 'cacophony', 'discordant', 'dissonant',
+      'antithesis', 'anathema', 'apotheosis', 'catharsis', 'nemesis', 'epitome', 'paragon',
+      'anomaly', 'conundrum', 'paradox', 'dichotomy', 'dichotomous', 'polemic', 'contentious',
+      'obsequious', 'servile', 'sycophantic', 'oleaginous', 'unctuous', 'mendacious', 'veracious',
+      'perspicacity', 'acumen', 'erudition', 'pedantic', 'scholastic', 'didactic', 'heuristic',
+      'ameliorate', 'exacerbate', 'mitigate', 'alleviate', 'palliate', 'assuage', 'placate',
+      'obfuscatory', 'elucidating', 'pellucid', 'opaque', 'translucent', 'lucent', 'luminous',
+      'pernicious', 'noxious', 'deleterious', 'baneful', 'inimical', 'virulent', 'vitriolic',
+      'magnanimous', 'pusillanimous', 'perspicacious', 'verbose', 'loquacious', 'taciturn', 'laconic',
+      'solipsistic', 'egocentric', 'altruistic', 'philanthropic', 'misanthropic', 'xenophobic', 'cosmopolitan',
+      'perspicuous', 'insipid', 'vapid', 'jejune', 'banal', 'quotidian', 'prosaic', 'mundane',
+      'inchoate', 'amorphous', 'incipient', 'proto', 'primordial', 'embryonic', 'nascent',
+      'fortuitous', 'synchronicity', 'serendipity', 'providence', 'kismet', 'fate', 'destiny',
+      'sesquipedalian', 'verbose', 'prolix', 'grandiose', 'bombastic', 'pompous', 'ostentatious',
+      'pellucid', 'perspicuous', 'limpid', 'luculent', 'luminous', 'crystalline', 'transparent',
+      'mercurial', 'capricious', 'inconstant', 'fickle', 'volatile', 'ephemeral', 'evanescent',
+      'hegemony', 'supremacy', 'dominion', 'sovereignty', 'ascendancy', 'preponderance', 'prevalence',
+      'insouciant', 'nonchalant', 'cavalier', 'offhand', 'perfunctory', 'cursory', 'desultory',
+      'sagacious', 'judicious', 'prudent', 'discerning', 'perspicacious', 'astute', 'penetrating',
+      'amelioration', 'aggrandizement', 'magnification', 'amplification', 'augmentation', 'proliferation',
+      'inveterate', 'congenital', 'inherent', 'intrinsic', 'immanent', 'constitutive', 'fundamental',
+      'exiguous', 'meager', 'jejune', 'spartan', 'austere', 'ascetic', 'abstemious',
+      'perspicuous', 'pellucid', 'crystalline', 'limpid', 'diaphanous', 'translucent', 'transparent',
+      'obtrusive', 'conspicuous', 'salient', 'prominent', 'striking', 'arresting', 'compelling',
+      'recondite', 'abstruse', 'arcane', 'esoteric', 'cryptic', 'enigmatic', 'inscrutable',
+      'pellucid', 'loquacious', 'verbose', 'prolix', 'garrulous', 'voluble', 'articulate',
+      // Advanced business/professional terminology (NOT basic terms)
+      'fiduciary', 'fungible', 'tranche', 'securitization', 'arbitrage', 'collateral', 'covenant',
+      'leverage', 'amortization', 'accrual', 'depreciation', 'impairment', 'provisioning', 'hedging',
+      'derivative', 'forward', 'futures', 'option', 'call', 'put', 'strike', 'volatility',
+      'equity', 'debt', 'subordinated', 'tranched', 'senior', 'junior', 'mezzanine', 'subordination',
+      // NOT including basic words like: compliance, fraudulent, verification, email, meeting, appointment, etc.
+    ];
+  }
+
+  /**
+   * Validates if a word is appropriate for C1 level
+   * REJECTS basic professional terms that should be A2-B2
+   */
+  isWordAcceptableForLevel(word: string): boolean {
+    const normalized = word.toLowerCase().trim();
+    const basicWordsToReject = [
+      'compliance', 'fraudulent', 'verification', 'email', 'meeting', 'appointment', 'doctor',
+      'hospital', 'patient', 'computer', 'project', 'team', 'manager', 'employee', 'company',
+      'business', 'work', 'office', 'report', 'memo', 'procedure', 'process', 'system',
+      'customer', 'client', 'service', 'product', 'sale', 'marketing', 'budget', 'plan',
+      'goal', 'objective', 'strategy', 'approach', 'method', 'implement', 'streamline',
+      'challenge', 'opportunity', 'risk', 'benefit', 'advantage', 'disadvantage', 'solution',
+      'problem', 'issue', 'concern', 'feedback', 'communication', 'meeting', 'conference',
+      'workshop', 'training', 'development', 'growth', 'success', 'failure', 'progress',
+    ];
+
+    // REJECT if word is in the basic words list
+    if (basicWordsToReject.some(w => w.includes(normalized) || normalized.includes(w))) {
+      return false;
+    }
+
+    // ACCEPT if word is in the approved C1 vocabulary
+    return this.getAcceptableVocabulary().some(w => w.includes(normalized) || normalized.includes(w));
+  }
+
+  /**
    * Returns the vocabulary guide for C1 level
    */
   getVocabularyGuide(): string {
