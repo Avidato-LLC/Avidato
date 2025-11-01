@@ -88,7 +88,7 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
               </div>
               
               {/* Example sentence */}
-              <div className="text-gray-600 dark:text-gray-400 text-sm break-words leading-relaxed mb-3">
+              <div className="text-gray-600 dark:text-gray-400 text-sm break-words leading-relaxed mb-3 italic">
                 <span dangerouslySetInnerHTML={{ 
                   __html: safeReplace(item.example) 
                 }} />
