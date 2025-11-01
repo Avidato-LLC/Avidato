@@ -62,6 +62,7 @@ export interface VocabularyItem {
   definition: string
   example: string
   synonym?: string // Contextually appropriate synonym, displayed as subscript. Leave empty if no suitable synonym exists.
+  expressions?: string[] // Common collocations or phrase patterns, e.g., ["demonstrate compliance", "breach of compliance"]. For A2+.
 }
 
 export interface DialogueCharacter {

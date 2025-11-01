@@ -21,6 +21,7 @@ interface VocabularyItem {
   definition: string
   example: string
   synonym?: string
+  expressions?: string[] // Common collocations/phrases using this word
 }
 
 interface Character {
@@ -87,11 +88,30 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
               </div>
               
               {/* Example sentence */}
-              <div className="text-gray-600 dark:text-gray-400 text-sm break-words leading-relaxed">
+              <div className="text-gray-600 dark:text-gray-400 text-sm break-words leading-relaxed mb-3">
                 <span dangerouslySetInnerHTML={{ 
                   __html: safeReplace(item.example) 
                 }} />
               </div>
+
+              {/* Expressions/collocations - show useful phrases if available (A2+) */}
+              {item.expressions && item.expressions.length > 0 && (
+                <div className="mt-2 pt-3 border-t border-gray-200 dark:border-gray-600">
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    Useful phrases:
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {item.expressions.map((expr, exprIndex) => (
+                      <span
+                        key={exprIndex}
+                        className="px-2 py-1 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 rounded border border-amber-200 dark:border-amber-800"
+                      >
+                        {expr}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

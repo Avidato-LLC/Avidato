@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 // We are adding the 'icons' and 'manifest' properties to your existing object.
 export const metadata: Metadata = {
   title: "Avidato",
-  description: "Your AI-powered teaching assistant.",
+  description: "Your AI-powered teaching assistant. English materials for Online English Tutors, share with your students. English ESL, ai, personalized, lesson plans, worksheets, flashcards, quizzes.",
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },

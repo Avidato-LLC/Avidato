@@ -17,7 +17,6 @@ import {
   StudentProfile,
   LearningTopic,
   LearningPlan,
-  LessonExercise,
   GeneratedLesson
 } from '../types/lesson-template';
 
@@ -291,7 +290,8 @@ FOR BEGINNER/ELEMENTARY (A1-A2):
   "phonetics": "/əˈpɔɪntmənt/",
   "definition": "a meeting that has been arranged for a particular time",
   "example": "I have a doctor's appointment at 3 PM.",
-  "synonym": "meeting"
+  "synonym": "meeting",
+  "expressions": []
 }
 
 FOR INTERMEDIATE (B1-B2):
@@ -301,7 +301,8 @@ FOR INTERMEDIATE (B1-B2):
   "phonetics": "/ˈstriːmlaɪn/",
   "definition": "to make a process more efficient by simplifying it",
   "example": "We need to streamline our approval process to reduce delays.",
-  "synonym": "simplify"
+  "synonym": "simplify",
+  "expressions": ["streamline the process", "streamline operations"]
 }
 
 FOR ADVANCED (C1-C2):
@@ -311,7 +312,8 @@ FOR ADVANCED (C1-C2):
   "phonetics": "/ˈpærədaɪm ʃɪft/",
   "definition": "a fundamental change in approach or underlying assumptions",
   "example": "The company underwent a paradigm shift, moving from traditional sales to digital-first strategies.",
-  "synonym": "major change"
+  "synonym": "major change",
+  "expressions": ["paradigm shift in", "represent a paradigm shift", "drive a paradigm shift"]
 }
 
 VOCABULARY FORMAT:
@@ -344,6 +346,20 @@ SYNONYM RULES (Issue #36):
 - Examples of WRONG synonyms:
   * "sing" → "vocalize" (for A1 - vocalize is TOO COMPLEX)
   * "run" → "perambulate" (for A1 - way too complex)
+
+EXPRESSIONS/COLLOCATIONS RULES (Issue #42):
+- Add an "expressions" array to EACH vocabulary item (can be empty for A1)
+- Expressions provide practical phrase patterns showing how the word is used in context
+- Level-specific rules:
+  * A1 (Beginner): Leave expressions empty [] - focus on word definitions only
+  * A2+ (Elementary and above): Include 2-3 common collocations/phrases using the word
+    - Examples for "compliance": ["demonstrate compliance", "ensure compliance", "compliance with"]
+    - Examples for "streamline": ["streamline the process", "streamline operations"]
+  * B1-C2: Include sophisticated, natural phrase patterns
+    - Examples for "paradigm shift": ["paradigm shift in", "represent a paradigm shift", "drive a paradigm shift"]
+- Expressions should be natural, commonly-used phrases that learners can memorize and reuse
+- Each expression should be 2-4 words (not full sentences)
+- Expressions help students understand how professional words are actually used in context
 
 **Exercise 2: Warm-up**
 2-3 discussion questions introducing the topic:
@@ -501,7 +517,15 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
         .replace(/\t/g, '\\t'); // Escape tabs
       
       const parsedResponse = JSON.parse(cleanedJson);
-      
+
+      // Sanitize and enforce synonym rules based on CEFR level before returning
+      try {
+        this.enforceSynonymConstraints(parsedResponse, student.level);
+      } catch (err) {
+        // If sanitization fails, log and continue returning raw parsed response
+        console.warn('Failed to sanitize synonyms:', err);
+      }
+
       return parsedResponse;
     } catch (error) {
       console.error('Error generating lesson:', error);
@@ -534,8 +558,154 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
   }
 
   private getLevelSpecificInstructions(level: string): string {
-    // ...existing implementation from previous code...
-    return '';
+    const l = level.toLowerCase();
+    if (l.includes('a1') || l.includes('beginner')) {
+      return `A1 BEGINNER STUDENTS:
+- Use ONLY the most common everyday words (first 1000 words)
+- Definitions must use only A1-appropriate words (no complex terms)
+- For synonyms: only include if equally simple (very common, 1-2 syllables, single word). Otherwise set "" (empty string)
+- Examples: "happy" → "glad", "sing" → "" (no simpler option, leave blank)
+- Focus on: Family, colors, numbers, food, basic verbs (be, have, go)
+- Expressions: Leave empty [] - focus on definitions only`;
+    }
+    if (l.includes('a2') || l.includes('elementary')) {
+      return `A2 ELEMENTARY STUDENTS:
+- Use EXPANDED everyday vocabulary and simple phrasal verbs
+- Include 2-3 common expressions showing how each word is used ("meeting schedule", "doctor's appointment")
+- For synonyms: include simple/common synonyms (1-3 syllables, single word). Otherwise set "" (empty string)
+- Examples: "appointment" → "meeting", then expressions like "doctor's appointment", "schedule an appointment"
+- Focus on: Expanded professional basics (for their field), common phrasal verbs, basic collocations
+- DO NOT teach C1-level words to A2 students`;
+    }
+    if (l.includes('b1') || l.includes('intermediate')) {
+      return `B1 INTERMEDIATE STUDENTS:
+- Use intermediate vocabulary, basic idioms, and common phrasal verbs
+- Include 2-3 expressions showing natural context ("streamline the process", "streamline operations")
+- Synonyms may be intermediate-level words (1-4 syllables)
+- Examples: "streamline" → "simplify" with expressions showing usage patterns
+- Focus on: Practical professional vocabulary, common business expressions, intermediate collocations
+- Challenge their English proficiency, not their professional knowledge`;
+    }
+    if (l.includes('b2') || l.includes('upper')) {
+      return `B2 UPPER-INTERMEDIATE STUDENTS:
+- Use upper-intermediate vocabulary with nuanced synonyms and collocations acceptable
+- Include 2-3 sophisticated expressions/collocations
+- Synonyms can be multi-word if appropriate
+- Focus on: Advanced phrasal verbs, idiomatic expressions, nuanced meaning distinctions
+- DO NOT use basic professional terms (they already know these)
+- Challenge their English proficiency with sophisticated expressions and collocations`;
+    }
+    if (l.includes('c1') || l.includes('advanced')) {
+      return `C1 ADVANCED STUDENTS:
+⚠️ CRITICAL: DO NOT WASTE TIME ON BASIC WORDS THEY ALREADY KNOW
+- Use ONLY advanced specialized vocabulary (NOT basic professional terms like "compliance", "fraudulent", "verification")
+- These words are A2-B1 level - a C1 professional knows them already!
+- Instead use: Advanced expressions, sophisticated idioms, nuanced synonyms, technical jargon from THEIR field
+- Examples of WRONG: "compliance" (basic), "fraudulent" (basic), "verification" (too basic)
+- Examples of CORRECT for C1 accountant: "materiality thresholds", "forensic accounting implications", "audit committee governance"
+- Include 2-3 sophisticated expressions showing professional usage in context
+- Each expression should demonstrate advanced business communication patterns
+- Challenge their English proficiency and offer new advanced vocabulary, not review of basics`;
+    }
+    if (l.includes('c2') || l.includes('proficiency')) {
+      return `C2 PROFICIENCY STUDENTS:
+⚠️ CRITICAL: ONLY USE EXPERT-LEVEL VOCABULARY AND EXPRESSIONS
+- Use ONLY native-like, expert-level terminology and sophisticated expressions
+- Never include basic or intermediate vocabulary
+- Include 2-3 expert-level expressions showing specialized context
+- Synonyms must be equally sophisticated
+- Focus on: Nuanced distinctions, cultural/domain-specific expressions, academic or expert-level terminology
+- Challenge their near-native English proficiency with sophisticated concepts and specialized communication`;
+    }
+    return `Use intermediate-level vocabulary and simple synonyms when possible.`;
+  }
+
+  /**
+   * Enforce synonym constraints on the parsed AI response. This mutates parsedResponse in-place.
+   * For beginner levels (A1/A2) we aggressively filter out synonyms that look complex (multi-word,
+   * many syllables, or containing advanced suffixes like -ize, -tion).
+   */
+  private enforceSynonymConstraints(parsedResponse: unknown, level: string) {
+    if (typeof parsedResponse !== 'object' || parsedResponse === null) return;
+    const resp = parsedResponse as { exercises?: unknown[] };
+    if (!resp.exercises || !Array.isArray(resp.exercises)) return;
+    const lvl = level.toLowerCase();
+
+    type Exercise = { type?: string; content?: { vocabulary?: unknown[] } };
+    for (const ex of resp.exercises as Exercise[]) {
+      if (!ex || ex.type !== 'vocabulary' || !ex.content || !Array.isArray(ex.content.vocabulary)) continue;
+
+      for (const item of ex.content.vocabulary as unknown[]) {
+        if (!item || typeof item !== 'object' || item === null) continue;
+        const obj = item as { synonym?: unknown; [k: string]: unknown };
+        const syn = (obj.synonym ?? '')?.toString().trim();
+
+        if (!syn) continue; // empty string is allowed
+
+        if (!this.isSynonymAcceptableForLevel(syn, lvl)) {
+          // Replace with empty string to force blank synonym when not appropriate
+          obj.synonym = '';
+        }
+      }
+    }
+  }
+
+  private isSynonymAcceptableForLevel(synonym: string, levelLower: string): boolean {
+    const s = synonym.toLowerCase().trim();
+    // Allow empty
+    if (!s) return true;
+    // Basic checks: single word for lower levels
+    const isMultiWord = s.split(/\s+/).length > 1;
+
+    // crude syllable estimate: count vowel groups
+    const syllables = this.estimateSyllables(s);
+    const len = s.length;
+
+    // Reject obvious advanced morphological forms for low levels
+    const advancedMarkers = ['ize', 'ise', 'tion', 'ify', 'ate', 'perambulate', 'vocalize'];
+    const containsAdvancedMarker = advancedMarkers.some(m => s.includes(m));
+
+    // Level-specific heuristics
+    if (levelLower.includes('a1') || levelLower.includes('beginner')) {
+      // A1: single-word, very short, <=2 syllables, length <= 8, no advanced markers
+      if (isMultiWord) return false;
+      if (syllables > 2) return false;
+      if (len > 8) return false;
+      if (containsAdvancedMarker) return false;
+      return true;
+    }
+    if (levelLower.includes('a2') || levelLower.includes('elementary')) {
+      // A2: single-word preferred, <=3 syllables, len <= 10
+      if (isMultiWord) return false;
+      if (syllables > 3) return false;
+      if (len > 10) return false;
+      if (containsAdvancedMarker) return false;
+      return true;
+    }
+    if (levelLower.includes('b1') || levelLower.includes('intermediate')) {
+      // B1: multi-word allowed, <=4 syllables
+      if (syllables > 4) return false;
+      return true;
+    }
+    if (levelLower.includes('b2') || levelLower.includes('upper')) {
+      // B2: allow more complex synonyms
+      if (syllables > 6) return false;
+      return true;
+    }
+    // C1/C2: accept most synonyms
+    return true;
+  }
+
+  private estimateSyllables(word: string): number {
+    if (!word) return 0;
+    const w = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (!w) return 0;
+    // Count vowel groups as a heuristic
+    const matches = w.match(/[aeiouy]{1,2}/g);
+    const count = matches ? matches.length : 0;
+    // adjust common silent e
+    if (w.endsWith('e')) return Math.max(1, count - 1);
+    return Math.max(1, count);
   }
 }
 
