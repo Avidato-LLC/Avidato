@@ -20,6 +20,7 @@ interface VocabularyItem {
   phonetics: string
   definition: string
   example: string
+  synonym?: string
 }
 
 interface Character {
@@ -45,6 +46,12 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
               <div className="text-xl lg:text-lg font-semibold text-blue-600 dark:text-blue-400 break-words leading-tight mb-2">
                 {item.word}
               </div>
+              {/* Synonym subscript - only show if available and contextually appropriate */}
+              {item.synonym && (
+                <div className="text-xs text-gray-600 dark:text-gray-400 mb-3 italic">
+                  <sub>{item.synonym}</sub>
+                </div>
+              )}
               <div className="flex items-center gap-3 mb-3 lg:mb-2">
                 <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded font-medium">
                   {item.partOfSpeech}

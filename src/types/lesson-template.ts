@@ -61,6 +61,7 @@ export interface VocabularyItem {
   phonetics: string // IPA pronunciation like "/ˈklæsɪfaɪd/"
   definition: string
   example: string
+  synonym?: string // Contextually appropriate synonym, displayed as subscript. Leave empty if no suitable synonym exists.
 }
 
 export interface DialogueCharacter {

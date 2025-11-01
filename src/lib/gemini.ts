@@ -284,7 +284,8 @@ FOR BEGINNER/ELEMENTARY (A1-A2):
   "partOfSpeech": "Noun",
   "phonetics": "/əˈpɔɪntmənt/",
   "definition": "a meeting that has been arranged for a particular time",
-  "example": "I have a doctor's appointment at 3 PM."
+  "example": "I have a doctor's appointment at 3 PM.",
+  "synonym": "meeting"
 }
 
 FOR INTERMEDIATE (B1-B2):
@@ -293,7 +294,8 @@ FOR INTERMEDIATE (B1-B2):
   "partOfSpeech": "Verb", 
   "phonetics": "/ˈstriːmlaɪn/",
   "definition": "to make a process more efficient by simplifying it",
-  "example": "We need to streamline our approval process to reduce delays."
+  "example": "We need to streamline our approval process to reduce delays.",
+  "synonym": "simplify"
 }
 
 FOR ADVANCED (C1-C2):
@@ -302,7 +304,8 @@ FOR ADVANCED (C1-C2):
   "partOfSpeech": "Noun phrase",
   "phonetics": "/ˈpærədaɪm ʃɪft/",
   "definition": "a fundamental change in approach or underlying assumptions",
-  "example": "The company underwent a paradigm shift, moving from traditional sales to digital-first strategies."
+  "example": "The company underwent a paradigm shift, moving from traditional sales to digital-first strategies.",
+  "synonym": "major change"
 }
 
 VOCABULARY FORMAT:
@@ -311,10 +314,21 @@ VOCABULARY FORMAT:
   "title": "Exercise 1: Vocabulary", 
   "description": "Learn and practice new vocabulary",
   "content": {
-    "vocabulary": [/* 6-8 level-appropriate vocabulary items */]
+    "vocabulary": [/* 6-8 level-appropriate vocabulary items WITH synonyms */]
   },
   "timeMinutes": 10
 }
+
+SYNONYM RULES (Issue #36):
+- Add a "synonym" field to EACH vocabulary item
+- Synonym should be a simpler, contextually appropriate word that fits the lesson context
+- Only include if a suitable synonym exists (leave empty string if none exists)
+- Synonym must be at the SAME level or LOWER than the vocabulary word
+- Examples:
+  * "appointment" → "meeting"
+  * "streamline" → "simplify"
+  * "paradigm shift" → "major change"
+  * "ameliorate" → "" (no simple synonym, leave blank)
 
 **Exercise 2: Warm-up**
 2-3 discussion questions introducing the topic:
