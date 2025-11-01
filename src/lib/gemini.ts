@@ -245,6 +245,12 @@ VOCABULARY WORDS: ${topic.vocabulary.join(', ')}
 LEVEL-APPROPRIATE VOCABULARY REQUIREMENTS:
 ${this.getLevelVocabularyGuide(student.level)}
 
+CRITICAL SYNONYM RULES FOR ${student.level.toUpperCase()} STUDENTS:
+- Synonyms MUST be appropriate for level ${student.level}
+- BEGINNER (A1/A2): Synonyms should be equally simple or LEAVE BLANK if no simple synonym exists
+- INTERMEDIATE (B1/B2): Synonyms should be intermediate-level
+- ADVANCED (C1/C2): Synonyms can be more sophisticated
+
 CRITICAL REQUIREMENTS:
 1. ALL vocabulary words MUST be used 2-3 times throughout the lesson
 2. Follow EXACT Engoo format with proper vocabulary structure
@@ -321,14 +327,23 @@ VOCABULARY FORMAT:
 
 SYNONYM RULES (Issue #36):
 - Add a "synonym" field to EACH vocabulary item
-- Synonym should be a simpler, contextually appropriate word that fits the lesson context
-- Only include if a suitable synonym exists (leave empty string if none exists)
-- Synonym must be at the SAME level or LOWER than the vocabulary word
-- Examples:
-  * "appointment" → "meeting"
-  * "streamline" → "simplify"
-  * "paradigm shift" → "major change"
-  * "ameliorate" → "" (no simple synonym, leave blank)
+- Synonym MUST be appropriate for the SAME level as the vocabulary word being taught
+- CRITICAL: DO NOT use complex synonyms for basic level students
+- ONLY include synonym if it's simpler or equally simple at that level (leave empty string "" if none exists)
+- Level-specific rules:
+  * A1/A2 (Beginner): Use ONLY very common, everyday words OR LEAVE BLANK
+    - "sing" → "" (no simpler word, leave blank)
+    - "happy" → "glad" (both simple)
+    - "appointment" → "meeting" (both common)
+  * B1/B2 (Intermediate): Use intermediate-level synonyms
+    - "streamline" → "simplify" (both intermediate)
+    - "vocalize" → "sing" (more common synonym)
+  * C1/C2 (Advanced): Use advanced synonyms
+    - "paradigm shift" → "major change" or "" (depends on context)
+    - "ameliorate" → "improve" or "" (improve is simpler, so OK or leave blank)
+- Examples of WRONG synonyms:
+  * "sing" → "vocalize" (for A1 - vocalize is TOO COMPLEX)
+  * "run" → "perambulate" (for A1 - way too complex)
 
 **Exercise 2: Warm-up**
 2-3 discussion questions introducing the topic:
