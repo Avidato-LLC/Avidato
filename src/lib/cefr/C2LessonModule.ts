@@ -2,7 +2,7 @@
 // Generates lessons and filters vocabulary for C2 level
 
 import { CEFRLessonModule } from './CEFRLessonModule';
-import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
 
 export class C2LessonModule implements CEFRLessonModule {
   async generateLesson(student: StudentProfile, topic: LearningTopic, duration: number): Promise<GeneratedLesson> {
@@ -89,6 +89,44 @@ export class C2LessonModule implements CEFRLessonModule {
   }
 
   /**
+   * Generates level-appropriate C2 vocabulary items
+   * C2: ONLY expert-level vocabulary, sophisticated expressions
+   */
+  async generateVocabularyItems(): Promise<VocabularyItem[]> {
+    const c2BaseVocabulary: VocabularyItem[] = [
+      {
+        word: 'serendipitous',
+        partOfSpeech: 'Adjective',
+        phonetics: '/ˌserənˈdɪpɪtəs/',
+        definition: 'occurring by chance in a happy or beneficial way; fortunate and unexpected',
+        example: 'The serendipitous meeting with the investor changed the trajectory of the startup.',
+        synonym: 'fortuitous',
+        expressions: ['serendipitous encounter', 'serendipitous discovery', 'serendipitous outcome']
+      },
+      {
+        word: 'ubiquitous',
+        partOfSpeech: 'Adjective',
+        phonetics: '/juːˈbɪkwɪtəs/',
+        definition: 'present, appearing, or found everywhere, especially without being noticed',
+        example: 'Smartphones have become ubiquitous in modern society.',
+        synonym: 'pervasive',
+        expressions: ['ubiquitous presence', 'ubiquitous in', 'ubiquitous technology']
+      },
+      {
+        word: 'quintessential',
+        partOfSpeech: 'Adjective',
+        phonetics: '/ˌkwɪntɪˈsenʃəl/',
+        definition: 'representing the most perfect or typical example of something',
+        example: 'Jazz is considered the quintessential American art form.',
+        synonym: 'archetypal',
+        expressions: ['quintessential example', 'quintessential feature', 'quintessential representation']
+      },
+    ];
+
+    return c2BaseVocabulary.slice(0, 6);
+  }
+
+  /**
    * Returns the vocabulary guide for C2 level
    */
   getVocabularyGuide(): string {
@@ -113,3 +151,4 @@ Example: "jump the shark", "move the goalposts", "a Pyrrhic victory", "throw the
     return words;
   }
 }
+

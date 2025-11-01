@@ -2,7 +2,7 @@
 // Generates lessons and filters vocabulary for A2 level
 
 import { CEFRLessonModule } from './CEFRLessonModule';
-import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
 
 export class A2LessonModule implements CEFRLessonModule {
   async generateLesson(student: StudentProfile, topic: LearningTopic, duration: number): Promise<GeneratedLesson> {
@@ -92,6 +92,44 @@ export class A2LessonModule implements CEFRLessonModule {
   }
 
   /**
+   * Generates level-appropriate A2 vocabulary items
+   * A2: Simple professional vocabulary with common expressions
+   */
+  async generateVocabularyItems(): Promise<VocabularyItem[]> {
+    const a2BaseVocabulary: VocabularyItem[] = [
+      {
+        word: 'appointment',
+        partOfSpeech: 'Noun',
+        phonetics: '/əˈpɔɪntmənt/',
+        definition: 'a meeting that has been arranged for a particular time',
+        example: 'I have a doctor\'s appointment at 3 PM.',
+        synonym: 'meeting',
+        expressions: ['doctor\'s appointment', 'schedule an appointment', 'appointment time']
+      },
+      {
+        word: 'comfortable',
+        partOfSpeech: 'Adjective',
+        phonetics: '/ˈkʌmftəbəl/',
+        definition: 'feeling relaxed and at ease',
+        example: 'This chair is very comfortable.',
+        synonym: 'cozy',
+        expressions: ['feel comfortable', 'make yourself comfortable', 'comfortable with']
+      },
+      {
+        word: 'arrive',
+        partOfSpeech: 'Verb',
+        phonetics: '/əˈraɪv/',
+        definition: 'to reach or come to a place',
+        example: 'I arrive at work at 8 AM.',
+        synonym: 'come',
+        expressions: ['arrive at', 'arrive on time', 'arrive early']
+      },
+    ];
+
+    return a2BaseVocabulary.slice(0, 6);
+  }
+
+  /**
    * Returns the vocabulary guide for A2 level
    */
   getVocabularyGuide(): string {
@@ -109,3 +147,4 @@ Example: "neighborhood", "get along with", "take care of"`;
     return words;
   }
 }
+

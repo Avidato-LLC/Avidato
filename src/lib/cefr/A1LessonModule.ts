@@ -2,7 +2,7 @@
 // Generates lessons and filters vocabulary for A1 level
 
 import { CEFRLessonModule } from './CEFRLessonModule';
-import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
 
 export class A1LessonModule implements CEFRLessonModule {
   /**
@@ -79,18 +79,59 @@ export class A1LessonModule implements CEFRLessonModule {
     };
   }
 
-    /**
-     * Returns the vocabulary guide for A1 level
-     */
-    getVocabularyGuide(): string {
-      return `A1/BEGINNER VOCABULARY:
+  /**
+   * Generates level-appropriate A1 vocabulary items
+   * A1: Simple everyday vocabulary with no expressions (just definitions)
+   */
+  async generateVocabularyItems(): Promise<VocabularyItem[]> {
+    // For A1, provide a curated set of simple vocabulary
+    // This is a base implementation that can be expanded with AI generation later
+    const a1BaseVocabulary: VocabularyItem[] = [
+      {
+        word: 'hello',
+        partOfSpeech: 'Interjection',
+        phonetics: '/həˈloʊ/',
+        definition: 'a word you say when you meet someone',
+        example: 'Hello! My name is Sarah.',
+        synonym: 'hi',
+        expressions: [] // A1: no expressions
+      },
+      {
+        word: 'happy',
+        partOfSpeech: 'Adjective',
+        phonetics: '/ˈhæpi/',
+        definition: 'feeling or showing pleasure',
+        example: 'I am happy today.',
+        synonym: 'glad',
+        expressions: [] // A1: no expressions
+      },
+      {
+        word: 'family',
+        partOfSpeech: 'Noun',
+        phonetics: '/ˈfæməli/',
+        definition: 'parents and children living together',
+        example: 'My family is very big.',
+        synonym: '',
+        expressions: [] // A1: no expressions, no complex synonyms
+      },
+    ];
+
+    return a1BaseVocabulary.slice(0, 6);
+  }
+
+  /**
+   * Returns the vocabulary guide for A1 level
+   */
+  getVocabularyGuide(): string {
+    return `A1/BEGINNER VOCABULARY:
    Basic everyday words they don't know yet (family, colors, numbers, food)
    Simple verbs (be, have, go, like)
    Common adjectives (big, small, good, bad)
    Present tense focus
    ⚠️ Only use basic professional terms if student is NEW to the profession
    Example: "happy", "family", "eat", "work". In the definition of the vocabulary, do not use any word an A1 student would not know`;
-    }
+  }
+
   /**
    * Filters vocabulary for A1 level using CEFR word-level system
    */
@@ -100,3 +141,4 @@ export class A1LessonModule implements CEFRLessonModule {
     return words;
   }
 }
+

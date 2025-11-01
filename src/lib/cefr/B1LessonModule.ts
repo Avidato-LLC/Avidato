@@ -2,7 +2,7 @@
 // Generates lessons and filters vocabulary for B1 level
 
 import { CEFRLessonModule } from './CEFRLessonModule';
-import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
 
 export class B1LessonModule implements CEFRLessonModule {
   async generateLesson(student: StudentProfile, topic: LearningTopic, duration: number): Promise<GeneratedLesson> {
@@ -77,6 +77,43 @@ export class B1LessonModule implements CEFRLessonModule {
   }
 
   /**
+   * Generates level-appropriate B1 vocabulary items
+   */
+  async generateVocabularyItems(): Promise<VocabularyItem[]> {
+    const b1BaseVocabulary: VocabularyItem[] = [
+      {
+        word: 'streamline',
+        partOfSpeech: 'Verb',
+        phonetics: '/ˈstriːmlaɪn/',
+        definition: 'to make a process more efficient by simplifying it',
+        example: 'We need to streamline our approval process to reduce delays.',
+        synonym: 'simplify',
+        expressions: ['streamline the process', 'streamline operations', 'streamline efficiency']
+      },
+      {
+        word: 'implement',
+        partOfSpeech: 'Verb',
+        phonetics: '/ˈɪmpləment/',
+        definition: 'to put a plan or system into action',
+        example: 'The company will implement new policies next month.',
+        synonym: 'apply',
+        expressions: ['implement changes', 'implement a system', 'implement strategy']
+      },
+      {
+        word: 'challenge',
+        partOfSpeech: 'Noun',
+        phonetics: '/ˈtʃælɪndʒ/',
+        definition: 'a difficult task or problem to solve',
+        example: 'The main challenge is managing the budget.',
+        synonym: 'difficulty',
+        expressions: ['face a challenge', 'overcome a challenge', 'main challenge']
+      },
+    ];
+
+    return b1BaseVocabulary.slice(0, 6);
+  }
+
+  /**
    * Returns the vocabulary guide for B1 level
    */
   getVocabularyGuide(): string {
@@ -94,3 +131,4 @@ Example: "put up with", "break the ice", "time management", "constructive feedba
     return words;
   }
 }
+

@@ -2,7 +2,7 @@
 // Generates lessons and filters vocabulary for C1 level
 
 import { CEFRLessonModule } from './CEFRLessonModule';
-import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
 
 export class C1LessonModule implements CEFRLessonModule {
   async generateLesson(student: StudentProfile, topic: LearningTopic, duration: number): Promise<GeneratedLesson> {
@@ -78,6 +78,44 @@ export class C1LessonModule implements CEFRLessonModule {
   }
 
   /**
+   * Generates level-appropriate C1 vocabulary items
+   * C1: ONLY advanced specialized vocabulary, NEVER basic professional terms
+   */
+  async generateVocabularyItems(): Promise<VocabularyItem[]> {
+    const c1BaseVocabulary: VocabularyItem[] = [
+      {
+        word: 'paradigm shift',
+        partOfSpeech: 'Noun',
+        phonetics: '/ˈpærədaɪm ʃɪft/',
+        definition: 'a fundamental change in approach or underlying assumptions within a field or discipline',
+        example: 'The cloud adoption represented a paradigm shift in enterprise infrastructure.',
+        synonym: 'major change',
+        expressions: ['paradigm shift in', 'represent a paradigm shift', 'drive a paradigm shift']
+      },
+      {
+        word: 'juxtaposition',
+        partOfSpeech: 'Noun',
+        phonetics: '/ˌdʒʌktəpəˈzɪʃən/',
+        definition: 'the fact of two things being seen or placed together for contrasting effect',
+        example: 'The juxtaposition of old traditions and modern innovation created tension.',
+        synonym: 'contrast',
+        expressions: ['juxtaposition of', 'striking juxtaposition', 'creative juxtaposition']
+      },
+      {
+        word: 'obfuscate',
+        partOfSpeech: 'Verb',
+        phonetics: '/əbˈfʌskeɪt/',
+        definition: 'to deliberately make something unclear or obscure in order to conceal the truth',
+        example: 'The report attempted to obfuscate the real issues with technical jargon.',
+        synonym: 'obscure',
+        expressions: ['obfuscate the truth', 'obfuscate reality', 'deliberately obfuscate']
+      },
+    ];
+
+    return c1BaseVocabulary.slice(0, 6);
+  }
+
+  /**
    * Returns the vocabulary guide for C1 level
    */
   getVocabularyGuide(): string {
@@ -102,3 +140,4 @@ Example: "cut through the red tape", "a watershed moment", "read between the lin
     return words;
   }
 }
+

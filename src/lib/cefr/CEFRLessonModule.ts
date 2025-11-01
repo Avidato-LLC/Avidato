@@ -1,7 +1,7 @@
 // Interface for CEFR-level lesson modules
 // Each module implements lesson generation and vocabulary filtering for a specific CEFR level
 
-import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
 
 export interface CEFRLessonModule {
   /**
@@ -10,7 +10,18 @@ export interface CEFRLessonModule {
   generateLesson(student: StudentProfile, topic: LearningTopic, duration: number): Promise<GeneratedLesson>;
 
   /**
+   * Generates level-appropriate vocabulary items with definitions, examples, synonyms, and expressions
+   */
+  generateVocabularyItems(topic: LearningTopic, occupation?: string): Promise<VocabularyItem[]>;
+
+  /**
    * Filters and returns vocabulary appropriate for the CEFR level
    */
   getVocabularyForLevel(words: string[]): string[];
+
+  /**
+   * Returns vocabulary guidance specific to this CEFR level
+   */
+  getVocabularyGuide(): string;
 }
+

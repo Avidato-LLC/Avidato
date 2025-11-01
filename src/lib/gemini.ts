@@ -557,6 +557,29 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
     return new B1LessonModule().getVocabularyGuide();
   }
 
+  /**
+   * Get the appropriate CEFR module instance for the given level
+   */
+  private getCEFRModule(level: string) {
+    const levelLower = level.toLowerCase();
+    if (levelLower.includes('a1')) return new A1LessonModule();
+    if (levelLower.includes('a2') || levelLower.includes('elementary')) return new A2LessonModule();
+    if (levelLower.includes('b1') || levelLower.includes('intermediate')) return new B1LessonModule();
+    if (levelLower.includes('b2') || levelLower.includes('upper')) return new B2LessonModule();
+    if (levelLower.includes('c1') || levelLower.includes('advanced')) return new C1LessonModule();
+    if (levelLower.includes('c2') || levelLower.includes('proficiency')) return new C2LessonModule();
+    return new B1LessonModule(); // Default
+  }
+
+  /**
+   * Generate vocabulary items using the appropriate CEFR module
+   * This replaces the AI-generated vocabulary with level-specific curated vocabulary
+   */
+  public async generateVocabularyForLevel(level: string): Promise<import('../types/lesson-template').VocabularyItem[]> {
+    const cefrModule = this.getCEFRModule(level);
+    return cefrModule.generateVocabularyItems();
+  }
+
   private getLevelSpecificInstructions(level: string): string {
     const l = level.toLowerCase();
     if (l.includes('a1') || l.includes('beginner')) {
