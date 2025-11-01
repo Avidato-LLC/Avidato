@@ -264,7 +264,7 @@ CRITICAL REQUIREMENTS:
    - Lesson topic and context
 
 🎯 FOR ${student.level.toUpperCase()} STUDENTS SPECIFICALLY:
-${this.getLevelSpecificInstructions(student.level)}
+${this.getCEFRModule(student.level).getVocabularyGuide()}
 
 🚫 CRITICAL VOCABULARY EXCLUSIONS:
 ${this.getOccupationExclusions(student.occupation || '')}
@@ -580,68 +580,7 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
     return cefrModule.generateVocabularyItems();
   }
 
-  private getLevelSpecificInstructions(level: string): string {
-    const l = level.toLowerCase();
-    if (l.includes('a1') || l.includes('beginner')) {
-      return `A1 BEGINNER STUDENTS:
-- Use ONLY the most common everyday words (first 1000 words)
-- Definitions must use only A1-appropriate words (no complex terms)
-- For synonyms: only include if equally simple (very common, 1-2 syllables, single word). Otherwise set "" (empty string)
-- Examples: "happy" → "glad", "sing" → "" (no simpler option, leave blank)
-- Focus on: Family, colors, numbers, food, basic verbs (be, have, go)
-- Expressions: Leave empty [] - focus on definitions only`;
-    }
-    if (l.includes('a2') || l.includes('elementary')) {
-      return `A2 ELEMENTARY STUDENTS:
-- Use EXPANDED everyday vocabulary and simple phrasal verbs
-- Include 2-3 common expressions showing how each word is used ("meeting schedule", "doctor's appointment")
-- For synonyms: include simple/common synonyms (1-3 syllables, single word). Otherwise set "" (empty string)
-- Examples: "appointment" → "meeting", then expressions like "doctor's appointment", "schedule an appointment"
-- Focus on: Expanded professional basics (for their field), common phrasal verbs, basic collocations
-- DO NOT teach C1-level words to A2 students`;
-    }
-    if (l.includes('b1') || l.includes('intermediate')) {
-      return `B1 INTERMEDIATE STUDENTS:
-- Use intermediate vocabulary, basic idioms, and common phrasal verbs
-- Include 2-3 expressions showing natural context ("streamline the process", "streamline operations")
-- Synonyms may be intermediate-level words (1-4 syllables)
-- Examples: "streamline" → "simplify" with expressions showing usage patterns
-- Focus on: Practical professional vocabulary, common business expressions, intermediate collocations
-- Challenge their English proficiency, not their professional knowledge`;
-    }
-    if (l.includes('b2') || l.includes('upper')) {
-      return `B2 UPPER-INTERMEDIATE STUDENTS:
-- Use upper-intermediate vocabulary with nuanced synonyms and collocations acceptable
-- Include 2-3 sophisticated expressions/collocations
-- Synonyms can be multi-word if appropriate
-- Focus on: Advanced phrasal verbs, idiomatic expressions, nuanced meaning distinctions
-- DO NOT use basic professional terms (they already know these)
-- Challenge their English proficiency with sophisticated expressions and collocations`;
-    }
-    if (l.includes('c1') || l.includes('advanced')) {
-      return `C1 ADVANCED STUDENTS:
-⚠️ CRITICAL: DO NOT WASTE TIME ON BASIC WORDS THEY ALREADY KNOW
-- Use ONLY advanced specialized vocabulary (NOT basic professional terms like "compliance", "fraudulent", "verification")
-- These words are A2-B1 level - a C1 professional knows them already!
-- Instead use: Advanced expressions, sophisticated idioms, nuanced synonyms, technical jargon from THEIR field
-- Examples of WRONG: "compliance" (basic), "fraudulent" (basic), "verification" (too basic)
-- Examples of CORRECT for C1 accountant: "materiality thresholds", "forensic accounting implications", "audit committee governance"
-- Include 2-3 sophisticated expressions showing professional usage in context
-- Each expression should demonstrate advanced business communication patterns
-- Challenge their English proficiency and offer new advanced vocabulary, not review of basics`;
-    }
-    if (l.includes('c2') || l.includes('proficiency')) {
-      return `C2 PROFICIENCY STUDENTS:
-⚠️ CRITICAL: ONLY USE EXPERT-LEVEL VOCABULARY AND EXPRESSIONS
-- Use ONLY native-like, expert-level terminology and sophisticated expressions
-- Never include basic or intermediate vocabulary
-- Include 2-3 expert-level expressions showing specialized context
-- Synonyms must be equally sophisticated
-- Focus on: Nuanced distinctions, cultural/domain-specific expressions, academic or expert-level terminology
-- Challenge their near-native English proficiency with sophisticated concepts and specialized communication`;
-    }
-    return `Use intermediate-level vocabulary and simple synonyms when possible.`;
-  }
+
 
   /**
    * Enforce synonym constraints on the parsed AI response. This mutates parsedResponse in-place.
