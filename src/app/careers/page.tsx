@@ -4,6 +4,7 @@ import Link from 'next/link';
 const careers = [
   { title: 'AI Engineer / ML Developer' },
   { title: 'Full-stack Developer' },
+  { title: 'Prompt Engineer' },
   { title: 'UI/UX Designer' },
   { title: 'ESL Content Specialist' },
   { title: 'Product Manager' },
