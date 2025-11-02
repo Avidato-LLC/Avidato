@@ -224,6 +224,27 @@ IMPORTANT: Return ONLY the JSON object. No additional text, markdown formatting,
     topic: LearningTopic, 
     duration: 25 | 50 = 50
   ): Promise<GeneratedLesson> {
+  // Issue #37: Build vocabulary context section
+  let vocabularyContextSection = '';
+  if (topic.shouldReuseVocabularyInDialogue && topic.previousVocabulary && topic.previousVocabulary.length > 0) {
+    const prevVocabList = topic.previousVocabulary.map(v => `- "${v.word}": ${v.definition}`).join('\n');
+    vocabularyContextSection = `
+
+ISSUE #37 - VOCABULARY CONTINUITY:
+The student has just completed: "${topic.previousLessonTitle}"
+From that lesson, they learned these vocabulary words:
+${prevVocabList}
+
+CRITICAL INSTRUCTION FOR DIALOGUE EXERCISE (Exercise 3):
+- In the dialogue exercise ONLY, naturally incorporate 2-3 of these previously learned words
+- Do NOT re-teach them or explain them in Exercise 1 (Vocabulary exercise)
+- Use them only if contextually appropriate to the current lesson topic
+- Example: If previous lesson was "Business Meetings" with "agenda", and this lesson is "Presentations", 
+  you could naturally use "agenda" in dialogue like: "How will this fit with the meeting agenda?"
+- This reinforces learning through natural context, not explicit re-teaching
+- If these words don't fit naturally into the current lesson's dialogue, OMIT them entirely`;
+  }
+
   const prompt = `You are an expert English teacher creating lessons in the Engoo format. Generate a comprehensive lesson following the EXACT Engoo structure.
 
 STUDENT PROFILE:
@@ -239,7 +260,7 @@ STUDENT PROFILE:
 LESSON TOPIC: ${topic.title}
 OBJECTIVE: ${topic.objective}
 CONTEXT: ${topic.context}
-VOCABULARY WORDS: ${topic.vocabulary.join(', ')}
+VOCABULARY WORDS: ${topic.vocabulary.join(', ')}${vocabularyContextSection}
 
 LEVEL-APPROPRIATE VOCABULARY REQUIREMENTS:
 ${this.getLevelVocabularyGuide(student.level)}

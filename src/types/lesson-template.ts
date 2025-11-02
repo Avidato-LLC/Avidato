@@ -20,6 +20,14 @@ export interface LearningTopic {
   skills: string[];
   context: string;
   methodology: 'CLT' | 'TBLT' | 'PPP' | 'TTT';
+  // Issue #37: Previous vocabulary context for natural reuse in dialogues
+  previousVocabulary?: Array<{
+    word: string;
+    definition: string;
+    example?: string;
+  }>;
+  previousLessonTitle?: string;
+  shouldReuseVocabularyInDialogue?: boolean;
 }
 
 export interface LearningPlan {

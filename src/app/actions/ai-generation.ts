@@ -7,6 +7,8 @@ import { prisma } from '@/lib/prisma';
 import geminiService, { StudentProfile, LearningPlan, GeneratedLesson } from '@/lib/gemini';
 import { revalidatePath } from 'next/cache';
 import type { Session } from 'next-auth';
+import { getVocabularyContext } from '@/lib/vocabulary-tracker';
+
 
 // Check and update daily generation count
 async function checkAndUpdateGenerationLimit(userId: string): Promise<boolean> {
@@ -313,10 +315,21 @@ export async function generateLesson(
       interests: student.interests || undefined,
     };
 
+    // Issue #37: Get vocabulary context from previous shared lessons
+    const vocabContext = await getVocabularyContext(studentId);
+
+    // Prepare lesson data with vocabulary context
+    const lessonDataWithContext = {
+      ...lessonData,
+      previousVocabulary: vocabContext.previousVocabulary,
+      previousLessonTitle: vocabContext.previousLessonTitle,
+      shouldReuseVocabularyInDialogue: vocabContext.shouldReuseInDialogue,
+    };
+
     // Generate lesson
     const generatedLesson = await geminiService.generateLesson(
       studentProfile,
-      lessonData,
+      lessonDataWithContext as Parameters<typeof geminiService.generateLesson>[1],
       duration
     );
 
@@ -430,6 +443,64 @@ export async function generateInstantLesson(
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to generate instant lesson' 
+    };
+  }
+}
+
+/**
+ * Issue #37: Mark a lesson as shared with the student
+ * 
+ * Sets the sharedAt timestamp to track when a lesson was taught/shared.
+ * This enables vocabulary continuity tracking across sequential lessons.
+ * 
+ * Called when tutors share/teach a lesson to the student.
+ */
+export async function shareLesson(lessonId: string, studentId: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const session = await getServerSession(authOptions) as Session | null;
+    if (!session?.user?.id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    // Verify student ownership
+    const student = await prisma.student.findUnique({
+      where: {
+        id: studentId,
+        tutorId: session.user.id,
+      },
+    });
+
+    if (!student) {
+      return { success: false, error: 'Student not found' };
+    }
+
+    // Verify lesson ownership (belongs to this student)
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+    });
+
+    if (!lesson || lesson.studentId !== studentId) {
+      return { success: false, error: 'Lesson not found or does not belong to this student' };
+    }
+
+    // Update lesson with sharedAt timestamp
+    await (prisma.lesson.update as unknown as typeof prisma.lesson.update)({
+      where: { id: lessonId },
+      data: {
+        sharedAt: new Date(),
+      },
+    });
+
+    revalidatePath(`/dashboard/students/${studentId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error sharing lesson:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to share lesson' 
     };
   }
 }
