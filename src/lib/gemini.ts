@@ -439,7 +439,7 @@ EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles):
 {
   "type": "dialogue",
   "title": "Exercise 3: Dialogue",
-  "description": "Read the dialogue about [context]. ${student.name} speaks on the lines marked as their character. Teacher reads all other roles.",
+  "description": "Read the dialogue. You are ${student.name}.",
   "content": {
     "context": "Setting description",
     "characters": [
@@ -454,7 +454,7 @@ EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles):
       {"character": "Director", "text": "Response"},
       {"character": "${student.name}", "text": "Student responds again using new vocabulary"}
     ],
-    "instructions": "Read the dialogue aloud with your teacher. Your part is marked as ${student.name}. Your teacher will read the other roles."
+    "instructions": "Read the dialogue. You are ${student.name}."
   },
   "timeMinutes": 12
 }
