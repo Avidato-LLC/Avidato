@@ -44,6 +44,7 @@ export async function GET(
         title: true,
         overview: true,
         createdAt: true,
+        sharedAt: true,
       },
     })
 

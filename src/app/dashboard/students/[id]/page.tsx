@@ -51,6 +51,7 @@ interface StudentLesson {
   title: string
   overview: string | null
   createdAt: Date
+  sharedAt: Date | null
 }
 
 type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
@@ -77,9 +78,8 @@ export default function StudentProfilePage() {
   const [instantFocus, setInstantFocus] = useState<'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed'>('mixed')
   const [instantDuration, setInstantDuration] = useState<25 | 50>(50)
   const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
-  // Issue #37: Track which lessons are being marked as taught
+  // Issue #37: Track which lesson is currently being marked as taught
   const [markingTaughtId, setMarkingTaughtId] = useState<string | null>(null)
-  const [markedAsTaughtIds, setMarkedAsTaughtIds] = useState<Set<string>>(new Set())
 
   // Helper function to check if a lesson already exists for a topic
   const isLessonGenerated = (topicTitle: string) => {
@@ -115,8 +115,6 @@ export default function StudentProfilePage() {
     try {
       const result = await shareLesson(lessonId, studentId)
       if (result.success) {
-        // Add to marked as taught set
-        setMarkedAsTaughtIds(prev => new Set([...prev, lessonId]))
         // Refresh lessons to show updated status
         await fetchLessons()
       } else {
@@ -952,7 +950,7 @@ export default function StudentProfilePage() {
                                       <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                                         {lesson.title}
                                       </h4>
-                                      {markedAsTaughtIds.has(lesson.id) && (
+                                      {lesson.sharedAt && (
                                         <span className="text-green-600 dark:text-green-400" title="Marked as taught to student">
                                           <ShareIcon className="w-4 h-4" />
                                         </span>
@@ -982,7 +980,7 @@ export default function StudentProfilePage() {
                                     e.preventDefault();
                                     try {
                                       // If not already marked as taught, mark it first
-                                      if (!markedAsTaughtIds.has(lesson.id) && markingTaughtId !== lesson.id) {
+                                      if (!lesson.sharedAt && markingTaughtId !== lesson.id) {
                                         await handleMarkLessonAsTaught(lesson.id);
                                       }
                                     } catch (err) {
@@ -998,12 +996,12 @@ export default function StudentProfilePage() {
                                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                                     markingTaughtId === lesson.id
                                       ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed'
-                                      : markedAsTaughtIds.has(lesson.id)
+                                      : lesson.sharedAt
                                       ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100'
                                       : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
                                   }`}
                                   title="Share this lesson with the student (this will also mark it as taught)">
-                                  {markingTaughtId === lesson.id ? 'Sharing...' : markedAsTaughtIds.has(lesson.id) ? '✓ Taught' : 'Share'}
+                                  {markingTaughtId === lesson.id ? 'Sharing...' : lesson.sharedAt ? '✓ Taught' : 'Share'}
                                 </button>
                               </div>
                             </div>
