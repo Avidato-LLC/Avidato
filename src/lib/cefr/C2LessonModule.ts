@@ -146,6 +146,68 @@ Example Professional Terms:
 Example: "jump the shark", "move the goalposts", "a Pyrrhic victory", "throw the baby out with the bathwater"`;
   }
 
+  /**
+   * Gets the list of acceptable vocabulary words for C2 level (proficiency/native-like)
+   * Used to validate AI-generated vocabulary matches the level
+   */
+  getAcceptableVocabulary(): string[] {
+    // C2: ONLY expert-level, native-like vocabulary
+    return [
+      // Sophisticated synonyms and alternatives (same as C1, but enforced strictly)
+      'paradigm', 'juxtaposition', 'obfuscate', 'obfuscation', 'serendipitous', 'ubiquitous', 'quintessential',
+      'ephemeral', 'esoteric', 'enigmatic', 'perspicacious', 'sagacious', 'propitious', 'auspicious',
+      'mellifluous', 'sonorous', 'dulcet', 'euphonious', 'cacophony', 'discordant', 'dissonant',
+      'antithesis', 'anathema', 'apotheosis', 'catharsis', 'nemesis', 'epitome', 'paragon',
+      'anomaly', 'conundrum', 'paradox', 'dichotomy', 'dichotomous', 'polemic', 'contentious',
+      'obsequious', 'servile', 'sycophantic', 'oleaginous', 'unctuous', 'mendacious', 'veracious',
+      'perspicacity', 'acumen', 'erudition', 'pedantic', 'scholastic', 'didactic', 'heuristic',
+      'ameliorate', 'exacerbate', 'mitigate', 'alleviate', 'palliate', 'assuage', 'placate',
+      'obfuscatory', 'elucidating', 'pellucid', 'opaque', 'translucent', 'lucent', 'luminous',
+      'pernicious', 'noxious', 'deleterious', 'baneful', 'inimical', 'virulent', 'vitriolic',
+      'magnanimous', 'pusillanimous', 'perspicacious', 'verbose', 'loquacious', 'taciturn', 'laconic',
+      'solipsistic', 'egocentric', 'altruistic', 'philanthropic', 'misanthropic', 'xenophobic', 'cosmopolitan',
+      'perspicuous', 'insipid', 'vapid', 'jejune', 'banal', 'quotidian', 'prosaic', 'mundane',
+      'inchoate', 'amorphous', 'incipient', 'proto', 'primordial', 'embryonic', 'nascent',
+      'fortuitous', 'synchronicity', 'serendipity', 'providence', 'kismet', 'fate', 'destiny',
+      'sesquipedalian', 'verbose', 'prolix', 'grandiose', 'bombastic', 'pompous', 'ostentatious',
+      'pellucid', 'perspicuous', 'limpid', 'luculent', 'luminous', 'crystalline', 'transparent',
+      'mercurial', 'capricious', 'inconstant', 'fickle', 'volatile', 'ephemeral', 'evanescent',
+      'hegemony', 'supremacy', 'dominion', 'sovereignty', 'ascendancy', 'preponderance', 'prevalence',
+      'insouciant', 'nonchalant', 'cavalier', 'offhand', 'perfunctory', 'cursory', 'desultory',
+      'sagacious', 'judicious', 'prudent', 'discerning', 'perspicacious', 'astute', 'penetrating',
+      'amelioration', 'aggrandizement', 'magnification', 'amplification', 'augmentation', 'proliferation',
+      // Rare, expert-level business terms (NOT basic terms)
+      'fiduciary', 'fungible', 'tranche', 'securitization', 'arbitrage', 'collateral', 'covenant',
+      'leverage', 'amortization', 'accrual', 'depreciation', 'impairment', 'provisioning', 'hedging',
+      'derivative', 'forward', 'futures', 'option', 'call', 'put', 'strike', 'volatility',
+    ];
+  }
+
+  /**
+   * Validates if a word is appropriate for C2 level
+   * STRICTLY REJECTS basic terms
+   */
+  isWordAcceptableForLevel(word: string): boolean {
+    const normalized = word.toLowerCase().trim();
+    const basicWordsToReject = [
+      'compliance', 'fraudulent', 'verification', 'email', 'meeting', 'appointment', 'doctor',
+      'hospital', 'patient', 'computer', 'project', 'team', 'manager', 'employee', 'company',
+      'business', 'work', 'office', 'report', 'memo', 'procedure', 'process', 'system',
+      'customer', 'client', 'service', 'product', 'sale', 'marketing', 'budget', 'plan',
+      'goal', 'objective', 'strategy', 'approach', 'method', 'implement', 'streamline',
+      'challenge', 'opportunity', 'risk', 'benefit', 'advantage', 'disadvantage', 'solution',
+      'problem', 'issue', 'concern', 'feedback', 'communication', 'conference', 'workshop',
+    ];
+
+    // STRICTLY REJECT basic words
+    if (basicWordsToReject.some(w => w.includes(normalized) || normalized.includes(w))) {
+      return false;
+    }
+
+    // ACCEPT only if in C2 vocabulary list
+    return this.getAcceptableVocabulary().some(w => w.includes(normalized) || normalized.includes(w));
+  }
+
   getVocabularyForLevel(words: string[]): string[] {
     // Dummy implementation: all words are treated as C2 for demonstration
     return words;

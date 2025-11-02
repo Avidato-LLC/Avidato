@@ -126,6 +126,53 @@ export class B1LessonModule implements CEFRLessonModule {
 Example: "put up with", "break the ice", "time management", "constructive feedback"`;
   }
 
+  /**
+   * Gets the list of acceptable vocabulary words for B1 level (intermediate)
+   */
+  getAcceptableVocabulary(): string[] {
+    return [
+      // Intermediate professional vocabulary
+      'streamline', 'implement', 'challenge', 'opportunity', 'strategy', 'approach', 'method',
+      'facilitate', 'coordination', 'collaboration', 'teamwork', 'cooperation', 'partnership',
+      'efficiency', 'effectiveness', 'productivity', 'performance', 'quality', 'improvement',
+      'analysis', 'evaluation', 'assessment', 'review', 'feedback', 'recommendation', 'suggestion',
+      'initiative', 'proposal', 'framework', 'structure', 'organization', 'management', 'administration',
+      'resource', 'allocation', 'distribution', 'utilization', 'optimization', 'prioritization',
+      'stakeholder', 'participant', 'contributor', 'member', 'colleague', 'associate', 'partner',
+      'objective', 'goal', 'target', 'milestone', 'deadline', 'timeline', 'schedule',
+      'risk', 'uncertainty', 'contingency', 'mitigation', 'prevention', 'precaution', 'safeguard',
+      'regulation', 'compliance', 'requirement', 'standard', 'criterion', 'benchmark', 'measurement',
+      'communication', 'dialogue', 'negotiation', 'discussion', 'consultation', 'presentation',
+      'documentation', 'record', 'archive', 'repository', 'database', 'repository', 'system',
+      'transition', 'change', 'transformation', 'evolution', 'development', 'progression', 'advancement',
+      'constraint', 'limitation', 'barrier', 'obstacle', 'impediment', 'hindrance', 'difficulty',
+      'resolution', 'solution', 'remedy', 'fix', 'correction', 'adjustment', 'modification',
+      'acquisition', 'procurement', 'purchase', 'investment', 'expenditure', 'budget', 'cost',
+      'revenue', 'income', 'profit', 'loss', 'margin', 'surplus', 'deficit', 'balance',
+      'correlation', 'relationship', 'connection', 'association', 'linkage', 'dependency', 'interdependence',
+      'simulation', 'model', 'prototype', 'scenario', 'case', 'example', 'illustration',
+      'perspective', 'viewpoint', 'stance', 'position', 'angle', 'orientation', 'outlook',
+    ];
+  }
+
+  /**
+   * Validates if a word is appropriate for B1 level
+   */
+  isWordAcceptableForLevel(word: string): boolean {
+    const normalized = word.toLowerCase().trim();
+    // B1 should not have very advanced vocabulary (C1/C2 level)
+    const advancedWordsToReject = [
+      'paradigm', 'juxtaposition', 'obfuscate', 'serendipitous', 'ubiquitous', 'quintessential',
+      'ephemeral', 'esoteric', 'enigmatic', 'perspicacious', 'sagacious',
+    ];
+
+    if (advancedWordsToReject.some(w => w.includes(normalized) || normalized.includes(w))) {
+      return false;
+    }
+
+    return this.getAcceptableVocabulary().some(w => w.includes(normalized) || normalized.includes(w));
+  }
+
   getVocabularyForLevel(words: string[]): string[] {
     // Dummy implementation: all words are treated as B1 for demonstration
     return words;

@@ -126,6 +126,52 @@ export class B2LessonModule implements CEFRLessonModule {
 Example: "come across as", "in the long run", "food for thought", "a double-edged sword"`;
   }
 
+  /**
+   * Gets the list of acceptable vocabulary words for B2 level (upper-intermediate)
+   */
+  getAcceptableVocabulary(): string[] {
+    return [
+      // Upper-intermediate professional vocabulary (includes B1 + more advanced)
+      'ambiguous', 'facilitate', 'resilience', 'adversity', 'turbulence', 'volatility', 'uncertainty',
+      'sophisticated', 'nuanced', 'elaborate', 'comprehensive', 'extensive', 'intricate', 'complex',
+      'substantive', 'significant', 'considerable', 'substantial', 'profound', 'deep', 'meaningful',
+      'dilemma', 'predicament', 'quandary', 'conundrum', 'paradox', 'contradiction', 'inconsistency',
+      'leverage', 'capitalize', 'exploit', 'utilize', 'harness', 'mobilize', 'activate', 'stimulate',
+      'perpetuate', 'sustain', 'maintain', 'preserve', 'conserve', 'retain', 'uphold', 'enforce',
+      'synthesis', 'integration', 'consolidation', 'amalgamation', 'fusion', 'merger', 'combination',
+      'trajectory', 'trajectory', 'progression', 'trajectory', 'momentum', 'velocity', 'acceleration',
+      'divergence', 'convergence', 'alignment', 'synchronization', 'harmony', 'discord', 'tension',
+      'amplify', 'magnify', 'enhance', 'intensify', 'escalate', 'exacerbate', 'aggravate',
+      'mitigate', 'alleviate', 'allay', 'assuage', 'placate', 'appease', 'mollify', 'relieve',
+      'dichotomy', 'binary', 'polarization', 'fragmentation', 'atomization', 'compartmentalization',
+      'precedent', 'convention', 'protocol', 'procedure', 'mechanism', 'apparatus', 'infrastructure',
+      'rationale', 'justification', 'reasoning', 'logic', 'premise', 'assumption', 'hypothesis',
+      'empirical', 'theoretical', 'pragmatic', 'idealistic', 'realistic', 'practical', 'abstract',
+      'epistemology', 'ontology', 'methodology', 'framework', 'paradigm', 'model', 'theory',
+      'manifesto', 'proclamation', 'declaration', 'statement', 'assertion', 'claim', 'proposition',
+      'scepticism', 'cynicism', 'idealism', 'pragmatism', 'realism', 'relativism', 'absolutism',
+      'ambivalence', 'equivocation', 'vacillation', 'oscillation', 'fluctuation', 'volatility', 'inconsistency',
+    ];
+  }
+
+  /**
+   * Validates if a word is appropriate for B2 level
+   */
+  isWordAcceptableForLevel(word: string): boolean {
+    const normalized = word.toLowerCase().trim();
+    // B2 should not include very obscure C1/C2 words
+    const advancedWordsToReject = [
+      'perspicacious', 'sagacious', 'obfuscate', 'serendipitous', 'ubiquitous', 'quintessential',
+      'ephemeral', 'esoteric', 'enigmatic', 'pellucid', 'insouciant', 'sesquipedalian',
+    ];
+
+    if (advancedWordsToReject.some(w => w.includes(normalized) || normalized.includes(w))) {
+      return false;
+    }
+
+    return this.getAcceptableVocabulary().some(w => w.includes(normalized) || normalized.includes(w));
+  }
+
   getVocabularyForLevel(words: string[]): string[] {
     // Dummy implementation: all words are treated as B2 for demonstration
     return words;

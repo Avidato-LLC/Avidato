@@ -23,5 +23,15 @@ export interface CEFRLessonModule {
    * Returns vocabulary guidance specific to this CEFR level
    */
   getVocabularyGuide(): string;
-}
+
+  /**
+   * Gets the list of acceptable vocabulary words for this CEFR level
+   * Used to validate AI-generated vocabulary matches the level
+   */
+  getAcceptableVocabulary(): string[];
+
+  /**
+   * Validates if a word is appropriate for this CEFR level
+   */
+  isWordAcceptableForLevel(word: string): boolean;
 
