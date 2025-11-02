@@ -51,7 +51,6 @@ interface StudentLesson {
   title: string
   overview: string | null
   createdAt: Date
-  sharedAt: Date | null
 }
 
 type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
