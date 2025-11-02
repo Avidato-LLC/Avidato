@@ -404,17 +404,23 @@ Realistic conversation between 3-4 characters using ALL vocabulary:
 - NEVER have characters introduce themselves unnecessarily (e.g., after being introduced, don't say "I'm James")
 - ALWAYS write NATURAL dialogue as people actually speak, not mechanical/stilted
 - Characters should build on previous context, not repeat it
+- DIALOGUE MUST HAVE A CONCLUSIVE ENDING: The conversation should reach a natural conclusion/resolution:
+  * Agreement on a point
+  * A decision made
+  * A plan established
+  * A question answered satisfactorily
+  * NEVER end with a hanging question or unfinished thought
 - GOOD DIALOGUE PATTERN:
   * Student speaks first (introduces topic or asks question using new vocabulary)
   * Character 2 responds
   * Student responds to Character 2 (uses more new vocabulary)
   * Character 3 responds  
   * Student responds to Character 3 (uses new vocabulary)
-  * Continue pattern: Student speaks AFTER each other character
+  * Final speaker (ideally student) concludes the conversation with resolution
 - Each character should speak naturally, using the vocabulary in context, not forcing it
 - CRITICAL: Do NOT have non-student characters speak consecutively - student MUST interject after each
 
-EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles):
+EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending):
 {
   "character": "${student.name}",
   "text": "I've been thinking about how to streamline our approval process. What are your thoughts on this approach?"
@@ -433,13 +439,13 @@ EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles):
 },
 {
   "character": "${student.name}",
-  "text": "We could start by analyzing the current workflow and gathering feedback from the team. The data would show us where delays occur."
+  "text": "We could start by analyzing the current workflow and gathering feedback from the team. The data would show us where delays occur. I think this is a solid plan we should move forward with."
 }
 
 {
   "type": "dialogue",
   "title": "Exercise 3: Dialogue",
-  "description": "Read the dialogue. You are ${student.name}.",
+  "description": "Practice your reading and speaking skills with a real scenario",
   "content": {
     "context": "Setting description",
     "characters": [
