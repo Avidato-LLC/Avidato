@@ -10,6 +10,7 @@ const careers = [
   { title: 'Product Manager' },
   { title: 'Marketing Lead / Growth Hacker' },
   { title: 'QA Engineer' },
+  { title: 'Legal Assistant' },
   { title: 'Data Analyst' },
   { title: 'Community Manager / Customer Success' },
   { title: 'DevOps Engineer' },
