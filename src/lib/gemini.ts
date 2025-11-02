@@ -224,6 +224,27 @@ IMPORTANT: Return ONLY the JSON object. No additional text, markdown formatting,
     topic: LearningTopic, 
     duration: 25 | 50 = 50
   ): Promise<GeneratedLesson> {
+  // Issue #37: Build vocabulary context section
+  let vocabularyContextSection = '';
+  if (topic.shouldReuseVocabularyInDialogue && topic.previousVocabulary && topic.previousVocabulary.length > 0) {
+    const prevVocabList = topic.previousVocabulary.map(v => `- "${v.word}": ${v.definition}`).join('\n');
+    vocabularyContextSection = `
+
+ISSUE #37 - VOCABULARY CONTINUITY:
+The student has just completed: "${topic.previousLessonTitle}"
+From that lesson, they learned these vocabulary words:
+${prevVocabList}
+
+CRITICAL INSTRUCTION FOR DIALOGUE EXERCISE (Exercise 3):
+- In the dialogue exercise ONLY, naturally incorporate 2-3 of these previously learned words
+- Do NOT re-teach them or explain them in Exercise 1 (Vocabulary exercise)
+- Use them only if contextually appropriate to the current lesson topic
+- Example: If previous lesson was "Business Meetings" with "agenda", and this lesson is "Presentations", 
+  you could naturally use "agenda" in dialogue like: "How will this fit with the meeting agenda?"
+- This reinforces learning through natural context, not explicit re-teaching
+- If these words don't fit naturally into the current lesson's dialogue, OMIT them entirely`;
+  }
+
   const prompt = `You are an expert English teacher creating lessons in the Engoo format. Generate a comprehensive lesson following the EXACT Engoo structure.
 
 STUDENT PROFILE:
@@ -239,7 +260,7 @@ STUDENT PROFILE:
 LESSON TOPIC: ${topic.title}
 OBJECTIVE: ${topic.objective}
 CONTEXT: ${topic.context}
-VOCABULARY WORDS: ${topic.vocabulary.join(', ')}
+VOCABULARY WORDS: ${topic.vocabulary.join(', ')}${vocabularyContextSection}
 
 LEVEL-APPROPRIATE VOCABULARY REQUIREMENTS:
 ${this.getLevelVocabularyGuide(student.level)}
@@ -374,44 +395,72 @@ EXPRESSIONS/COLLOCATIONS RULES (Issue #42):
 **Exercise 3: Dialogue**
 Realistic conversation between 3-4 characters using ALL vocabulary:
 
-⚠️ CRITICAL DIALOGUE RULES:
+⚠️ CRITICAL DIALOGUE RULES - ISSUE #37 & STUDENT PRACTICE:
+- The FIRST character in dialogue MUST be the student (${student.name})
+- The student MUST speak after EVERY other character speaks
+- This ensures the student practices responding to all roles while the teacher reads other parts
+- Student dialogue MUST naturally use 2-3 of the new vocabulary words being taught
+- Teacher can easily see which lines to read (all non-student characters) and which the student reads
 - NEVER have characters introduce themselves unnecessarily (e.g., after being introduced, don't say "I'm James")
 - ALWAYS write NATURAL dialogue as people actually speak, not mechanical/stilted
 - Characters should build on previous context, not repeat it
-- GOOD: "You mentioned the proposal yesterday. What do you think about the timeline?"
-- BAD: "Hi, I'm James. I'm an employee. What do you think about the proposal?"
+- DIALOGUE MUST HAVE A CONCLUSIVE ENDING: The conversation should reach a natural conclusion/resolution:
+  * Agreement on a point
+  * A decision made
+  * A plan established
+  * A question answered satisfactorily
+  * NEVER end with a hanging question or unfinished thought
+- GOOD DIALOGUE PATTERN:
+  * Student speaks first (introduces topic or asks question using new vocabulary)
+  * Character 2 responds
+  * Student responds to Character 2 (uses more new vocabulary)
+  * Character 3 responds  
+  * Student responds to Character 3 (uses new vocabulary)
+  * Final speaker (ideally student) concludes the conversation with resolution
 - Each character should speak naturally, using the vocabulary in context, not forcing it
-- Avoid having the same character speak twice in a row without a response from another character
+- CRITICAL: Do NOT have non-student characters speak consecutively - student MUST interject after each
 
-EXAMPLE OF NATURAL DIALOGUE:
+EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending):
 {
-  "character": "James",
-  "text": "I've been thinking about the timeline for this project. Do you think we can streamline the approval process?"
+  "character": "${student.name}",
+  "text": "I've been thinking about how to streamline our approval process. What are your thoughts on this approach?"
 },
 {
-  "character": "Chairman",
-  "text": "That's a good point. What changes would you suggest to implement?"
+  "character": "Manager",
+  "text": "That's interesting. Could you elaborate on what you mean by 'streamline'?"
 },
 {
-  "character": "James",
-  "text": "If we could reduce the review stages, we'd save at least two weeks."
+  "character": "${student.name}",
+  "text": "I mean we should identify the bottlenecks and see if we can reduce unnecessary steps. This would help us implement changes faster."
+},
+{
+  "character": "Director",
+  "text": "I see your point. How would you approach identifying these bottlenecks?"
+},
+{
+  "character": "${student.name}",
+  "text": "We could start by analyzing the current workflow and gathering feedback from the team. The data would show us where delays occur. I think this is a solid plan we should move forward with."
 }
 
 {
   "type": "dialogue",
   "title": "Exercise 3: Dialogue",
-  "description": "Read the dialogue about [context]",
+  "description": "Practice your reading and speaking skills with a real scenario",
   "content": {
     "context": "Setting description",
     "characters": [
-      {"name": "James", "role": "Employee", "avatar": "young professional man"},
-      {"name": "Chairman", "role": "CEO", "avatar": "senior businessman"}
+      {"name": "${student.name}", "role": "Facilitator", "avatar": "You are the student - read your lines aloud"},
+      {"name": "Manager", "role": "Manager", "avatar": "professional"},
+      {"name": "Director", "role": "Director", "avatar": "senior professional"}
     ],
     "dialogue": [
-      {"character": "James", "text": "Speech that uses vocabulary naturally"},
-      {"character": "Chairman", "text": "Response using more vocabulary"}
+      {"character": "${student.name}", "text": "Speech that uses vocabulary naturally - student speaks FIRST"},
+      {"character": "Manager", "text": "Response"},
+      {"character": "${student.name}", "text": "Student responds using new vocabulary"},
+      {"character": "Director", "text": "Response"},
+      {"character": "${student.name}", "text": "Student responds again using new vocabulary"}
     ],
-    "instructions": "Read the dialogue aloud with your teacher"
+    "instructions": "Read the dialogue. You are ${student.name}."
   },
   "timeMinutes": 12
 }
@@ -700,8 +749,8 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
   }
 
   /**
-   * Validates and fixes dialogue structure to ensure student speaks after every non-student speaker.
-   * This prevents awkward dialogue where two non-student characters speak consecutively.
+   * Validates dialogue structure to ensure student speaks after every non-student speaker.
+   * Issue #37 & Student Practice: Student must speak after each other character for practice opportunity.
    * This validation runs silently on the parsed response (no error thrown to user).
    */
   private enforceDialogueStructure(parsedResponse: unknown, studentName: string): void {
@@ -720,26 +769,47 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
       const dialogue = exercise.content.dialogue as Array<{ character?: string; text?: string }>;
       if (dialogue.length < 2) continue; // Skip if not enough lines
 
-      // Check for consecutive non-student speakers and log (for debugging)
-      let lastWasStudent = false;
+      // Validate dialogue structure per Issue #37 requirements:
+      // 1. Student should speak FIRST (facilitate the conversation)
+      // 2. Student should speak AFTER each non-student character (practice all roles)
+      // 3. No two non-student characters should speak consecutively
+      
+      let consecutiveNonStudentCount = 0;
+      let lastWasStudent = true; // Expect student to speak first
+      
       for (let i = 0; i < dialogue.length; i++) {
         const isStudent = dialogue[i].character === studentName;
         
+        // Track non-student consecutive speakers
+        if (!isStudent) {
+          if (!lastWasStudent) {
+            consecutiveNonStudentCount++;
+          } else {
+            consecutiveNonStudentCount = 0;
+          }
+        }
+        
+        // Log issues for debugging
         if (!isStudent && !lastWasStudent && i > 0) {
-          // Two non-student speakers in a row - this is what we want to prevent
-          // But we don't mutate here; instead we just log for awareness
           console.warn(
-            `Dialogue structure: Non-student speakers '${dialogue[i - 1].character}' and '${dialogue[i].character}' speak consecutively`
+            `⚠️ Dialogue Issue: Non-student speakers '${dialogue[i - 1].character}' and '${dialogue[i].character}' speak consecutively. Student should interject after each character.`
+          );
+        }
+        
+        if (i === 0 && !isStudent) {
+          console.warn(
+            `⚠️ Dialogue Issue: Dialogue should start with ${studentName} (the student). Currently starts with '${dialogue[i].character}'.`
           );
         }
         
         lastWasStudent = isStudent;
       }
-      // Note: We don't auto-fix the dialogue structure here because:
-      // 1. It's complex to insert student responses without knowing context
-      // 2. The AI prompt should generate correct structure
-      // 3. This validation is mainly for logging/awareness
-      // If needed in future, dialogue reconstruction logic can be added here.
+      
+      if (consecutiveNonStudentCount > 0) {
+        console.warn(
+          `⚠️ Dialogue Issue: Student does not speak after every character. This reduces practice opportunities. Pattern should be: Student → Others → Student → Others → etc.`
+        );
+      }
     }
   }
 }

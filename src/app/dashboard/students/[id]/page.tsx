@@ -6,9 +6,10 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getStudent } from '../../../actions/students'
-import { generateLearningPlan, generateLesson, generateInstantLesson, getGenerationStats, getStudentLearningPlan } from '../../../actions/ai-generation'
+import { generateLearningPlan, generateLesson, generateInstantLesson, getGenerationStats, getStudentLearningPlan, shareLesson } from '../../../actions/ai-generation'
 import { languages, levels, ageGroups } from '@/lib/form-data-mappings'
 import { LearningPlan } from '@/lib/gemini'
+import ShareIcon from '@/components/icons/ShareIcon'
 
 /**
  * StudentProfilePage Component
@@ -50,6 +51,7 @@ interface StudentLesson {
   title: string
   overview: string | null
   createdAt: Date
+  sharedAt: Date | null
 }
 
 type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
@@ -76,6 +78,8 @@ export default function StudentProfilePage() {
   const [instantFocus, setInstantFocus] = useState<'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed'>('mixed')
   const [instantDuration, setInstantDuration] = useState<25 | 50>(50)
   const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
+  // Issue #37: Track which lesson is currently being marked as taught
+  const [markingTaughtId, setMarkingTaughtId] = useState<string | null>(null)
 
   // Helper function to check if a lesson already exists for a topic
   const isLessonGenerated = (topicTitle: string) => {
@@ -104,6 +108,24 @@ export default function StudentProfilePage() {
       setLoadingLessons(false)
     }
   }, [studentId])
+
+  // Issue #37: Handle marking lesson as taught
+  const handleMarkLessonAsTaught = useCallback(async (lessonId: string) => {
+    setMarkingTaughtId(lessonId)
+    try {
+      const result = await shareLesson(lessonId, studentId)
+      if (result.success) {
+        // Refresh lessons to show updated status
+        await fetchLessons()
+      } else {
+        console.error('Failed to mark lesson as taught:', result.error)
+      }
+    } catch (err) {
+      console.error('Error marking lesson as taught:', err)
+    } finally {
+      setMarkingTaughtId(null)
+    }
+  }, [studentId, fetchLessons])
 
   // Fetch existing learning plan
   const fetchExistingLearningPlan = useCallback(async () => {
@@ -924,9 +946,16 @@ export default function StudentProfilePage() {
                                     {index + 1}
                                   </span>
                                   <div>
-                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                      {lesson.title}
-                                    </h4>
+                                    <div className="flex items-center gap-2">
+                                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        {lesson.title}
+                                      </h4>
+                                      {lesson.sharedAt && (
+                                        <span className="text-green-600 dark:text-green-400" title="Marked as taught to student">
+                                          <ShareIcon className="w-4 h-4" />
+                                        </span>
+                                      )}
+                                    </div>
                                     {lesson.overview && (
                                       <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                                         {lesson.overview}
@@ -945,14 +974,35 @@ export default function StudentProfilePage() {
                                 >
                                   View Lesson
                                 </Link>
-                                <Link
-                                  href={`/lessons/${lesson.id}/share`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm font-medium"
-                                >
-                                  Share
-                                </Link>
+                                {/* Merge behaviour: clicking Share will also mark as taught */}
+                                <button
+                                  onClick={async (e) => {
+                                    e.preventDefault();
+                                    try {
+                                      // If not already marked as taught, mark it first
+                                      if (!lesson.sharedAt && markingTaughtId !== lesson.id) {
+                                        await handleMarkLessonAsTaught(lesson.id);
+                                      }
+                                    } catch (err) {
+                                      // swallow errors so share still works
+                                      console.error('Error marking lesson as taught before sharing:', err);
+                                    }
+
+                                    // Open the public share page in a new tab
+                                    const shareUrl = `${window.location.origin}/lessons/${lesson.id}/share`;
+                                    window.open(shareUrl, '_blank', 'noopener');
+                                  }}
+                                  disabled={markingTaughtId === lesson.id}
+                                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    markingTaughtId === lesson.id
+                                      ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                                      : lesson.sharedAt
+                                      ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100'
+                                      : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
+                                  }`}
+                                  title="Share this lesson with the student (this will also mark it as taught)">
+                                  {markingTaughtId === lesson.id ? 'Sharing...' : lesson.sharedAt ? '✓ Taught' : 'Share'}
+                                </button>
                               </div>
                             </div>
                           </div>

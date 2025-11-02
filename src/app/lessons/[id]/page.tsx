@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
+import { shareLesson } from '@/app/actions/ai-generation'
 import { 
   VocabularyExercise, 
   WarmupExercise, 
@@ -71,15 +72,29 @@ export default function LessonPage() {
   const [lesson, setLesson] = useState<LessonData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [copySuccess, setCopySuccess] = useState(false)
+  const [isTaught, setIsTaught] = useState(false)
+  const [isMarking, setIsMarking] = useState(false)
 
-  // Copy share link to clipboard
+  // Copy share link to clipboard AND mark lesson as taught (Issue #37)
   const copyShareLink = async () => {
     try {
+      setIsMarking(true)
+      
+      // Mark lesson as taught (Issue #37: vocabulary continuity tracking)
+      if (!isTaught && lesson) {
+        const result = await shareLesson(lesson.id, lesson.student.id)
+        if (result.success) {
+          setIsTaught(true)
+        } else {
+          console.error('Failed to mark lesson as taught:', result.error)
+        }
+      }
+
+      // Copy share link to clipboard
       const shareUrl = `${window.location.origin}/lessons/${lessonId}/share`
       await navigator.clipboard.writeText(shareUrl)
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000) // Reset after 2 seconds
+      
+      setIsMarking(false)
     } catch (err) {
       console.error('Failed to copy link:', err)
       // Fallback for older browsers
@@ -89,8 +104,7 @@ export default function LessonPage() {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
+      setIsMarking(false)
     }
   }
 
@@ -387,14 +401,20 @@ export default function LessonPage() {
               
               <button
                 onClick={copyShareLink}
-                className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
+                disabled={isMarking}
+                className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {copySuccess ? (
+                {isTaught ? (
                   <>
                     <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-green-500">Link Copied!</span>
+                    <span className="text-green-500">✓ Taught</span>
+                  </>
+                ) : isMarking ? (
+                  <>
+                    <div className="w-4 h-4 mr-2 border-2 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
+                    <span>Marking...</span>
                   </>
                 ) : (
                   <>
