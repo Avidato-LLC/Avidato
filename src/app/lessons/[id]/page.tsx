@@ -108,10 +108,15 @@ export default function LessonPage() {
     }
   }
 
-  // Fetch lesson data
+  // Fetch lesson data (only fetch if lesson not already loaded)
   useEffect(() => {
     const fetchLesson = async () => {
       if (session && lessonId) {
+        // Skip if lesson is already loaded
+        if (lesson?.id === lessonId) {
+          return
+        }
+
         try {
           setLoading(true)
           setError(null)
@@ -121,6 +126,15 @@ export default function LessonPage() {
           
           if (response.ok) {
             setLesson(data)
+            // Restore scroll position if available
+            if (typeof window !== 'undefined') {
+              const savedScroll = sessionStorage.getItem(`lesson-scroll-${lessonId}`)
+              if (savedScroll) {
+                setTimeout(() => {
+                  window.scrollTo(0, parseInt(savedScroll))
+                }, 100)
+              }
+            }
           } else {
             setError(data.error || 'Failed to load lesson')
           }
@@ -134,7 +148,7 @@ export default function LessonPage() {
     }
 
     fetchLesson()
-  }, [session, lessonId])
+  }, [session, lessonId, lesson?.id])
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -144,6 +158,18 @@ export default function LessonPage() {
       return
     }
   }, [session, status, router])
+
+  // Save scroll position before navigation
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(`lesson-scroll-${lessonId}`, window.scrollY.toString())
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [lessonId])
 
   const getExerciseIcon = (type: string) => {
     switch (type) {
