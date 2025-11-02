@@ -25,7 +25,6 @@ interface LessonLoaderProps {
 
 export function LessonLoader({ exercises, priorityCount = 2 }: LessonLoaderProps) {
   const [loadedCount, setLoadedCount] = useState(priorityCount)
-  const [isIntersecting, setIsIntersecting] = useState(false)
 
   // Load more exercises when user scrolls near the end
   useEffect(() => {
@@ -44,7 +43,7 @@ export function LessonLoader({ exercises, priorityCount = 2 }: LessonLoaderProps
     return () => observer.disconnect()
   }, [loadedCount, exercises.length])
 
-  const renderExercise = (exercise: Exercise, index: number) => {
+  const renderExercise = (exercise: Exercise) => {
     const content = exercise.content
 
     switch (exercise.type) {
@@ -133,11 +132,11 @@ export function LessonLoader({ exercises, priorityCount = 2 }: LessonLoaderProps
           
           {index < priorityCount ? (
             // Render immediately for priority exercises
-            renderExercise(exercise, index)
+            renderExercise(exercise)
           ) : (
             // Lazy render for subsequent exercises
             <div className="min-h-[200px]">
-              {renderExercise(exercise, index)}
+              {renderExercise(exercise)}
             </div>
           )}
         </div>

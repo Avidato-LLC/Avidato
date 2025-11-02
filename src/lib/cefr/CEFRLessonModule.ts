@@ -34,4 +34,4 @@ export interface CEFRLessonModule {
    * Validates if a word is appropriate for this CEFR level
    */
   isWordAcceptableForLevel(word: string): boolean;
-
+}

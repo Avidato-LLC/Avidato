@@ -1,6 +1,7 @@
 // src/hooks/useLessonCache.ts
 // TODO: Install @tanstack/react-query before using this hook
 // import { useQuery, useQueryClient } from '@tanstack/react-query'
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 interface Lesson {
   id: string

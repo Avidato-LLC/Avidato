@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 
 const PublicNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
