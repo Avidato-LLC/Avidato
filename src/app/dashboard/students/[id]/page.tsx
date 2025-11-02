@@ -976,33 +976,35 @@ export default function StudentProfilePage() {
                                 >
                                   View Lesson
                                 </Link>
-                                {/* Issue #37: Mark as Taught button - for vocabulary continuity tracking */}
+                                {/* Merge behaviour: clicking Share will also mark as taught */}
                                 <button
-                                  onClick={() => handleMarkLessonAsTaught(lesson.id)}
-                                  disabled={markingTaughtId === lesson.id || markedAsTaughtIds.has(lesson.id)}
+                                  onClick={async (e) => {
+                                    e.preventDefault();
+                                    try {
+                                      // If not already marked as taught, mark it first
+                                      if (!markedAsTaughtIds.has(lesson.id) && markingTaughtId !== lesson.id) {
+                                        await handleMarkLessonAsTaught(lesson.id);
+                                      }
+                                    } catch (err) {
+                                      // swallow errors so share still works
+                                      console.error('Error marking lesson as taught before sharing:', err);
+                                    }
+
+                                    // Open the public share page in a new tab
+                                    const shareUrl = `${window.location.origin}/lessons/${lesson.id}/share`;
+                                    window.open(shareUrl, '_blank', 'noopener');
+                                  }}
+                                  disabled={markingTaughtId === lesson.id}
                                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                    markedAsTaughtIds.has(lesson.id)
-                                      ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 cursor-default'
-                                      : markingTaughtId === lesson.id
+                                    markingTaughtId === lesson.id
                                       ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed'
-                                      : 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/40'
+                                      : markedAsTaughtIds.has(lesson.id)
+                                      ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100'
+                                      : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
                                   }`}
-                                  title="Mark this lesson as taught to enable vocabulary continuity in future lessons"
-                                >
-                                  {markingTaughtId === lesson.id
-                                    ? 'Marking...'
-                                    : markedAsTaughtIds.has(lesson.id)
-                                    ? '✓ Taught'
-                                    : 'Mark as Taught'}
+                                  title="Share this lesson with the student (this will also mark it as taught)">
+                                  {markingTaughtId === lesson.id ? 'Sharing...' : markedAsTaughtIds.has(lesson.id) ? '✓ Shared' : 'Share'}
                                 </button>
-                                <Link
-                                  href={`/lessons/${lesson.id}/share`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors text-sm font-medium"
-                                >
-                                  Share
-                                </Link>
                               </div>
                             </div>
                           </div>
