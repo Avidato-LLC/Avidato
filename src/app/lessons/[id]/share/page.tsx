@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import Image from 'next/image'
 import ClientThemeProvider from '@/components/ClientThemeProvider'
+import { Under18LessonDisplay } from '@/lib/lesson-displays/under-18-display'
 import { 
   VocabularyExercise, 
   WarmupExercise, 
@@ -352,7 +353,46 @@ export default function ShareableLessonPage() {
 
         {/* Lesson Content */}
         {!loading && !error && lesson && (
-          <div className="space-y-6 sm:space-y-8">
+          <>
+            {/* Check if this is an Under-18 lesson */}
+            {lesson.content.lessonType === 'Under-18' ? (
+              // Render Under-18 lesson with new modular display
+              <Under18LessonDisplay 
+                lesson={{
+                  metadata: {
+                    id: lesson.id,
+                    title: lesson.content.title,
+                    level: lesson.student.level,
+                    topic: lesson.content.context,
+                    duration: lesson.content.duration,
+                    difficulty: lesson.content.difficulty,
+                    targetAudience: 'Under 18',
+                    ageGroup: 'Under 18'
+                  },
+                  learningObjectives: {
+                    communicative: [lesson.content.objective],
+                    linguistic: lesson.content.skills,
+                    cultural: []
+                  },
+                  exercises: lesson.content.exercises.map((ex) => ({
+                    id: `exercise-${ex.type}`,
+                    number: (lesson.content.exercises.indexOf(ex) + 1),
+                    type: ex.type,
+                    title: ex.title,
+                    description: ex.description,
+                    timeMinutes: ex.timeMinutes,
+                    instructions: typeof ex.content === 'object' && ex.content !== null && 'instructions' in ex.content 
+                      ? (ex.content as Record<string, unknown>).instructions as string
+                      : 'Complete this exercise',
+                    content: (typeof ex.content === 'object' && ex.content !== null ? ex.content : {}) as Record<string, unknown>
+                  }))
+                }}
+                showObjectives={true}
+                showProgressBar={true}
+              />
+            ) : (
+              // Original rendering for non-Under-18 lessons
+              <div className="space-y-6 sm:space-y-8">
             {/* Lesson Header */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
               <div className="text-center mb-6 sm:mb-8">
@@ -465,7 +505,9 @@ export default function ShareableLessonPage() {
                 Lesson created with Avidato • Generated on {new Date(lesson.createdAt).toLocaleDateString()}
               </p>
             </div>
-          </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* No Lesson Found */}

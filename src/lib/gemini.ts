@@ -245,6 +245,53 @@ CRITICAL INSTRUCTION FOR DIALOGUE EXERCISE (Exercise 3):
 - If these words don't fit naturally into the current lesson's dialogue, OMIT them entirely`;
   }
 
+  // Special instructions for under-18 students: Add grammar exercise
+  let under18Section = '';
+  if (student.ageGroup === 'child' || student.ageGroup === 'teenager') {
+    under18Section = `
+
+UNDER-18 STUDENT - GRAMMAR EXERCISE REQUIREMENT:
+This is a student under 18 years old. You MUST include Exercise 5 with the "Find the Mistake" grammar exercise.
+
+**Exercise 5: Find the Mistake (MANDATORY FOR UNDER-18)**
+This exercise focuses on correcting common grammar errors in sentences DIRECTLY RELATED TO THE LESSON TOPIC: "${topic.title}"
+
+IMPORTANT RULES:
+- Create 6-8 sentences ALL ABOUT THE LESSON TOPIC: "${topic.title}"
+- Sentences should use the lesson vocabulary: ${topic.vocabulary.join(', ')}
+- Errors should focus on verb tenses, verb forms, and subject-verb agreement
+- Sentences may contain common errors like:
+  * Missing prepositions in phrasal verbs
+  * Incorrect verb tenses (e.g., present simple vs present perfect)
+  * Wrong verb forms (e.g., base form vs past participle)
+  * Subject-verb agreement errors (e.g., singular/plural mismatch)
+  * Incorrect auxiliary verbs (e.g., "are" vs "have" with participles)
+  * Word order issues
+- Do NOT make the same type of error twice - vary the error types
+- Include 2-3 sentences that are grammatically correct (to make it more challenging)
+- ALL sentences must relate to the lesson context: "${topic.context}"
+
+RESPONSE FORMAT FOR EXERCISE 5:
+{
+  "type": "grammar",
+  "title": "Exercise 5: Find the Mistake",
+  "description": "Find and correct the mistake in each sentence. Be careful — not all sentences have a mistake!",
+  "instructions": "Find and correct the mistake in each sentence. Remember to check verb tenses, verb forms, and word order.",
+  "content": {
+    "sentences": [
+      {
+        "incorrect": "A sentence about ${topic.title} with or without a grammar error",
+        "correct": "The same sentence corrected, OR if already correct: 'This is already correct'"
+      },
+      ... (6-8 total items, ALL using vocabulary from: ${topic.vocabulary.join(', ')})
+    ]
+  },
+  "timeMinutes": 5
+}
+
+CRITICAL: This exercise must appear as Exercise 5 in the exercises array. ALL sentences must be thematically related to the lesson topic and use the vocabulary being taught.`;
+  }
+
   const prompt = `You are an expert English teacher creating lessons in the Engoo format. Generate a comprehensive lesson following the EXACT Engoo structure.
 
 STUDENT PROFILE:
@@ -260,7 +307,7 @@ STUDENT PROFILE:
 LESSON TOPIC: ${topic.title}
 OBJECTIVE: ${topic.objective}
 CONTEXT: ${topic.context}
-VOCABULARY WORDS: ${topic.vocabulary.join(', ')}${vocabularyContextSection}
+VOCABULARY WORDS: ${topic.vocabulary.join(', ')}${vocabularyContextSection}${under18Section}
 
 LEVEL-APPROPRIATE VOCABULARY REQUIREMENTS:
 ${this.getLevelVocabularyGuide(student.level)}
@@ -419,6 +466,7 @@ Realistic conversation between 3-4 characters using ALL vocabulary:
   * Final speaker (ideally student) concludes the conversation with resolution
 - Each character should speak naturally, using the vocabulary in context, not forcing it
 - CRITICAL: Do NOT have non-student characters speak consecutively - student MUST interject after each
+- CONTEXT/SETTING: Generate a unique, descriptive context that explains WHO is talking, WHERE they are, and WHAT they're discussing. Example: "Sarah, Mike, and Jessica are having a meeting in their office about streamlining an approval process. This is a professional discussion where they're brainstorming solutions." NOT just "A conversation" or "In an office".
 
 EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending):
 {
@@ -447,7 +495,7 @@ EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending)
   "title": "Exercise 3: Dialogue",
   "description": "Practice your reading and speaking skills with a real scenario",
   "content": {
-    "context": "Setting description",
+    "setting": "Generate a rich, detailed context describing WHO is talking, WHERE, WHEN, and WHAT about. Include character names and the topic being discussed. Example: 'Alex, Jordan, and Casey are discussing a challenging project deadline at their tech startup office on Monday morning.'",
     "characters": [
       {"name": "${student.name}", "role": "Facilitator", "avatar": "You are the student - read your lines aloud"},
       {"name": "Manager", "role": "Manager", "avatar": "professional"},
@@ -548,7 +596,7 @@ ADVANCED (C1-C2):
 OUTPUT FORMAT (JSON):
 {
   "title": "${topic.title}",
-  "lessonType": "interactive",
+  "lessonType": "${(student.ageGroup === 'child' || student.ageGroup === 'teenager') ? 'Under-18' : 'interactive'}",
   "difficulty": ${student.level === 'beginner' ? '3-4' : student.level === 'intermediate' ? '5-6' : '7-8'},
   "duration": ${duration},
   "objective": "${topic.objective}",

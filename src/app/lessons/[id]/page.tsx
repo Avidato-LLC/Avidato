@@ -6,6 +6,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { shareLesson } from '@/app/actions/ai-generation'
+import { Under18LessonDisplay } from '@/lib/lesson-displays'
 import { 
   VocabularyExercise, 
   WarmupExercise, 
@@ -60,6 +61,42 @@ interface LessonData {
     name: string
     targetLanguage: string
     level: string
+  }
+}
+
+/**
+ * Transform LessonData to Under18Lesson format
+ * Maps the API response format to the display component's expected format
+ */
+const transformToUnder18Lesson = (lessonData: LessonData) => {
+  return {
+    metadata: {
+      id: lessonData.id,
+      title: lessonData.content.title,
+      level: lessonData.student.level,
+      topic: lessonData.content.title,
+      duration: lessonData.content.duration,
+      difficulty: lessonData.content.difficulty,
+      targetAudience: 'Students Under 18',
+      ageGroup: 'Under 18'
+    },
+    learningObjectives: {
+      communicative: [],
+      linguistic: [],
+      cultural: []
+    },
+    exercises: lessonData.content.exercises.map((exercise, index) => ({
+      id: `exercise-${index}`,
+      number: index + 1,
+      type: exercise.type,
+      title: exercise.title,
+      description: exercise.description,
+      timeMinutes: exercise.timeMinutes,
+      instructions: exercise.description,
+      content: (typeof exercise.content === 'object' && exercise.content !== null) 
+        ? (exercise.content as Record<string, unknown>) 
+        : {}
+    }))
   }
 }
 
@@ -533,35 +570,44 @@ export default function LessonPage() {
             </div>
 
             {/* Lesson Exercises */}
-            <div className="space-y-4 sm:space-y-6">
-              {lesson.content.exercises.map((exercise, index) => (
-                <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-                  <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
-                    <div className="flex items-center space-x-3 min-w-0 flex-1">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
-                        {getExerciseIcon(exercise.type)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
-                          {exercise.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                          {getExerciseTitle(exercise.type)} • {exercise.timeMinutes} minutes
-                        </p>
+            {lesson.content.lessonType === 'Under-18' ? (
+              <Under18LessonDisplay
+                lesson={transformToUnder18Lesson(lesson)}
+                studentName={lesson.student.name}
+                showObjectives={true}
+                showProgressBar={true}
+              />
+            ) : (
+              <div className="space-y-4 sm:space-y-6">
+                {lesson.content.exercises.map((exercise, index) => (
+                  <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+                    <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand-primary text-white rounded-full flex items-center justify-center flex-shrink-0">
+                          {getExerciseIcon(exercise.type)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
+                            {exercise.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                            {getExerciseTitle(exercise.type)} • {exercise.timeMinutes} minutes
+                          </p>
+                        </div>
                       </div>
                     </div>
+                    
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 sm:mb-4">
+                      {exercise.description}
+                    </p>
+                    
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 overflow-x-auto">
+                      {renderExerciseContent(exercise)}
+                    </div>
                   </div>
-                  
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-3 sm:mb-4">
-                    {exercise.description}
-                  </p>
-                  
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 overflow-x-auto">
-                    {renderExerciseContent(exercise)}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
