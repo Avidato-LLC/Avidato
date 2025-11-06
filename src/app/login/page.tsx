@@ -173,6 +173,14 @@ function LoginPageContent() {
               </div>
             </div>
 
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <Link href="/auth/forgot-password" className="font-medium text-brand-primary hover:text-brand-accent dark:text-brand-secondary dark:hover:text-brand-primary">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
             <div className="space-y-4">
               <button
                 type="submit"
