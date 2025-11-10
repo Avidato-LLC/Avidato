@@ -19,7 +19,7 @@ import {
   LearningPlan,
   GeneratedLesson
 } from '../types/lesson-template';
-// NEVER EDIT THIS MODEL WITHOUT APPROVAL
+// NEVER EDIT THIS MODEL WITHOUT APPROVAL FROM THE OWNER
 class GeminiService {
   public model = genAI.getGenerativeModel({ 
     model: 'gemini-2.5-flash',
