@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getStudent } from '../../../actions/students'
-import { generateLearningPlan, generateLesson, generateInstantLesson, getGenerationStats, getStudentLearningPlan, shareLesson } from '../../../actions/ai-generation'
+import { generateLearningPlan, generateLesson, getGenerationStats, getStudentLearningPlan, shareLesson } from '../../../actions/ai-generation'
 import { languages, levels, ageGroups } from '@/lib/form-data-mappings'
 import { LearningPlan } from '@/lib/gemini'
 import ShareIcon from '@/components/icons/ShareIcon'
@@ -53,7 +53,7 @@ interface StudentLesson {
   createdAt: Date
 }
 
-type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
+type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons'
 
 export default function StudentProfilePage() {
   const { data: session, status } = useSession()
@@ -73,10 +73,6 @@ export default function StudentProfilePage() {
   const [currentLearningPlan, setCurrentLearningPlan] = useState<LearningPlan | null>(null)
   const [lessons, setLessons] = useState<StudentLesson[]>([])
   const [loadingLessons, setLoadingLessons] = useState(false)
-  const [instantPrompt, setInstantPrompt] = useState('')
-  const [instantFocus, setInstantFocus] = useState<'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed'>('mixed')
-  const [instantDuration, setInstantDuration] = useState<25 | 50>(50)
-  const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
   // Issue #37: Track which lesson is currently being marked as taught
   const [markingTaughtId, setMarkingTaughtId] = useState<string | null>(null)
 
@@ -266,37 +262,6 @@ export default function StudentProfilePage() {
   const generateLearningTopics = (studentData: StudentData) => {
     // Remove demo data - topics will come from AI generation only
     setLearningTopics([])
-  }
-
-  // Handle instant lesson generation
-  const handleInstantLessonGenerate = async () => {
-    if (!instantPrompt.trim() || isGeneratingInstantLesson) return
-
-    setIsGeneratingInstantLesson(true)
-    try {
-      const result = await generateInstantLesson(
-        studentId,
-        instantPrompt.trim(),
-        instantFocus,
-        instantDuration
-      )
-      
-      if (result.success && result.data) {
-        // Refresh lessons list
-        await fetchLessons()
-        // Clear the form
-        setInstantPrompt('')
-        // Show success message or redirect to lesson
-        window.location.href = `/lessons/${result.data.lessonId}`
-      } else {
-        alert(result.error || 'Failed to generate instant lesson')
-      }
-    } catch (error) {
-      console.error('Error generating instant lesson:', error)
-      alert('Failed to generate instant lesson. Please try again.')
-    } finally {
-      setIsGeneratingInstantLesson(false)
-    }
   }
 
   // Redirect if not authenticated
@@ -496,22 +461,6 @@ export default function StudentProfilePage() {
                       </svg>
                       <span className="hidden lg:inline">Generated Lessons</span>
                       <span className="lg:hidden">Lessons</span>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('instant-lesson')}
-                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
-                      activeTab === 'instant-lesson'
-                        ? 'border-brand-primary text-brand-primary'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-1 sm:space-x-2">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <span className="hidden lg:inline">Instant Lesson</span>
-                      <span className="lg:hidden">Instant</span>
                     </div>
                   </button>
                 </nav>
@@ -1008,113 +957,6 @@ export default function StudentProfilePage() {
                         ))}
                       </div>
                     )}
-                  </div>
-                )}
-
-                {/* Instant Lesson Tab */}
-                {activeTab === 'instant-lesson' && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                          Instant Lesson Generator
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
-                          Generate a lesson instantly based on specific needs or situations
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <div className="flex">
-                        <svg className="flex-shrink-0 w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div className="ml-3">
-                          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-400">
-                            Examples of instant lesson prompts:
-                          </h4>
-                          <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                            <ul className="list-disc list-inside space-y-1">
-                              <li>&quot;I have a job interview tomorrow&quot;</li>
-                              <li>&quot;I need to give a presentation next week&quot;</li>
-                              <li>&quot;I&apos;m going to a business dinner&quot;</li>
-                              <li>&quot;I need to negotiate a contract&quot;</li>
-                              <li>&quot;I&apos;m traveling to London next month&quot;</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="instant-prompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Describe your immediate learning need
-                        </label>
-                        <textarea
-                          id="instant-prompt"
-                          rows={4}
-                          value={instantPrompt}
-                          onChange={(e) => setInstantPrompt(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
-                          placeholder="Example: I have a job interview tomorrow for a marketing position and need to practice talking about my experience and asking good questions..."
-                        />
-                      </div>
-
-                      <div className="flex items-center space-x-4">
-                        <div>
-                          <label htmlFor="lesson-duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Lesson Duration
-                          </label>
-                          <select
-                            id="lesson-duration"
-                            value={instantDuration}
-                            onChange={(e) => setInstantDuration(Number(e.target.value) as 25 | 50)}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
-                          >
-                            <option value={25}>25 minutes</option>
-                            <option value={50}>50 minutes</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label htmlFor="lesson-focus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Primary Focus
-                          </label>
-                          <select
-                            id="lesson-focus"
-                            value={instantFocus}
-                            onChange={(e) => setInstantFocus(e.target.value as 'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed')}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
-                          >
-                            <option value="speaking">Speaking Practice</option>
-                            <option value="vocabulary">Vocabulary Building</option>
-                            <option value="grammar">Grammar Focus</option>
-                            <option value="listening">Listening Skills</option>
-                            <option value="mixed">Mixed Skills</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={handleInstantLessonGenerate}
-                        disabled={isGeneratingInstantLesson || !instantPrompt.trim()}
-                        className="w-full bg-brand-primary text-white py-3 px-4 rounded-lg hover:bg-brand-accent transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isGeneratingInstantLesson ? 'Generating Instant Lesson...' : 'Generate Instant Lesson'}
-                      </button>
-                    </div>
-
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">How it works:</h4>
-                      <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <li>Describe your specific situation or learning need</li>
-                        <li>AI analyzes your student profile and the context</li>
-                        <li>Generates a customized lesson with relevant vocabulary and exercises</li>
-                        <li>Practice immediately or save for later</li>
-                      </ol>
-                    </div>
                   </div>
                 )}
               </div>
