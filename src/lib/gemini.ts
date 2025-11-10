@@ -19,15 +19,15 @@ import {
   LearningPlan,
   GeneratedLesson
 } from '../types/lesson-template';
-
+// NEVER EDIT THIS MODEL WITHOUT APPROVAL
 class GeminiService {
   public model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.0-flash-exp',
+    model: 'gemini-2.5-flash',
     generationConfig: {
-      temperature: 0.7,
+      temperature: 0.1, // Lower temperature for consistent JSON output
       topK: 40,
       topP: 0.95,
-      maxOutputTokens: 4096,
+      maxOutputTokens: 8192, // Increased for comprehensive lessons
     },
   });
 
@@ -136,20 +136,72 @@ IMPORTANT: Return ONLY the JSON object. No additional text, markdown formatting,
       
       const text = result.text();
       
-      // Extract JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
+      // Extract JSON - more robust parsing for gemini-2.5-flash
+      const startIdx = text.indexOf('{');
+      const lastIdx = text.lastIndexOf('}');
+      
+      if (startIdx === -1 || lastIdx === -1 || startIdx >= lastIdx) {
+        console.error('No JSON found in response:', text.substring(0, 200));
         throw new Error('No valid JSON found in AI response');
       }
       
-      // Clean the JSON string of control characters
-      const cleanedJson = jsonMatch[0]
-        .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
-        .replace(/\n/g, '\\n') // Escape newlines
-        .replace(/\r/g, '\\r') // Escape carriage returns
-        .replace(/\t/g, '\\t'); // Escape tabs
+      const jsonStr = text.substring(startIdx, lastIdx + 1);
       
-      const parsedResponse = JSON.parse(cleanedJson);
+      // Carefully clean the JSON
+      let cleanedJson = jsonStr
+        .replace(/\r\n/g, '\n') // Normalize line endings
+        .replace(/\n/g, ' ') // Replace newlines with space
+        .replace(/\t/g, ' ') // Replace tabs with space
+        .replace(/  +/g, ' ') // Collapse multiple spaces
+        .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
+        .replace(/,\s*}/g, '}'); // Remove trailing commas in objects
+      
+      // Try parsing
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(cleanedJson);
+      } catch (firstError) {
+        // Log the problematic JSON segment around error position
+        const syntaxError = firstError as SyntaxError;
+        const positionMatch = syntaxError.message.match(/position (\d+)/);
+        const errorPos = positionMatch ? parseInt(positionMatch[1]) : -1;
+        
+        if (errorPos > 0) {
+          const start = Math.max(0, errorPos - 100);
+          const end = Math.min(cleanedJson.length, errorPos + 100);
+          console.error(
+            `JSON syntax error at position ${errorPos}:`,
+            cleanedJson.substring(start, end)
+          );
+        }
+
+        // Try more aggressive cleanup
+        cleanedJson = cleanedJson
+          .replace(/[\x00-\x1F\x7F]/g, ' ') // Replace control chars with spaces
+          .replace(/\\+n/g, ' ') // Fix double-escaped newlines
+          .replace(/\\+r/g, '') // Remove escaped carriage returns
+          .replace(/\\+t/g, ' ') // Fix escaped tabs
+          .replace(/  +/g, ' '); // Collapse multiple spaces again
+
+        // Fix unescaped quotes within string values
+        const parts = cleanedJson.split('"');
+        for (let i = 1; i < parts.length; i += 2) {
+          // Odd indices are content within quotes - escape any unescaped quotes
+          parts[i] = parts[i].replace(/\\"/g, '\\"').replace(/"/g, '\\"');
+        }
+        cleanedJson = parts.join('"');
+
+        // Fix common JSON structural issues
+        cleanedJson = cleanedJson
+          .replace(/}\s+{/g, '},{') // Fix missing commas between objects
+          .replace(/]\s+{/g, '],[') // Fix missing commas between array and object
+          .replace(/}\s+\[/g, '},[') // Fix missing commas between object and array
+          .replace(/]\s+[{[\d"]/g, (match) => '],' + match.slice(1)) // Fix missing commas after arrays
+          .replace(/}\s+[{[\d"]/g, (match) => '},' + match.slice(1)); // Fix missing commas after objects
+        
+        console.error('JSON parse error:', syntaxError.message);
+        parsedResponse = JSON.parse(cleanedJson);
+      }
       
       return {
         selectedMethodology: methodology,
@@ -620,21 +672,77 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
       });
       
       const text = result.text();
-      
-      // Extract JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
+
+      console.log('Lesson generation response (first 200 chars):', text.substring(0, 200));
+
+      // Extract JSON using index-based approach (more reliable than regex)
+      const startIdx = text.indexOf('{');
+      const lastIdx = text.lastIndexOf('}');
+
+      if (startIdx === -1 || lastIdx === -1 || startIdx >= lastIdx) {
         throw new Error('No valid JSON found in AI response');
       }
-      
-      // Clean the JSON string of control characters
-      const cleanedJson = jsonMatch[0]
-        .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
-        .replace(/\n/g, '\\n') // Escape newlines
-        .replace(/\r/g, '\\r') // Escape carriage returns
-        .replace(/\t/g, '\\t'); // Escape tabs
-      
-      const parsedResponse = JSON.parse(cleanedJson);
+
+      const jsonStr = text.substring(startIdx, lastIdx + 1);
+
+      // Clean the JSON string intelligently
+      let cleanedJson = jsonStr
+        .replace(/\r\n/g, '\n') // Normalize line endings
+        .replace(/[\r\t]/g, ' ') // Replace tabs and remaining carriage returns with spaces
+        .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+        .replace(/  +/g, ' '); // Collapse multiple spaces to one
+
+      let parsedResponse: GeneratedLesson;
+      try {
+        parsedResponse = JSON.parse(cleanedJson) as GeneratedLesson;
+      } catch (firstError) {
+        // Log the problematic JSON segment around error position
+        const syntaxError = firstError as SyntaxError;
+        const positionMatch = syntaxError.message.match(/position (\d+)/);
+        const errorPos = positionMatch ? parseInt(positionMatch[1]) : -1;
+        
+        if (errorPos > 0) {
+          const start = Math.max(0, errorPos - 100);
+          const end = Math.min(cleanedJson.length, errorPos + 100);
+          console.error(
+            `JSON syntax error at position ${errorPos}:`,
+            cleanedJson.substring(start, end)
+          );
+        }
+
+        // Second attempt with more aggressive cleanup
+        cleanedJson = cleanedJson
+          .replace(/[\x00-\x1F\x7F]/g, ' ') // Replace control characters with spaces
+          .replace(/\\\\n/g, ' ') // Fix double-escaped newlines
+          .replace(/\\\\t/g, ' ') // Fix double-escaped tabs
+          .replace(/  +/g, ' ') // Collapse spaces again
+          .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
+          .replace(/,\s*}/g, '}'); // Remove trailing commas in objects
+
+        // Fix unescaped quotes within string values by properly escaping them
+        // Split by quote boundaries and fix quotes only within string values
+        const parts = cleanedJson.split('"');
+        for (let i = 1; i < parts.length; i += 2) {
+          // Odd indices are content within quotes - escape any unescaped quotes
+          parts[i] = parts[i].replace(/\\"/g, '\\"').replace(/"/g, '\\"');
+        }
+        cleanedJson = parts.join('"');
+
+        // Third pass: fix common JSON structural issues
+        cleanedJson = cleanedJson
+          .replace(/}\s+{/g, '},{') // Fix missing commas between objects
+          .replace(/]\s+{/g, '],[') // Fix missing commas between array and object
+          .replace(/}\s+\[/g, '},[') // Fix missing commas between object and array
+          .replace(/]\s+[{[\d"]/g, (match) => '],' + match.slice(1)) // Fix missing commas after arrays
+          .replace(/}\s+[{[\d"]/g, (match) => '},' + match.slice(1)); // Fix missing commas after objects
+
+        console.error(
+          'JSON parse failed on first attempt. Error:',
+          syntaxError.message
+        );
+
+        parsedResponse = JSON.parse(cleanedJson) as GeneratedLesson;
+      }
 
       // Sanitize and enforce synonym rules based on CEFR level before returning
       try {
