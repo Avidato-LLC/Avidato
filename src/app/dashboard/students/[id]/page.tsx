@@ -53,7 +53,7 @@ interface StudentLesson {
   createdAt: Date
 }
 
-type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons'
+type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
 
 export default function StudentProfilePage() {
   const { data: session, status } = useSession()
@@ -75,6 +75,10 @@ export default function StudentProfilePage() {
   const [loadingLessons, setLoadingLessons] = useState(false)
   // Issue #37: Track which lesson is currently being marked as taught
   const [markingTaughtId, setMarkingTaughtId] = useState<string | null>(null)
+  
+  // Instant Lesson Generator State
+  const [instantGrammarTopic, setInstantGrammarTopic] = useState('')
+  const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
 
   // Helper function to check if a lesson already exists for a topic
   const isLessonGenerated = (topicTitle: string) => {
@@ -461,6 +465,22 @@ export default function StudentProfilePage() {
                       </svg>
                       <span className="hidden lg:inline">Generated Lessons</span>
                       <span className="lg:hidden">Lessons</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('instant-lesson')}
+                    className={`py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                      activeTab === 'instant-lesson'
+                        ? 'border-brand-primary text-brand-primary'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span className="hidden lg:inline">Instant Lesson</span>
+                      <span className="lg:hidden">Instant</span>
                     </div>
                   </button>
                 </nav>
@@ -959,12 +979,123 @@ export default function StudentProfilePage() {
                     )}
                   </div>
                 )}
+
+                {/* Instant Lesson Tab */}
+                {activeTab === 'instant-lesson' && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        Generate Instant Grammar Lesson
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                        Generate a focused grammar lesson on any topic. The lesson will be customized to {student?.name}&apos;s proficiency level and interests.
+                      </p>
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault()
+                          if (!instantGrammarTopic.trim()) {
+                            alert('Please enter a grammar topic')
+                            return
+                          }
+
+                          setIsGeneratingInstantLesson(true)
+                          try {
+                            const response = await fetch('/api/lessons/grammar', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                studentId,
+                                topic: instantGrammarTopic.trim()
+                              })
+                            })
+
+                            if (response.ok) {
+                              const result = await response.json()
+                              // Refresh lessons list and redirect to lesson view
+                              await fetchLessons()
+                              // Navigate to the new lesson
+                              router.push(`/lessons/${result.data.id}`)
+                            } else {
+                              const error = await response.json()
+                              alert(`Error: ${error.error || 'Failed to generate lesson'}`)
+                            }
+                          } catch (error) {
+                            console.error('Error generating lesson:', error)
+                            alert('Failed to generate lesson. Please try again.')
+                          } finally {
+                            setIsGeneratingInstantLesson(false)
+                          }
+                        }}
+                        className="space-y-4"
+                      >
+                        <div>
+                          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                            Grammar Topic
+                          </label>
+                          <input
+                            type="text"
+                            value={instantGrammarTopic}
+                            onChange={(e) => setInstantGrammarTopic(e.target.value)}
+                            placeholder="e.g., Present Perfect, Reported Speech, Conditional Sentences..."
+                            disabled={isGeneratingInstantLesson}
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50"
+                          />
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            Enter any grammar topic you&apos;d like to teach. The lesson will be customized to the student&apos;s level and context.
+                          </p>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isGeneratingInstantLesson || !instantGrammarTopic.trim()}
+                          className="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+                        >
+                          {isGeneratingInstantLesson ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <span>Generating Lesson...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                              <span>Generate Lesson</span>
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Example Topics */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                        Example Topics:
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <li>• Present Perfect Tense</li>
+                          <li>• Reported Speech</li>
+                          <li>• Conditional Sentences</li>
+                        </ul>
+                        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <li>• Passive Voice</li>
+                          <li>• Phrasal Verbs</li>
+                          <li>• Word Order</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* No Student Found */}
+                {/* No Student Found */}
         {!loading && !student && !error && (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
