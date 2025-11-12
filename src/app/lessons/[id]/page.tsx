@@ -7,6 +7,7 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { shareLesson } from '@/app/actions/ai-generation'
 import { Under18LessonDisplay } from '@/lib/lesson-displays'
+import GrammarLessonDisplay from '@/components/lesson/GrammarLessonDisplay'
 import { 
   VocabularyExercise, 
   WarmupExercise, 
@@ -522,61 +523,70 @@ export default function LessonPage() {
               </div>
 
               {/* Lesson Overview */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Skills Practiced</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {lesson.content.skills.map((skill) => (
-                      <span key={skill} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-xs sm:text-sm">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Key Vocabulary</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {lesson.content.vocabulary.slice(0, 6).map((word, index) => {
-                      // Handle both string vocabulary and object vocabulary
-                      const displayWord = typeof word === 'string' ? word : (word.word || word.term || String(word));
-                      const key = typeof word === 'string' ? word : `vocab-${index}`;
-                      
-                      return (
-                        <span key={key} className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 rounded text-xs sm:text-sm">
-                          {displayWord}
+              {!(lesson.content as Record<string, unknown>).isGrammarLesson && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Skills Practiced</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {((lesson.content as Record<string, unknown>).skills as string[]).map((skill) => (
+                        <span key={skill} className="px-2 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded text-xs sm:text-sm">
+                          {skill}
                         </span>
-                      );
-                    })}
-                    {lesson.content.vocabulary.length > 6 && (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs sm:text-sm">
-                        +{lesson.content.vocabulary.length - 6} more
-                      </span>
-                    )}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                  
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Key Vocabulary</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {((lesson.content as Record<string, unknown>).vocabulary as unknown[]).slice(0, 6).map((word, index) => {
+                        // Handle both string vocabulary and object vocabulary
+                        const displayWord = typeof word === 'string' ? word : ((word as Record<string, unknown>).word || (word as Record<string, unknown>).term || String(word));
+                        const key = typeof word === 'string' ? word : `vocab-${index}`;
+                        
+                        return (
+                          <span key={key} className="px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 rounded text-xs sm:text-sm">
+                            {String(displayWord)}
+                          </span>
+                        );
+                      })}
+                      {((lesson.content as Record<string, unknown>).vocabulary as unknown[]).length > 6 && (
+                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs sm:text-sm">
+                          +{((lesson.content as Record<string, unknown>).vocabulary as unknown[]).length - 6} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Context</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                    {lesson.content.context}
-                  </p>
-                  <div className="mt-2">
-                    <span className="font-medium text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Difficulty: </span>
-                    <span className="text-xs sm:text-sm text-gray-900 dark:text-white">{lesson.content.difficulty}/10</span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Context</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      {String((lesson.content as Record<string, unknown>).context)}
+                    </p>
+                    <div className="mt-2">
+                      <span className="font-medium text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Difficulty: </span>
+                      <span className="text-xs sm:text-sm text-gray-900 dark:text-white">{String((lesson.content as Record<string, unknown>).difficulty)}/10</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Lesson Exercises */}
             {lesson.content.lessonType === 'Under-18' ? (
               <Under18LessonDisplay
                 lesson={transformToUnder18Lesson(lesson)}
-                studentName={lesson.student.name}
                 showObjectives={true}
                 showProgressBar={true}
               />
+            ) : (lesson.content as Record<string, unknown>).isGrammarLesson ? (
+              <GrammarLessonDisplay lesson={lesson.content as unknown as Record<string, unknown> & {
+                title: string
+                grammarTopic: string
+                context: string
+                explanation: { definition: string; usage: string; examples: string[] }
+                exercises: { type: string; title: string; content: Record<string, unknown> }[]
+              }} />
             ) : (
               <div className="space-y-4 sm:space-y-6">
                 {lesson.content.exercises.map((exercise, index) => (

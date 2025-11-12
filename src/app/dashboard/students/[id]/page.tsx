@@ -6,7 +6,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getStudent } from '../../../actions/students'
-import { generateLearningPlan, generateLesson, generateInstantLesson, getGenerationStats, getStudentLearningPlan, shareLesson } from '../../../actions/ai-generation'
+import { generateLearningPlan, generateLesson, getGenerationStats, getStudentLearningPlan, shareLesson } from '../../../actions/ai-generation'
 import { languages, levels, ageGroups } from '@/lib/form-data-mappings'
 import { LearningPlan } from '@/lib/gemini'
 import ShareIcon from '@/components/icons/ShareIcon'
@@ -73,12 +73,12 @@ export default function StudentProfilePage() {
   const [currentLearningPlan, setCurrentLearningPlan] = useState<LearningPlan | null>(null)
   const [lessons, setLessons] = useState<StudentLesson[]>([])
   const [loadingLessons, setLoadingLessons] = useState(false)
-  const [instantPrompt, setInstantPrompt] = useState('')
-  const [instantFocus, setInstantFocus] = useState<'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed'>('mixed')
-  const [instantDuration, setInstantDuration] = useState<25 | 50>(50)
-  const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
   // Issue #37: Track which lesson is currently being marked as taught
   const [markingTaughtId, setMarkingTaughtId] = useState<string | null>(null)
+  
+  // Instant Lesson Generator State
+  const [instantGrammarTopic, setInstantGrammarTopic] = useState('')
+  const [isGeneratingInstantLesson, setIsGeneratingInstantLesson] = useState(false)
 
   // Helper function to check if a lesson already exists for a topic
   const isLessonGenerated = (topicTitle: string) => {
@@ -266,37 +266,6 @@ export default function StudentProfilePage() {
   const generateLearningTopics = (studentData: StudentData) => {
     // Remove demo data - topics will come from AI generation only
     setLearningTopics([])
-  }
-
-  // Handle instant lesson generation
-  const handleInstantLessonGenerate = async () => {
-    if (!instantPrompt.trim() || isGeneratingInstantLesson) return
-
-    setIsGeneratingInstantLesson(true)
-    try {
-      const result = await generateInstantLesson(
-        studentId,
-        instantPrompt.trim(),
-        instantFocus,
-        instantDuration
-      )
-      
-      if (result.success && result.data) {
-        // Refresh lessons list
-        await fetchLessons()
-        // Clear the form
-        setInstantPrompt('')
-        // Show success message or redirect to lesson
-        window.location.href = `/lessons/${result.data.lessonId}`
-      } else {
-        alert(result.error || 'Failed to generate instant lesson')
-      }
-    } catch (error) {
-      console.error('Error generating instant lesson:', error)
-      alert('Failed to generate instant lesson. Please try again.')
-    } finally {
-      setIsGeneratingInstantLesson(false)
-    }
   }
 
   // Redirect if not authenticated
@@ -1014,106 +983,110 @@ export default function StudentProfilePage() {
                 {/* Instant Lesson Tab */}
                 {activeTab === 'instant-lesson' && (
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                          Instant Lesson Generator
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mt-1">
-                          Generate a lesson instantly based on specific needs or situations
-                        </p>
-                      </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        Generate Instant Grammar Lesson
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                        Generate a focused grammar lesson on any topic. The lesson will be customized to {student?.name}&apos;s proficiency level and interests.
+                      </p>
                     </div>
 
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <div className="flex">
-                        <svg className="flex-shrink-0 w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div className="ml-3">
-                          <h4 className="text-sm font-medium text-blue-800 dark:text-blue-400">
-                            Examples of instant lesson prompts:
-                          </h4>
-                          <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                            <ul className="list-disc list-inside space-y-1">
-                              <li>&quot;I have a job interview tomorrow&quot;</li>
-                              <li>&quot;I need to give a presentation next week&quot;</li>
-                              <li>&quot;I&apos;m going to a business dinner&quot;</li>
-                              <li>&quot;I need to negotiate a contract&quot;</li>
-                              <li>&quot;I&apos;m traveling to London next month&quot;</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault()
+                          if (!instantGrammarTopic.trim()) {
+                            alert('Please enter a grammar topic')
+                            return
+                          }
 
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="instant-prompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Describe your immediate learning need
-                        </label>
-                        <textarea
-                          id="instant-prompt"
-                          rows={4}
-                          value={instantPrompt}
-                          onChange={(e) => setInstantPrompt(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
-                          placeholder="Example: I have a job interview tomorrow for a marketing position and need to practice talking about my experience and asking good questions..."
-                        />
-                      </div>
+                          setIsGeneratingInstantLesson(true)
+                          try {
+                            const response = await fetch('/api/lessons/grammar', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                studentId,
+                                topic: instantGrammarTopic.trim()
+                              })
+                            })
 
-                      <div className="flex items-center space-x-4">
-                        <div>
-                          <label htmlFor="lesson-duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Lesson Duration
-                          </label>
-                          <select
-                            id="lesson-duration"
-                            value={instantDuration}
-                            onChange={(e) => setInstantDuration(Number(e.target.value) as 25 | 50)}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
-                          >
-                            <option value={25}>25 minutes</option>
-                            <option value={50}>50 minutes</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label htmlFor="lesson-focus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Primary Focus
-                          </label>
-                          <select
-                            id="lesson-focus"
-                            value={instantFocus}
-                            onChange={(e) => setInstantFocus(e.target.value as 'speaking' | 'vocabulary' | 'grammar' | 'listening' | 'mixed')}
-                            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
-                          >
-                            <option value="speaking">Speaking Practice</option>
-                            <option value="vocabulary">Vocabulary Building</option>
-                            <option value="grammar">Grammar Focus</option>
-                            <option value="listening">Listening Skills</option>
-                            <option value="mixed">Mixed Skills</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={handleInstantLessonGenerate}
-                        disabled={isGeneratingInstantLesson || !instantPrompt.trim()}
-                        className="w-full bg-brand-primary text-white py-3 px-4 rounded-lg hover:bg-brand-accent transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            if (response.ok) {
+                              const result = await response.json()
+                              // Refresh lessons list and redirect to lesson view
+                              await fetchLessons()
+                              // Navigate to the new lesson
+                              router.push(`/lessons/${result.data.id}`)
+                            } else {
+                              const error = await response.json()
+                              alert(`Error: ${error.error || 'Failed to generate lesson'}`)
+                            }
+                          } catch (error) {
+                            console.error('Error generating lesson:', error)
+                            alert('Failed to generate lesson. Please try again.')
+                          } finally {
+                            setIsGeneratingInstantLesson(false)
+                          }
+                        }}
+                        className="space-y-4"
                       >
-                        {isGeneratingInstantLesson ? 'Generating Instant Lesson...' : 'Generate Instant Lesson'}
-                      </button>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                            Grammar Topic
+                          </label>
+                          <input
+                            type="text"
+                            value={instantGrammarTopic}
+                            onChange={(e) => setInstantGrammarTopic(e.target.value)}
+                            placeholder="e.g., Present Perfect, Reported Speech, Conditional Sentences..."
+                            disabled={isGeneratingInstantLesson}
+                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50"
+                          />
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            Enter any grammar topic you&apos;d like to teach. The lesson will be customized to the student&apos;s level and context.
+                          </p>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isGeneratingInstantLesson || !instantGrammarTopic.trim()}
+                          className="w-full bg-brand-primary text-white px-6 py-3 rounded-lg hover:bg-brand-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+                        >
+                          {isGeneratingInstantLesson ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <span>Generating Lesson...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                              <span>Generate Lesson</span>
+                            </>
+                          )}
+                        </button>
+                      </form>
                     </div>
 
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">How it works:</h4>
-                      <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                        <li>Describe your specific situation or learning need</li>
-                        <li>AI analyzes your student profile and the context</li>
-                        <li>Generates a customized lesson with relevant vocabulary and exercises</li>
-                        <li>Practice immediately or save for later</li>
-                      </ol>
+                    {/* Example Topics */}
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                        Example Topics:
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <li>• Present Perfect Tense</li>
+                          <li>• Reported Speech</li>
+                          <li>• Conditional Sentences</li>
+                        </ul>
+                        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                          <li>• Passive Voice</li>
+                          <li>• Phrasal Verbs</li>
+                          <li>• Word Order</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1122,7 +1095,7 @@ export default function StudentProfilePage() {
           </div>
         )}
 
-        {/* No Student Found */}
+                {/* No Student Found */}
         {!loading && !student && !error && (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
