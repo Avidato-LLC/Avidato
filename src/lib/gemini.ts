@@ -471,14 +471,23 @@ CRITICAL SYNONYM RULES FOR ${student.level.toUpperCase()} STUDENTS:
 
 VOCABULARY COMPOSITION RULES (CRITICAL):
 - Total vocabulary items: 6-8
-- Maximum 2 noun phrases (can be 0-2) (e.g., "paradigm shift", "organizational agility", "innovation pipeline")
-- Include 2-4 single-word items: verbs, adjectives, adverbs (e.g., "derive", "leverage", "robust", "retention")
-- Include 1-2 idioms, phrasal verbs, or collocations (e.g., "pick up", "cut to the chase", "get the ball rolling")
-- STRICTLY PROHIBITED: Do NOT repeat demonstration words from these instructions (e.g., do NOT use "derive", "leverage", "robust", "retention", "pick up", "cut to the chase", "paradigm shift", "organizational agility" in actual lessons)
+- **PRIMARILY SINGLE-WORD VOCABULARY** (4-8 items): verbs, adjectives, nouns, adverbs appropriate for ${student.level}
+  * Examples of structure (NOT words to copy): single words like "fatigue", "tolerance", "adverse", "iteration", "asymmetrical", "proprietary"
+  * Choose words CONTEXTUALLY RELEVANT to this specific lesson topic: "${topic.title}"
+  * DO NOT use these example words unless they genuinely fit the lesson context
+- **Maximum 0-2 multi-word phrases** (prefer 0-1):
+  * ONLY idioms or phrasal verbs (e.g., structure like "food for thought", "get bogged down", "allay concerns")
+  * Choose phrases CONTEXTUALLY RELEVANT to this lesson topic
+  * DO NOT use these example phrases unless they genuinely fit the lesson context
+- **STRICTLY AVOID COMPOUND NOUN PHRASES**:
+  * ❌ WRONG: "stress concentration", "fatigue life", "material compatibility", "design iteration", "manufacturing tolerances", "cost-effectiveness"
+  * ✅ CORRECT: Use the core single word instead: "fatigue" (not "fatigue life"), "tolerance" (not "manufacturing tolerances"), "iteration" (not "design iteration"), "concentration" (not "stress concentration")
+- **UNIQUENESS RULE**: Do NOT repeat vocabulary from previous lessons. Each lesson should have contextually specific, unique vocabulary.
+- **EXCEPTION**: If the lesson specifically focuses on teaching idioms or phrasal verbs as its main objective, you may use more multi-word items (but they must be idioms/phrasal verbs, NOT noun phrases)
 - Level adaptation:
-  * A1-A2: Simple single words, basic phrasal verbs
-  * B1-B2: Mixed single words and 0-1 noun phrases
-  * C1-C2: More noun phrases (max 2), advanced collocations
+  * A1-A2: Simple single-word verbs, nouns, adjectives (e.g., "happy", "run", "big"), 0-1 basic phrasal verb (e.g., "pick up", "look for")
+  * B1-B2: Intermediate single words (e.g., "analyze", "efficient", "comprehensive"), 0-1 common idiom/phrasal verb
+  * C1-C2: Advanced single words (e.g., "mitigate", "leverage", "nuanced"), 0-2 sophisticated idioms/collocations
 
 CRITICAL REQUIREMENTS:
 1. EVERY vocabulary item MUST appear naturally in the Exercise 3 dialogue. ALL vocabulary words MUST be used 2-3 times throughout the lesson.
@@ -513,12 +522,12 @@ Create 6-8 vocabulary items with this EXACT format (examples for different level
 
 FOR BEGINNER/ELEMENTARY (A1-A2):
 {
-  "word": "appointment",
-  "partOfSpeech": "Noun",
-  "phonetics": "/əˈpɔɪntmənt/",
-  "definition": "a meeting that has been arranged for a particular time",
-  "example": "I have a doctor's appointment at 3 PM.",
-  "synonym": "meeting",
+  "word": "comfortable",
+  "partOfSpeech": "Adjective",
+  "phonetics": "/ˈkʌmftəbəl/",
+  "definition": "feeling physically relaxed and free from pain or constraint",
+  "example": "This chair is very comfortable.",
+  "synonym": "cozy",
   "expressions": []
 }
 
@@ -535,13 +544,24 @@ FOR INTERMEDIATE (B1-B2):
 
 FOR ADVANCED (C1-C2):
 {
-  "word": "paradigm shift",
-  "partOfSpeech": "Noun phrase",
-  "phonetics": "/ˈpærədaɪm ʃɪft/",
-  "definition": "a fundamental change in approach or underlying assumptions",
-  "example": "The company underwent a paradigm shift, moving from traditional sales to digital-first strategies.",
-  "synonym": "major change",
-  "expressions": ["paradigm shift in", "represent a paradigm shift", "drive a paradigm shift"]
+  "word": "asymmetrical",
+  "partOfSpeech": "Adjective",
+  "phonetics": "/ˌeɪsɪˈmetrɪkəl/",
+  "definition": "having parts that fail to correspond to one another in shape, size, or arrangement; lacking symmetry",
+  "example": "The building features an asymmetrical design that challenges conventional architecture.",
+  "synonym": "uneven",
+  "expressions": ["asymmetrical design", "asymmetrical distribution", "asymmetrical approach"]
+}
+
+IDIOM/PHRASAL VERB EXAMPLE (any level):
+{
+  "word": "get bogged down",
+  "partOfSpeech": "Phrasal verb",
+  "phonetics": "/ɡet bɒɡd daʊn/",
+  "definition": "to become so involved in details or difficulties that you cannot make progress",
+  "example": "Let's not get bogged down in minor details; we need to focus on the big picture.",
+  "synonym": "get stuck",
+  "expressions": ["get bogged down in details", "get bogged down by bureaucracy"]
 }
 
 VOCABULARY FORMAT:
@@ -759,8 +779,8 @@ VOCABULARY INTEGRATION RULES:
 PHONETICS EXAMPLES BY LEVEL:
 
 BEGINNER (A1-A2):
-- appointment: /əˈpɔɪntmənt/
 - comfortable: /ˈkʌmftəbəl/
+- happy: /ˈhæpi/
 - temperature: /ˈtempərətʃər/
 
 INTERMEDIATE (B1-B2):
@@ -769,7 +789,7 @@ INTERMEDIATE (B1-B2):
 - accommodate: /əˈkɑːmədeɪt/
 
 ADVANCED (C1-C2):
-- paradigm shift: /ˈpærədaɪm ʃɪft/
+- asymmetrical: /ˌeɪsɪˈmetrɪkəl/
 - serendipitous: /ˌserənˈdɪpɪtəs/
 - ubiquitous: /juːˈbɪkwɪtəs/
 - quintessential: /ˌkwɪntɪˈsenʃəl/
