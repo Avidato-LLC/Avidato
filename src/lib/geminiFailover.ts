@@ -14,13 +14,18 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY)
 // Ordered by preference / capability (adjust as needed)
 // Provided by user: want to switch to "any other" on error.
 // We'll attempt higher capability / freshness first, then lighter / experimental.
+// Preferred model order (user-specified):
+// 1) Gemini 2.5 Pro
+// 2) Gemini 2.5 Flash
+// 3) Gemini 2.5 Flash-Lite
+// 4) Gemini 2.0 Flash
+// 5) Gemini 2.0 Flash-Lite
 export const MODEL_FALLBACK_CHAIN: string[] = [
-  'gemini-2.5-flash',
   'gemini-2.5-pro',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
   'gemini-2.0-flash',
   'gemini-2.0-flash-lite',
-  'gemini-2.5-flash-lite',
-  'earnlm-2.0-flash-experimental'
 ]
 
 export interface FailoverResult {

@@ -1,5 +1,6 @@
 // src/lib/gemini.ts
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateWithFailover } from './geminiFailover';
 import { A1LessonModule } from './cefr/A1LessonModule';
 import { A2LessonModule } from './cefr/A2LessonModule';
 import { B1LessonModule } from './cefr/B1LessonModule';
@@ -22,7 +23,7 @@ import {
 // NEVER EDIT THIS MODEL WITHOUT APPROVAL FROM THE OWNER
 class GeminiService {
   public model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-pro',
     generationConfig: {
       temperature: 0.1, // Lower temperature for consistent JSON output
       topK: 40,
@@ -30,6 +31,68 @@ class GeminiService {
       maxOutputTokens: 8192, // Increased for comprehensive lessons
     },
   });
+
+  /**
+   * Suggest realistic workplace roles and scenario examples based on occupation.
+   * Used to steer dialogue/role-play toward actual conversations aligned with student goals.
+   */
+  private getSuggestedRolesAndScenarios(occupationRaw: string | undefined): { roles: string[]; examples: string[] } {
+    const occupation = (occupationRaw || '').toLowerCase();
+    // Software/Engineering
+    if (/(software|developer|engineer|engineering|programmer)/.test(occupation)) {
+      return {
+        roles: ['Tech Lead', 'Product Manager', 'QA Engineer', 'Colleague'],
+        examples: ['Daily standup', 'Code review feedback session', 'Sprint planning', 'Incident postmortem']
+      };
+    }
+    // Customer Success / Account Management
+    if (/(customer success|cs|account manager|customer support|success manager)/.test(occupation)) {
+      return {
+        roles: ['Client (Director level)', 'Account Manager', 'Project Manager'],
+        examples: ['Client kickoff call', 'QBR alignment', 'Renewal negotiation']
+      };
+    }
+    // Sales / Business Development
+    if (/(sales|account executive|business development|bd)/.test(occupation)) {
+      return {
+        roles: ['Prospect', 'Sales Manager', 'Account Executive'],
+        examples: ['Discovery call', 'Objection handling', 'Pricing discussion']
+      };
+    }
+    // Healthcare
+    if (/(doctor|physician|nurse|medical|healthcare)/.test(occupation)) {
+      return {
+        roles: ['Patient', 'Nurse', 'Consultant Physician'],
+        examples: ['Patient intake', 'Follow-up consultation', 'Care plan briefing']
+      };
+    }
+    // Legal
+    if (/(lawyer|attorney|legal)/.test(occupation)) {
+      return {
+        roles: ['Client', 'Senior Partner', 'Associate'],
+        examples: ['Client consultation', 'Contract review', 'Case strategy meeting']
+      };
+    }
+    // Education
+    if (/(teacher|professor|education|lecturer)/.test(occupation)) {
+      return {
+        roles: ['Student', 'Colleague', 'Department Chair'],
+        examples: ['Parent-teacher conference', 'Curriculum planning', 'Department meeting']
+      };
+    }
+    // Finance / Operations / General Business
+    if (/(finance|analyst|operations|manager|executive|business)/.test(occupation)) {
+      return {
+        roles: ['Manager', 'Director', 'Colleague'],
+        examples: ['Quarterly results briefing', 'Project update', 'Stakeholder check-in']
+      };
+    }
+    // Default generic
+    return {
+      roles: ['Manager', 'Colleague', 'Client'],
+      examples: ['Team sync', 'Project update', 'Stakeholder check-in']
+    };
+  }
 
   // Methodology selection based on student profile
   private selectMethodology(student: StudentProfile): { methodology: 'CLT' | 'TBLT' | 'PPP' | 'TTT'; reasoning: string } {
@@ -74,8 +137,11 @@ class GeminiService {
   // Generate learning plan (10 topics)
   async generateLearningPlan(student: StudentProfile): Promise<LearningPlan> {
     const { methodology, reasoning } = this.selectMethodology(student);
+    const { roles, examples } = this.getSuggestedRolesAndScenarios(student.occupation);
+    const rolesList = roles.join(', ');
+    const exampleList = examples.join('; ');
     
-    const prompt = `Generate a 10-lesson learning plan for a ${student.level} ${student.targetLanguage} student.
+  const prompt = `Generate a 10-lesson learning plan for a ${student.level} ${student.targetLanguage} student.
 
 STUDENT PROFILE:
 - Name: ${student.name}
@@ -93,22 +159,25 @@ ${reasoning}
 
 REQUIREMENTS:
 1. Create exactly 10 learning topics
-2. Each topic should be relevant to the student's goals and context
-3. Focus on speaking-based materials as most students prefer this
-4. Use ${methodology} methodology principles:
+2. Each topic should be relevant to the student's goals and context and MUST be a concrete, real interaction (meeting/call/review/briefing) aligned with the student's occupation and goals — NOT abstract skills
+  - Roles should reflect the student's world. Suggested roles: ${rolesList}
+  - Scenario examples (adapt as appropriate): ${exampleList}
+3. Do NOT create topics about "speaking skills" or "confidence" or "presentation delivery" as abstract abilities. If the student's goal hints at delivery/confidence, convert it into a real event (e.g., QBR with client director, design review, code review, stakeholder update) and focus on the content of that interaction.
+4. Focus on speaking-based materials as most students prefer this
+5. Use ${methodology} methodology principles:
    ${methodology === 'CLT' ? '- Emphasize real-life communication, dialogues, role-plays, discussions' : ''}
    ${methodology === 'TBLT' ? '- Focus on meaningful tasks and practical applications' : ''}
    ${methodology === 'PPP' ? '- Structure with clear presentation, controlled practice, then production' : ''}
    ${methodology === 'TTT' ? '- Balance teacher input with guided student discovery' : ''}
-5. Make content domain-specific to their occupation/interests when relevant
-6. Progress logically from simpler to more complex topics
-7. VOCABULARY MUST BE LEVEL-APPROPRIATE:
+6. Make content domain-specific to their occupation/interests when relevant
+7. Progress logically from simpler to more complex topics
+8. VOCABULARY inside each topic MUST be scenario-based and domain-relevant for the student's occupation. STRICTLY FORBIDDEN vocabulary/themes: "exude confidence", "convey gravitas", "articulate clearly", "come across as", "hold one's own", "without reservation", "speak volumes", "project gravitas", "assertively", or any meta-communication coaching terms.
 ${this.getLevelVocabularyGuide(student.level)}
 
 🚫 CRITICAL VOCABULARY EXCLUSIONS:
 ${this.getOccupationExclusions(student.occupation || '')}
 
-🎯 FOCUS ON: Advanced expressions, sophisticated communication patterns, and nuanced language that challenges language skills rather than professional knowledge.
+🎯 FOCUS ON: Natural workplace language, domain-relevant phrases, and nuanced communication that challenges language skills (not lecturing professional knowledge). Avoid meta-teaching/coaching in dialogues and topics; make it a real conversation.
 
 FORMAT YOUR RESPONSE AS VALID JSON ONLY (no markdown, no explanations):
 {
@@ -129,12 +198,15 @@ FORMAT YOUR RESPONSE AS VALID JSON ONLY (no markdown, no explanations):
 IMPORTANT: Return ONLY the JSON object. No additional text, markdown formatting, or explanations.`;
 
     try {
-      const result = await this.retryWithBackoff(async () => {
-        const response = await this.model.generateContent(prompt);
-        return await response.response;
+      const { rawText: text } = await generateWithFailover({
+        prompt,
+        generationConfig: {
+          temperature: 0.1,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
+        },
       });
-      
-      const text = result.text();
       
       // Extract JSON - more robust parsing for gemini-2.5-flash
       const startIdx = text.indexOf('{');
@@ -344,7 +416,11 @@ RESPONSE FORMAT FOR EXERCISE 5:
 CRITICAL: This exercise must appear as Exercise 5 in the exercises array. ALL sentences must be thematically related to the lesson topic and use the vocabulary being taught.`;
   }
 
-  const prompt = `You are an expert English teacher creating lessons in the Engoo format. Generate a comprehensive lesson following the EXACT Engoo structure.
+  const { roles, examples } = this.getSuggestedRolesAndScenarios(student.occupation);
+  const primaryRoleA = roles[0] || 'Manager';
+  const scenarioHints = examples.join('; ');
+
+  const prompt = `You are an expert language instructor crafting Engoo-format lessons focused on authentic, role-based workplace interactions. Generate a comprehensive lesson following the EXACT Engoo structure.
 
 STUDENT PROFILE:
 - Name: ${student.name}
@@ -361,6 +437,29 @@ OBJECTIVE: ${topic.objective}
 CONTEXT: ${topic.context}
 VOCABULARY WORDS: ${topic.vocabulary.join(', ')}${vocabularyContextSection}${under18Section}
 
+🎯 CRITICAL ENGOO-STYLE REQUIREMENT:
+The lesson topic "${topic.title}" must be ENACTED in the dialogue, NOT discussed as an abstract skill.
+
+EXAMPLES OF CORRECT INTERPRETATION:
+- "Delivering a Presentation" → Dialogue is ${student.name} ACTUALLY delivering a presentation to stakeholders/investors
+- "Client QBR Review" → Dialogue is ${student.name} ACTUALLY conducting the QBR with the client
+- "Processing an Order" → Dialogue is ${student.name} ACTUALLY processing a customer order
+- "Code Review Session" → Dialogue is ${student.name} ACTUALLY reviewing code with teammates
+- "Negotiating Contract Terms" → Dialogue is ${student.name} ACTUALLY negotiating terms with counterparty
+- "Triaging Production Incident" → Dialogue is ${student.name} ACTUALLY triaging the incident with team
+
+❌ STRICTLY FORBIDDEN:
+- Meta-discussions where colleagues coach ${student.name} on "how to present" or "how to articulate"
+- Pre-meeting prep conversations about delivery techniques
+- Post-meeting debriefs analyzing communication style
+- Any vocabulary about presentation skills, confidence, gravitas, articulation, etc.
+
+✅ VOCABULARY MUST BE:
+- Domain-specific and naturally occurring in the ACTUAL scenario
+- Used functionally within the event itself (presentation terms in a presentation, negotiation terms in a negotiation, technical terms in a code review)
+- Level-appropriate for ${student.level}
+- Composed per VOCABULARY COMPOSITION RULES below (max 3 noun phrases, include verbs/idioms/collocations)
+
 LEVEL-APPROPRIATE VOCABULARY REQUIREMENTS:
 ${this.getLevelVocabularyGuide(student.level)}
 
@@ -370,30 +469,42 @@ CRITICAL SYNONYM RULES FOR ${student.level.toUpperCase()} STUDENTS:
 - INTERMEDIATE (B1/B2): Synonyms should be intermediate-level
 - ADVANCED (C1/C2): Synonyms can be more sophisticated
 
+VOCABULARY COMPOSITION RULES (CRITICAL):
+- Total vocabulary items: 6-8
+- Maximum 2 noun phrases (can be 0-2) (e.g., "paradigm shift", "organizational agility", "innovation pipeline")
+- Include 2-4 single-word items: verbs, adjectives, adverbs (e.g., "derive", "leverage", "robust", "retention")
+- Include 1-2 idioms, phrasal verbs, or collocations (e.g., "pick up", "cut to the chase", "get the ball rolling")
+- STRICTLY PROHIBITED: Do NOT repeat demonstration words from these instructions (e.g., do NOT use "derive", "leverage", "robust", "retention", "pick up", "cut to the chase", "paradigm shift", "organizational agility" in actual lessons)
+- Level adaptation:
+  * A1-A2: Simple single words, basic phrasal verbs
+  * B1-B2: Mixed single words and 0-1 noun phrases
+  * C1-C2: More noun phrases (max 2), advanced collocations
+
 CRITICAL REQUIREMENTS:
-1. ALL vocabulary words MUST be used 2-3 times throughout the lesson
+1. EVERY vocabulary item MUST appear naturally in the Exercise 3 dialogue. ALL vocabulary words MUST be used 2-3 times throughout the lesson.
 2. Follow EXACT Engoo format with proper vocabulary structure
-3. Create realistic dialogue with multiple characters
-4. All exercises must connect thematically
+3. The dialogue MUST BE the actual event described in the lesson title. Examples:
+   - "Delivering Quarterly Results" → ${student.name} delivers actual presentation with Q&A, NOT colleagues coaching ${student.name} on how to present
+   - "Negotiating Contract Terms" → ${student.name} negotiates with client, NOT team discussing negotiation strategy
+   - "Code Review Meeting" → ${student.name} reviews actual code with team, NOT discussing how to give feedback
+   - "Processing Customer Order" → ${student.name} processes actual order with customer, NOT training scenario
+   The dialogue participants are colleagues/clients/managers engaging with ${student.name} about the work content itself.
+4. All exercises must connect thematically to the ACTUAL event
 5. VOCABULARY MUST BE LEVEL-APPROPRIATE - avoid basic words for advanced students
 6. SELECT VOCABULARY BASED ON:
+   - What would naturally be said DURING this specific event (presentation, meeting, call, review, negotiation, etc.)
    - Student's level (use guidelines above)
    - Student's occupation (${student.occupation || 'general'})
-   - Student's goals (${student.endGoals})
-   - Student's weaknesses (${student.weaknesses || 'general improvement'})
-   - Lesson topic and context
+   - The functional language needed to execute this task
+7. DOMAIN TERMS: Naturally include 2-4 domain-specific terms that would be used in this actual scenario
 
 🎯 FOR ${student.level.toUpperCase()} STUDENTS SPECIFICALLY:
 ${this.getCEFRModule(student.level).getVocabularyGuide()}
 
-🚫 CRITICAL VOCABULARY EXCLUSIONS:
-${this.getOccupationExclusions(student.occupation || '')}
-
-🎯 INSTEAD, FOR ${student.level.toUpperCase()} ${student.occupation || 'PROFESSIONALS'}:
-- Use sophisticated vocabulary that challenges language skills, NOT professional knowledge
-- Focus on advanced expressions, nuanced communication, complex linguistic structures
-- Include advanced idioms, phrasal verbs, and sophisticated terminology from OTHER fields
-- Challenge their English proficiency, not their domain expertise
+🎯 VOCABULARY PRIORITY FOR ${student.level.toUpperCase()} ${student.occupation || 'PROFESSIONALS'}:
+- Prioritize natural workplace phrases,idioms, collocations, and domain-relevant terminology used in context
+- Challenge English proficiency while keeping domain terms realistic for the role; do not define domain terms
+- Include advanced idioms and phrasal verbs where natural
 
 ENGOO LESSON STRUCTURE:
 
@@ -478,68 +589,70 @@ EXPRESSIONS/COLLOCATIONS RULES (Issue #42):
 - Each expression should be 2-4 words (not full sentences)
 - Expressions help students understand how professional words are actually used in context
 
-**Exercise 2: Warm-up**
-2-3 discussion questions introducing the topic:
+  **Exercise 2: Warm-up**
+  2-3 discussion prompts that prepare for the ACTUAL scenario:
 {
   "type": "warmup",
   "title": "Exercise 2: Warm-up",
   "description": "Discussion questions to introduce the topic",
   "content": {
-    "questions": ["Question using vocabulary naturally", "Another question"],
-    "instructions": "Discuss these questions with your teacher"
+    "questions": ["Question about prior experience with this type of scenario", "Question about challenges in this context", "Question about best practices in this situation"],
+    "instructions": "Try responding as naturally as possible, using any vocabulary you know related to the topic."
   },
   "timeMinutes": 8
+}**Exercise 3: Dialogue**
+${student.name} performs the ACTUAL task/event described in the lesson title:
+
+  ⚠️ CRITICAL DIALOGUE RULES - THE DIALOGUE MUST BE THE ACTUAL EVENT:
+  - ${student.name} is PERFORMING the task in the title (presenting, negotiating, processing order, reviewing code, conducting QBR, etc.)
+  - Other characters are the AUDIENCE/PARTICIPANTS in this event (investors, clients, customers, teammates, manager, etc.)
+  - The FIRST character speaking MUST be ${student.name}
+  - ${student.name} MUST speak after EVERY other character speaks
+  - ABSOLUTELY NO consecutive speeches by non-student characters (e.g., Character A then Character B without student between them)
+  - This is a 1-on-1 lesson format: the teacher reads one role, the student reads ${student.name}'s role, and they alternate strictly
+  - If multiple participants are present in the scenario, they should speak one at a time with ${student.name} responding to each in turn
+  - The conversation is about the ACTUAL CONTENT of the event (project details, product specs, code logic, contract terms, etc.) - NOT about how to communicate
+  - Vocabulary words are used FUNCTIONALLY within the event (e.g., "projected sales" used when presenting sales data, "expedited shipping" used when processing an order, "merge conflict" used during code review)
+  - NEVER have characters introduce themselves unnecessarily
+  - ALWAYS write NATURAL dialogue as people actually speak
+  - DIALOGUE MUST HAVE A CONCLUSIVE ENDING with a decision/agreement/resolution
+  
+EXAMPLE PATTERNS:
+  * "Delivering Presentation" → ${student.name} presents to stakeholders, they ask questions about content
+  * "Client QBR" → ${student.name} reviews quarterly metrics with client, discusses next steps
+  * "Processing Order" → ${student.name} takes customer order, confirms details, arranges shipping
+  * "Code Review" → ${student.name} walks through code changes, teammates ask technical questions
+  * "Contract Negotiation" → ${student.name} proposes terms, counterparty responds, they negotiate
+
+- CONTEXT/SETTING: Generate a descriptive context explaining WHO is participating, WHERE, and WHAT the event is about. Choose roles aligned with the student's occupation. Suggested roles include: ${roles.join(', ')}. Scenario hints: ${scenarioHints}. The setting describes the ACTUAL event being performed.
+
+EXAMPLE OF CORRECT DIALOGUE (${student.name} ACTUALLY performing the task):
+If lesson is "Delivering a Presentation":
+{
+  "character": "${student.name}",
+  "text": "Good afternoon everyone. Today I'm here to present our Q3 results and projections for Q4. Let me start with our revenue figures..."
+},
+{
+  "character": "Investor",
+  "text": "Before you continue, could you clarify what factors contributed to the 15% increase?"
+},
+{
+  "character": "${student.name}",
+  "text": "Absolutely. The increase was primarily driven by our expansion into the Asian market and improved customer retention rates..."
 }
 
-**Exercise 3: Dialogue**
-Realistic conversation between 3-4 characters using ALL vocabulary:
-
-⚠️ CRITICAL DIALOGUE RULES - ISSUE #37 & STUDENT PRACTICE:
-- The FIRST character in dialogue MUST be the student (${student.name})
-- The student MUST speak after EVERY other character speaks
-- This ensures the student practices responding to all roles while the teacher reads other parts
-- Student dialogue MUST naturally use 2-3 of the new vocabulary words being taught
-- Teacher can easily see which lines to read (all non-student characters) and which the student reads
-- NEVER have characters introduce themselves unnecessarily (e.g., after being introduced, don't say "I'm James")
-- ALWAYS write NATURAL dialogue as people actually speak, not mechanical/stilted
-- Characters should build on previous context, not repeat it
-- DIALOGUE MUST HAVE A CONCLUSIVE ENDING: The conversation should reach a natural conclusion/resolution:
-  * Agreement on a point
-  * A decision made
-  * A plan established
-  * A question answered satisfactorily
-  * NEVER end with a hanging question or unfinished thought
-- GOOD DIALOGUE PATTERN:
-  * Student speaks first (introduces topic or asks question using new vocabulary)
-  * Character 2 responds
-  * Student responds to Character 2 (uses more new vocabulary)
-  * Character 3 responds  
-  * Student responds to Character 3 (uses new vocabulary)
-  * Final speaker (ideally student) concludes the conversation with resolution
-- Each character should speak naturally, using the vocabulary in context, not forcing it
-- CRITICAL: Do NOT have non-student characters speak consecutively - student MUST interject after each
-- CONTEXT/SETTING: Generate a unique, descriptive context that explains WHO is talking, WHERE they are, and WHAT they're discussing. Example: "Sarah, Mike, and Jessica are having a meeting in their office about streamlining an approval process. This is a professional discussion where they're brainstorming solutions." NOT just "A conversation" or "In an office".
-
-EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending):
+If lesson is "Processing an Order":
 {
   "character": "${student.name}",
-  "text": "I've been thinking about how to streamline our approval process. What are your thoughts on this approach?"
+  "text": "Thank you for calling. How may I help you today?"
 },
 {
-  "character": "Manager",
-  "text": "That's interesting. Could you elaborate on what you mean by 'streamline'?"
+  "character": "Customer",
+  "text": "Hi, I'd like to place an order for the Model X laptop."
 },
 {
   "character": "${student.name}",
-  "text": "I mean we should identify the bottlenecks and see if we can reduce unnecessary steps. This would help us implement changes faster."
-},
-{
-  "character": "Director",
-  "text": "I see your point. How would you approach identifying these bottlenecks?"
-},
-{
-  "character": "${student.name}",
-  "text": "We could start by analyzing the current workflow and gathering feedback from the team. The data would show us where delays occur. I think this is a solid plan we should move forward with."
+  "text": "Excellent choice. Let me check our inventory... Yes, we have that in stock. Would you prefer standard or expedited shipping?"
 }
 
 {
@@ -547,18 +660,17 @@ EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending)
   "title": "Exercise 3: Dialogue",
   "description": "Practice your reading and speaking skills with a real scenario",
   "content": {
-    "setting": "Generate a rich, detailed context describing WHO is talking, WHERE, WHEN, and WHAT about. Include character names and the topic being discussed. Example: 'Alex, Jordan, and Casey are discussing a challenging project deadline at their tech startup office on Monday morning.'",
+    "setting": "Detailed description of the ACTUAL event: ${student.name} is [performing the task from lesson title]. WHO is the audience/participants, WHERE is this happening, WHAT is the specific situation. Example: '${student.name} is delivering a quarterly presentation to the board of directors in the main conference room, presenting Q3 sales results and Q4 projections.'",
     "characters": [
-      {"name": "${student.name}", "role": "Facilitator", "avatar": "You are the student - read your lines aloud"},
-      {"name": "Manager", "role": "Manager", "avatar": "professional"},
-      {"name": "Director", "role": "Director", "avatar": "senior professional"}
+      {"name": "${student.name}", "role": "${student.occupation || 'Professional'} performing the task", "avatar": "You are ${student.name}"},
+      {"name": "${primaryRoleA}", "role": "${primaryRoleA}", "avatar": "participant"}
     ],
     "dialogue": [
-      {"character": "${student.name}", "text": "Speech that uses vocabulary naturally - student speaks FIRST"},
-      {"character": "Manager", "text": "Response"},
-      {"character": "${student.name}", "text": "Student responds using new vocabulary"},
-      {"character": "Director", "text": "Response"},
-      {"character": "${student.name}", "text": "Student responds again using new vocabulary"}
+      {"character": "${student.name}", "text": "${student.name} PERFORMS the task - opens the presentation/takes the order/begins the review/etc."},
+      {"character": "Participant", "text": "Response/question about the CONTENT"},
+      {"character": "${student.name}", "text": "${student.name} responds about the CONTENT using vocabulary"},
+      {"character": "Participant", "text": "Follow-up about CONTENT"},
+      {"character": "${student.name}", "text": "${student.name} addresses it, concludes"}
     ],
     "instructions": "Read the dialogue. You are ${student.name}."
   },
@@ -566,7 +678,15 @@ EXAMPLE OF CORRECT DIALOGUE (Student practices with 3 roles + conclusive ending)
 }
 
 **Exercise 4: Dialogue Comprehension**
-Questions about the dialogue:
+Create 4-5 questions testing dialogue understanding. Use ONLY these two question types:
+- 2-3 multiple-choice questions (MCQ)
+- 1-2 open-ended questions requiring full sentence answers (e.g., "What was the main concern raised?", "Why did [character] suggest...?")
+
+CRITICAL MCQ RULES:
+- Randomize which option (A/B/C/D) contains the correct answer
+- DO NOT consistently place correct answers in position B
+- Distribute correct answers across all positions naturally
+
 {
   "type": "comprehension",
   "title": "Exercise 4: Dialogue Comprehension",
@@ -576,8 +696,13 @@ Questions about the dialogue:
       {
         "question": "What did James suggest?",
         "type": "multiple-choice",
-        "options": ["A) Option 1", "B) Option 2", "C) Option 3"],
-        "answer": "A"
+        "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
+        "answer": "C"
+      },
+      {
+        "question": "Why did Sarah recommend the new approach?",
+        "type": "open-ended",
+        "answer": "Sarah recommended it because it would reduce costs and improve efficiency."
       }
     ]
   },
@@ -585,18 +710,23 @@ Questions about the dialogue:
 }
 
 **Exercise 5: Role Play (if appropriate)**
-Scenario using vocabulary and context:
+Create a 2-PERSON role-play scenario where the student PERFORMS the same task as in the dialogue.
+CRITICAL: The roleplay is strictly between TWO people:
+1. ${student.name} (the student)
+2. ONE counterpart role (assumed by the teacher)
+
+DO NOT create scenarios with 3 or more participants. The teacher will read the counterpart's lines, and the student reads their own lines in alternating fashion.
+
 {
   "type": "roleplay",
   "title": "Exercise 5: Role Play",
-  "description": "Practice the conversation in a new scenario",
+  "description": "Perform the task in a new situation",
   "content": {
-    "scenario": "You and your partner are...",
+    "scenario": "The ACTUAL event happening: ${student.name} is [doing the task from lesson title]. WHO is the ONE other person they're with, WHERE is it, WHAT specifically is happening. Example: '${student.name} is delivering a product demo to a potential client in the sales conference room.'",
     "roles": [
-      {"name": "Student A", "description": "You are...", "keyPoints": ["Use vocabulary"]},
-      {"name": "Student B", "description": "You are...", "keyPoints": ["Use vocabulary"]}
+      {"name": "${student.name}", "description": "${student.occupation || 'professional'} performing [the task from lesson title]", "keyPoints": ["PERFORM the task completely", "Use vocabulary naturally within the content", "Act as the actual performer/deliverer/executor"]},
+      {"name": "${primaryRoleA}", "description": "The ONE counterpart: the audience member/participant/recipient of the task. Example: 'A potential client asking questions during the demo' or 'A customer placing an order'", "keyPoints": ["Respond naturally as the participant", "Ask content-related questions", "React to what ${student.name} is doing"]}
     ],
-    "instructions": "Have a 5-minute conversation using the vocabulary",
     "timeMinutes": 10
   },
   "timeMinutes": 10
@@ -666,12 +796,15 @@ FINAL REMINDER: For ${student.level.toUpperCase()} students, vocabulary MUST be 
 Generate a complete Engoo-style lesson with proper vocabulary integration. Return ONLY the JSON.`;
 
     try {
-      const result = await this.retryWithBackoff(async () => {
-        const response = await this.model.generateContent(prompt);
-        return await response.response;
+      const { rawText: text } = await generateWithFailover({
+        prompt,
+        generationConfig: {
+          temperature: 0.1,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 8192,
+        },
       });
-      
-      const text = result.text();
 
       console.log('Lesson generation response (first 200 chars):', text.substring(0, 200));
 
