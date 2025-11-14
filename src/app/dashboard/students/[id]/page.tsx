@@ -8,7 +8,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { getStudent } from '../../../actions/students'
 import { generateLearningPlan, generateLesson, getGenerationStats, getStudentLearningPlan, shareLesson } from '../../../actions/ai-generation'
 import { languages, levels, ageGroups } from '@/lib/form-data-mappings'
-import { LearningPlan } from '@/lib/gemini'
+import type { LearningPlan } from '@/types/lesson-template'
 import ShareIcon from '@/components/icons/ShareIcon'
 
 /**
@@ -51,6 +51,7 @@ interface StudentLesson {
   title: string
   overview: string | null
   createdAt: Date
+  sharedAt: Date | null
 }
 
 type TabType = 'details' | 'learning-plan' | 'generate-lesson' | 'generated-lessons' | 'instant-lesson'
