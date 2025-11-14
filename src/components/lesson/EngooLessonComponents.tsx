@@ -1,7 +1,7 @@
 'use client'
 
 // src/components/lesson/EngooLessonComponents.tsx
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 
 /**
  * Engoo-style Lesson Components
@@ -37,6 +37,39 @@ interface DialogueLine {
 
 // Vocabulary Exercise Component
 export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[] }) {
+  const [playingWord, setPlayingWord] = useState<string | null>(null);
+  const [loadingWord, setLoadingWord] = useState<string | null>(null);
+
+  const playAudio = async (word: string) => {
+    try {
+      setLoadingWord(word);
+      
+      // Fetch audio URL from API
+      const response = await fetch(`/api/vocabulary/${encodeURIComponent(word)}/audio`);
+      if (!response.ok) {
+        throw new Error('Failed to load audio');
+      }
+      
+      const data = await response.json();
+      
+      // Play audio using HTML5 Audio
+      const audio = new Audio(data.audioUrl);
+      setPlayingWord(word);
+      
+      audio.onended = () => setPlayingWord(null);
+      audio.onerror = () => {
+        setPlayingWord(null);
+        console.error('Audio playback error');
+      };
+      
+      await audio.play();
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    } finally {
+      setLoadingWord(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {vocabulary.map((item, index) => (
@@ -57,12 +90,28 @@ export function VocabularyExercise({ vocabulary }: { vocabulary: VocabularyItem[
                 <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded font-medium">
                   {item.partOfSpeech}
                 </span>
-                {/* Audio icon */}
-                <div className="text-gray-400 dark:text-gray-500">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6h4a1 1 0 001-1v-4a1 1 0 00-1-1H9z" />
-                  </svg>
-                </div>
+                {/* Audio button */}
+                <button
+                  onClick={() => playAudio(item.word)}
+                  disabled={loadingWord === item.word}
+                  className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50"
+                  aria-label={`Play audio for ${item.word}`}
+                >
+                  {playingWord === item.word ? (
+                    <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6h4a1 1 0 001-1v-4a1 1 0 00-1-1H9z" />
+                    </svg>
+                  ) : loadingWord === item.word ? (
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6h4a1 1 0 001-1v-4a1 1 0 00-1-1H9z" />
+                    </svg>
+                  )}
+                </button>
               </div>
               {/* Phonetics - show on mobile too */}
               <div className="lg:hidden mb-3">

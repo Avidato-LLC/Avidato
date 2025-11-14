@@ -2,7 +2,7 @@
 // Generates lessons and filters vocabulary for A2 level
 
 import { CEFRLessonModule } from './CEFRLessonModule';
-import { StudentProfile, LearningTopic, GeneratedLesson, VocabularyItem } from '../../types/lesson-template';
+import { StudentProfile, LearningTopic, GeneratedLesson } from '../../types/lesson-template';
 
 export class A2LessonModule implements CEFRLessonModule {
   async generateLesson(student: StudentProfile, topic: LearningTopic, duration: number): Promise<GeneratedLesson> {
@@ -92,102 +92,16 @@ export class A2LessonModule implements CEFRLessonModule {
   }
 
   /**
-   * Generates level-appropriate A2 vocabulary items
-   * A2: Simple professional vocabulary with common expressions
-   */
-  async generateVocabularyItems(): Promise<VocabularyItem[]> {
-    const a2BaseVocabulary: VocabularyItem[] = [
-      {
-        word: 'appointment',
-        partOfSpeech: 'Noun',
-        phonetics: '/əˈpɔɪntmənt/',
-        definition: 'a meeting that has been arranged for a particular time',
-        example: 'I have a doctor\'s appointment at 3 PM.',
-        synonym: 'meeting',
-        expressions: ['doctor\'s appointment', 'schedule an appointment', 'appointment time']
-      },
-      {
-        word: 'comfortable',
-        partOfSpeech: 'Adjective',
-        phonetics: '/ˈkʌmftəbəl/',
-        definition: 'feeling relaxed and at ease',
-        example: 'This chair is very comfortable.',
-        synonym: 'cozy',
-        expressions: ['feel comfortable', 'make yourself comfortable', 'comfortable with']
-      },
-      {
-        word: 'arrive',
-        partOfSpeech: 'Verb',
-        phonetics: '/əˈraɪv/',
-        definition: 'to reach or come to a place',
-        example: 'I arrive at work at 8 AM.',
-        synonym: 'come',
-        expressions: ['arrive at', 'arrive on time', 'arrive early']
-      },
-    ];
-
-    return a2BaseVocabulary.slice(0, 6);
-  }
-
-  /**
    * Returns the vocabulary guide for A2 level
    */
   getVocabularyGuide(): string {
     return `A2/ELEMENTARY VOCABULARY:
 - Expanded everyday vocabulary
-- Simple phrasal verbs (get up, go out)
-- Basic collocations (make friends, take a shower)
+- Simple phrasal verbs (basic two-word verbs)
+- Basic collocations (common verb+noun combinations)
 - Past tense forms
 ⚠️ Still avoid advanced professional jargon
-Example: "neighborhood", "get along with", "take care of"`;
-  }
-
-  /**
-   * Gets the list of acceptable vocabulary words for A2 level (1000-2000 most common words)
-   * Used to validate AI-generated vocabulary
-   */
-  getAcceptableVocabulary(): string[] {
-    // A2: Basic professional + expanded everyday vocabulary (includes A1 + more)
-    return [
-      // A1 words (included here too)
-      ...['hello', 'goodbye', 'please', 'thank', 'family', 'school', 'work', 'food', 'house', 'day'],
-      // A2 additions: Simple professional terms, past tense
-      'appointment', 'meeting', 'email', 'phone', 'computer', 'office', 'manager', 'team', 'project',
-      'experience', 'skill', 'company', 'job', 'employee', 'customer', 'client', 'service', 'product',
-      'decision', 'problem', 'solution', 'question', 'answer', 'information', 'document', 'report',
-      'plan', 'schedule', 'deadline', 'budget', 'cost', 'price', 'money', 'payment', 'invoice',
-      'transaction', 'account', 'balance', 'deposit', 'withdraw', 'transfer', 'fee', 'charge',
-      'training', 'development', 'education', 'course', 'class', 'lesson', 'exam', 'test',
-      'communication', 'discussion', 'feedback', 'suggestion', 'comment', 'opinion', 'agree', 'disagree',
-      'visit', 'travel', 'journey', 'trip', 'destination', 'hotel', 'restaurant', 'shop', 'market',
-      'transportation', 'car', 'bus', 'train', 'plane', 'ticket', 'reservation', 'booking',
-      'weather', 'temperature', 'season', 'climate', 'environment', 'nature', 'animal', 'plant',
-      'sport', 'exercise', 'activity', 'hobby', 'game', 'entertainment', 'movie', 'music', 'art',
-      'health', 'medicine', 'doctor', 'hospital', 'nurse', 'patient', 'illness', 'disease', 'symptom',
-      'treatment', 'medication', 'exercise', 'diet', 'lifestyle', 'stress', 'relax', 'sleep',
-      'technology', 'software', 'hardware', 'internet', 'website', 'application', 'app', 'digital',
-      'security', 'password', 'login', 'account', 'data', 'backup', 'file', 'folder', 'document',
-      'started', 'ended', 'began', 'finished', 'completed', 'achieved', 'accomplished', 'succeeded',
-      'failed', 'missed', 'delayed', 'early', 'late', 'on-time', 'progress', 'improvement',
-    ];
-  }
-
-  /**
-   * Validates if a word is appropriate for A2 level
-   */
-  isWordAcceptableForLevel(word: string): boolean {
-    const normalized = word.toLowerCase().trim();
-    // A2 should not have very advanced vocabulary
-    const advancedWordsToReject = [
-      'paradigm', 'juxtaposition', 'obfuscate', 'serendipitous', 'ubiquitous', 'quintessential',
-      'ephemeral', 'esoteric', 'enigmatic', 'sagacious', 'perspicacious', 'ameliorate', 'exacerbate',
-    ];
-
-    if (advancedWordsToReject.some(w => w.includes(normalized) || normalized.includes(w))) {
-      return false;
-    }
-
-    return this.getAcceptableVocabulary().some(w => w.includes(normalized) || normalized.includes(w));
+Structure: Single words or basic phrasal verbs from expanded everyday vocabulary`;
   }
 
   getVocabularyForLevel(words: string[]): string[] {
