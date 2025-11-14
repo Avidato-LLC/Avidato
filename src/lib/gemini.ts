@@ -471,23 +471,31 @@ CRITICAL SYNONYM RULES FOR ${student.level.toUpperCase()} STUDENTS:
 
 VOCABULARY COMPOSITION RULES (CRITICAL):
 - Total vocabulary items: 6-8
-- **PRIMARILY SINGLE-WORD VOCABULARY** (4-8 items): verbs, adjectives, nouns, adverbs appropriate for ${student.level}
-  * Examples of structure (NOT words to copy): single words like "fatigue", "tolerance", "adverse", "iteration", "asymmetrical", "proprietary"
-  * Choose words CONTEXTUALLY RELEVANT to this specific lesson topic: "${topic.title}"
-  * DO NOT use these example words unless they genuinely fit the lesson context
-- **Maximum 0-2 multi-word phrases** (prefer 0-1):
-  * ONLY idioms or phrasal verbs (e.g., structure like "food for thought", "get bogged down", "allay concerns")
-  * Choose phrases CONTEXTUALLY RELEVANT to this lesson topic
-  * DO NOT use these example phrases unless they genuinely fit the lesson context
-- **STRICTLY AVOID COMPOUND NOUN PHRASES**:
-  * ❌ WRONG: "stress concentration", "fatigue life", "material compatibility", "design iteration", "manufacturing tolerances", "cost-effectiveness"
-  * ✅ CORRECT: Use the core single word instead: "fatigue" (not "fatigue life"), "tolerance" (not "manufacturing tolerances"), "iteration" (not "design iteration"), "concentration" (not "stress concentration")
-- **UNIQUENESS RULE**: Do NOT repeat vocabulary from previous lessons. Each lesson should have contextually specific, unique vocabulary.
-- **EXCEPTION**: If the lesson specifically focuses on teaching idioms or phrasal verbs as its main objective, you may use more multi-word items (but they must be idioms/phrasal verbs, NOT noun phrases)
-- Level adaptation:
-  * A1-A2: Simple single-word verbs, nouns, adjectives (e.g., "happy", "run", "big"), 0-1 basic phrasal verb (e.g., "pick up", "look for")
-  * B1-B2: Intermediate single words (e.g., "analyze", "efficient", "comprehensive"), 0-1 common idiom/phrasal verb
-  * C1-C2: Advanced single words (e.g., "mitigate", "leverage", "nuanced"), 0-2 sophisticated idioms/collocations
+- **PRIMARILY SINGLE-WORD VOCABULARY** (4-8 items):
+  * Must be verbs, adjectives, nouns, or adverbs
+  * Must be appropriate for ${student.level} CEFR level
+  * Must be CONTEXTUALLY RELEVANT to the specific lesson topic: "${topic.title}"
+  * Must be UNIQUE - do NOT repeat vocabulary from other lessons
+- **Maximum 0-2 multi-word phrases** (strongly prefer 0-1):
+  * ONLY idioms or phrasal verbs
+  * Must be contextually appropriate for this specific lesson scenario
+  * Must match ${student.level} complexity
+- **STRICTLY FORBIDDEN - COMPOUND NOUN PHRASES**:
+  * ❌ DO NOT USE: Multi-word noun phrases with possessive/descriptive structures
+  * ❌ WRONG TYPE: Phrases combining two nouns or adjective+noun combinations that form a technical term
+  * ✅ CORRECT APPROACH: Extract and teach the CORE SINGLE WORD from compound phrases
+  * ✅ CORRECT TYPE: Individual verbs, adjectives, or single nouns that stand alone
+- **UNIQUENESS REQUIREMENT**:
+  * Each lesson must have completely unique vocabulary
+  * Do NOT repeat words across different lessons
+  * Choose words specific to THIS lesson's context and scenario
+- **EXCEPTION FOR IDIOM-FOCUSED LESSONS**:
+  * If the lesson explicitly teaches idioms or phrasal verbs as its primary objective, you may include more multi-word items
+  * Even then, they must be idioms/phrasal verbs, NOT compound noun phrases
+- **Level-specific adaptation**:
+  * A1-A2: Simple single-word verbs, nouns, adjectives; 0-1 basic phrasal verb if contextually essential
+  * B1-B2: Intermediate-level single words; 0-1 common idiom or phrasal verb
+  * C1-C2: Advanced single words; 0-2 sophisticated idioms or natural collocations
 
 CRITICAL REQUIREMENTS:
 1. EVERY vocabulary item MUST appear naturally in the Exercise 3 dialogue. ALL vocabulary words MUST be used 2-3 times throughout the lesson.
@@ -702,10 +710,20 @@ Create 4-5 questions testing dialogue understanding. Use ONLY these two question
 - 2-3 multiple-choice questions (MCQ)
 - 1-2 open-ended questions requiring full sentence answers (e.g., "What was the main concern raised?", "Why did [character] suggest...?")
 
-CRITICAL MCQ RULES:
-- Randomize which option (A/B/C/D) contains the correct answer
-- DO NOT consistently place correct answers in position B
-- Distribute correct answers across all positions naturally
+!!!ABSOLUTE REQUIREMENT FOR MCQ ANSWERS!!!
+You MUST use DIFFERENT letters for each MCQ answer. FORBIDDEN patterns:
+❌ Question 1: "B", Question 2: "B" (REJECTED - same letter twice)
+❌ Question 1: "C", Question 2: "C" (REJECTED - same letter twice)
+❌ All answers being B or C (REJECTED - no variation)
+
+✅ REQUIRED: Each MCQ must have a DIFFERENT answer letter
+✅ If you have 2 MCQs, use 2 different letters completely random selection
+✅ If you have 3 MCQs, use 3 different letters
+
+EXAMPLE OF CORRECT ANSWER DISTRIBUTION:
+Question 1 (MCQ): answer is "A"
+Question 2 (MCQ): answer is "D" (different from Q1)
+Question 3 (open-ended): full sentence answer.
 
 {
   "type": "comprehension",
@@ -714,15 +732,21 @@ CRITICAL MCQ RULES:
   "content": {
     "questions": [
       {
-        "question": "What did James suggest?",
+        "question": "What main challenge did the team identify?",
         "type": "multiple-choice",
-        "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
-        "answer": "C"
+        "options": ["A) Budget constraints", "B) Timeline issues", "C) Resource allocation", "D) Technical limitations"],
+        "answer": "A"
       },
       {
-        "question": "Why did Sarah recommend the new approach?",
+        "question": "Which solution did Sarah propose?",
+        "type": "multiple-choice",
+        "options": ["A) Hire more staff", "B) Extend the deadline", "C) Outsource the work", "D) Restructure the approach"],
+        "answer": "D"
+      },
+      {
+        "question": "Why did the team agree with this proposal?",
         "type": "open-ended",
-        "answer": "Sarah recommended it because it would reduce costs and improve efficiency."
+        "answer": "The team agreed because it addressed both the timeline and budget concerns while maintaining quality standards."
       }
     ]
   },
@@ -957,17 +981,6 @@ Generate a complete Engoo-style lesson with proper vocabulary integration. Retur
     if (levelLower.includes('c2') || levelLower.includes('proficiency')) return new C2LessonModule();
     return new B1LessonModule(); // Default
   }
-
-  /**
-   * Generate vocabulary items using the appropriate CEFR module
-   * This replaces the AI-generated vocabulary with level-specific curated vocabulary
-   */
-  public async generateVocabularyForLevel(level: string): Promise<import('../types/lesson-template').VocabularyItem[]> {
-    const cefrModule = this.getCEFRModule(level);
-    return cefrModule.generateVocabularyItems();
-  }
-
-
 
   /**
    * Enforce synonym constraints on the parsed AI response. This mutates parsedResponse in-place.

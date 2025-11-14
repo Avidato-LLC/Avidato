@@ -125,3 +125,14 @@ model PasswordResetToken {
   @@index([email])
   @@index([token])
 }
+
+model VocabularyAudio {
+  id           String   @id @default(cuid())
+  word         String   @unique
+  audioUrl     String
+  storageKey   String
+  language     String   @default("en")
+  createdAt    DateTime @default(now())
+
+  @@index([word])
+}
